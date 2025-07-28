@@ -1255,19 +1255,112 @@ class RealEstateAIApp:
 
     def analytics_section(self):
         """Display course analytics and visualizations."""
-        if not st.session_state.selected_course:
+        st.header("📊 Course Analytics")
+        
+        # Check if any courses are available first - check multiple locations
+        course_names = []
+        
+        # Check indexed courses
+        if self.config.indexed_courses_dir.exists():
+            indexed_courses = list(self.config.indexed_courses_dir.glob("*/"))
+            course_names.extend([course.name for course in indexed_courses if course.is_dir()])
+        
+        # Check raw docs for uploaded documents
+        if self.config.raw_docs_dir.exists():
+            raw_courses = list(self.config.raw_docs_dir.glob("*/"))
+            raw_course_names = [course.name for course in raw_courses if course.is_dir()]
+            course_names.extend([name for name in raw_course_names if name not in course_names])
+        
+        # Check transcriptions directory
+        transcriptions_dir = Path("./transcriptions")
+        if transcriptions_dir.exists():
+            transcription_courses = list(transcriptions_dir.glob("*/"))
+            trans_course_names = [course.name for course in transcription_courses if course.is_dir()]
+            course_names.extend([name for name in trans_course_names if name not in course_names])
+        
+        # Check vectors directory for vector embeddings
+        vectors_dir = Path("./vectors")
+        if vectors_dir.exists():
+            vector_files = list(vectors_dir.glob("*_vectors.json"))
+            vector_course_names = [f.stem.replace('_vectors', '') for f in vector_files]
+            course_names.extend([name for name in vector_course_names if name not in course_names])
+        
+        # Remove duplicates and sort
+        course_names = sorted(list(set(course_names)))
+        
+        if not course_names:
+            st.info("**No courses available for analysis yet.**")
+            
+            st.subheader("🚀 Get Started with Your Course Content")
+            
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                st.markdown("""
+                **Option 1: Upload Documents**
+                1. Go to the **📚 Documents** tab
+                2. Upload PDFs, DOCX, PPTX files
+                3. Select course name and process
+                4. Return here for analytics
+                """)
+                
+            with col2:
+                st.markdown("""
+                **Option 2: Bulk Transcription (Recommended)**
+                1. Go to **🎥 Bulk Transcription** tab
+                2. Add folder path with video/audio files  
+                3. Use RTX 3060 for cost-effective transcription
+                4. Create vector embeddings for smart search
+                """)
+            
+            st.subheader("💡 Why Use the Vector RAG Workflow?")
+            
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.metric("Cost Savings/Year", "$900+")
+                st.caption("vs cloud subscriptions")
+            with col2:
+                st.metric("RTX 3060 Efficiency", "30x cheaper")
+                st.caption("than cloud transcription")
+            with col3:
+                st.metric("Response Quality", "Superior")
+                st.caption("with cloud APIs")
+            
+            st.markdown("""
+            **Complete Workflow for Maximum Savings:**
+            1. **🎥 Bulk Transcription**: Process your course videos locally with RTX 3060
+            2. **🔍 Vector RAG**: Generate embeddings locally, query with cloud APIs  
+            3. **📊 Analytics**: View insights here once content is processed
+            
+            This hybrid approach saves hundreds per year while providing better search accuracy than traditional methods.
+            """)
+            
             return
         
-        st.header("📊 Course Analytics")
+        # If no course is selected, show course selection
+        if not st.session_state.get('selected_course'):
+            st.subheader("📚 Select Course for Analytics")
+            
+            selected = st.selectbox(
+                "Choose a course to analyze:",
+                course_names,
+                help="Select which course content to analyze"
+            )
+            
+            if selected:
+                st.session_state.selected_course = selected
+                st.rerun()
+            return
         
         if self.course_indexer is None:
             st.error("❌ Course indexer not available. Please install AI dependencies.")
             return
         
         try:
-            analytics = self.course_indexer.get_course_analytics(st.session_state.selected_course)
+            # Get analytics from multiple sources
+            analytics = self._get_comprehensive_analytics(st.session_state.selected_course)
             
-            if analytics:
+            if analytics and analytics.get('total_documents', 0) > 0:
                 col1, col2, col3 = st.columns(3)
                 
                 with col1:
@@ -1671,6 +1764,34 @@ class RealEstateAIApp:
         
         # Title
         st.title("📚 Local Course AI Assistant")
+        
+        # Clear overview of app structure and billing
+        with st.expander("📖 App Overview - Where Your Money Gets Charged", expanded=False):
+            st.markdown("""
+            ### 🏗️ **App Structure & Billing Guide**
+            
+            **FREE TABS (No charges):**
+            - 📁 **Upload Documents**: Upload PDFs/DOCX - completely free local processing
+            - 📊 **Analytics**: View course insights - completely free 
+            - 🎥 **Bulk Transcription**: Convert videos to text using RTX 3060 - free after setup
+            - 💬 **Ask Questions**: Local AI responses - completely free (but slower/lower quality)
+            - ⚙️ **System Status**: Check what's working - completely free
+            
+            **PAID TAB (Where you get charged):**
+            - 🔍 **Vector RAG**: THIS IS THE ONLY TAB THAT CHARGES YOU MONEY
+              - Here you select OpenAI or Perplexity 
+              - Each query costs ~$0.001-0.01 depending on length
+              - Clear billing warnings shown before each query
+              - Cost estimate displayed before charging
+            
+            **❓ How to Query Your Documents:**
+            1. Upload documents in 📁 Upload Documents tab (free)
+            2. OR process videos in 🎥 Bulk Transcription tab (free) 
+            3. Go to 🔍 Vector RAG tab to ask questions (paid but higher quality)
+            4. Select OpenAI or Perplexity (this selection determines who charges you)
+            5. Submit query (billing happens here with clear warnings)
+            """)
+        
         st.markdown("**Fully Local Course Analysis with Mistral 7B + Whisper**")
         
         # Load models
@@ -1684,8 +1805,15 @@ class RealEstateAIApp:
         # Sidebar
         self.sidebar_course_management()
         
-        # Main content tabs
-        tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["📁 Upload Documents", "🎥 Bulk Transcription", "🔍 Vector RAG", "💬 Ask Questions", "📊 Analytics", "⚙️ System Status"])
+        # Main content tabs with clear billing indicators
+        tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+            "📁 Upload Documents (FREE)", 
+            "🎥 Bulk Transcription (FREE)", 
+            "🔍 Vector RAG (💳 PAID)", 
+            "💬 Ask Questions (FREE)", 
+            "📊 Analytics (FREE)", 
+            "⚙️ System Status (FREE)"
+        ])
         
         with tab1:
             self.file_upload_section()
@@ -2237,7 +2365,7 @@ class RealEstateAIApp:
         
         # API Key Management
         st.subheader("🔑 API Key Setup")
-        st.info("**Required**: Add your API keys to enable cloud LLM responses")
+        st.info("**This is where you pay for AI responses**: Add your API keys to enable cloud LLM responses")
         
         # Check current API key status
         import os
@@ -2326,11 +2454,13 @@ These keys enable the cost-saving Vector RAG workflow where you only pay for act
                     st.warning("⚠️ No API keys available. Please add API keys above to enable LLM responses.")
                     st.stop()
                 
+                st.warning("⚠️ **BILLING ALERT**: The selection below determines which service charges you for AI responses")
+                
                 api_provider = st.radio(
-                    "Choose AI provider:",
+                    "💰 Choose AI provider (THIS CHARGES YOU):",
                     providers,
                     format_func=lambda x: provider_labels[x],
-                    help="Select which API to use for generating responses"
+                    help="⚡ IMPORTANT: Each query you submit will charge your selected API account. OpenAI charges ~$0.001-0.01 per query, Perplexity similar rates."
                 )
                 
                 # Advanced options
@@ -2365,10 +2495,12 @@ These keys enable the cost-saving Vector RAG workflow where you only pay for act
                                         st.metric("Savings vs Flat Rate", f"${savings:.4f}")
                                 
                                 # Step 3: Generate response
-                                st.info(f"🤖 Generating response using {provider_labels[api_provider]}...")
-                                response = rag_engine.generate_response_with_context(
-                                    query, search_results, api_provider
-                                )
+                                st.warning(f"💳 **BILLING**: Now charging your {provider_labels[api_provider]} account...")
+                                
+                                with st.spinner(f"🤖 Generating response using {provider_labels[api_provider]}..."):
+                                    response = rag_engine.generate_response_with_context(
+                                        query, search_results, api_provider
+                                    )
                                 
                                 # Display response
                                 st.subheader("🤖 AI Response")
