@@ -415,20 +415,44 @@ class LocalModelManager:
         try:
             model_config = self.config.model_config['embeddings']
             model_name = model_config['model_name']
-            # Use CUDA for embeddings with RTX 3060
-            device = 'cuda' if torch and torch.cuda.is_available() else 'cpu'
             
             cache_status = self._check_cache_status(model_name)
             logger.info(f"Loading embedding model from cache: {self.config.models_dir} - {cache_status}")
             
+            # Try CUDA first if available
+            if torch and torch.cuda.is_available():
+                try:
+                    logger.info("Attempting to load embedding model on CUDA...")
+                    self.embedding_model = SentenceTransformer(
+                        model_name,
+                        cache_folder=str(self.config.models_dir),
+                        device='cuda',
+                        use_auth_token=os.getenv("HF_TOKEN")
+                    )
+                    logger.info("✅ Embedding model loaded on CUDA")
+                    return
+                    
+                except RuntimeError as cuda_error:
+                    if "CUDA" in str(cuda_error) and ("device-side assert" in str(cuda_error) or "out of memory" in str(cuda_error)):
+                        logger.warning(f"CUDA error loading embedding model: {cuda_error}")
+                        logger.info("Falling back to CPU for embedding model...")
+                        
+                        # Clear CUDA state
+                        if torch and torch.cuda.is_available():
+                            torch.cuda.empty_cache()
+                            torch.cuda.synchronize()
+                    else:
+                        raise cuda_error
+            
+            # CPU fallback
+            logger.info("Loading embedding model on CPU...")
             self.embedding_model = SentenceTransformer(
                 model_name,
                 cache_folder=str(self.config.models_dir),
-                device=device,
-                use_auth_token=os.getenv("HF_TOKEN")  # Use token if available
+                device='cpu',
+                use_auth_token=os.getenv("HF_TOKEN")
             )
-            
-            logger.info(f"Embedding model loaded on {device}")
+            logger.info("✅ Embedding model loaded on CPU")
             
         except Exception as e:
             logger.error(f"Failed to load embedding model: {e}")
