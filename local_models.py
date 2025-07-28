@@ -279,25 +279,44 @@ class LocalModelManager:
         return None
     
     def _clear_unused_models(self, target_model: str):
-        """Clear models that aren't the target to save memory - only one model at a time."""
+        """Clear models that aren't the target to save RTX 3060 memory - only one model at a time."""
+        import gc
+        
         if target_model == "mistral":
-            # Clear Llama models
+            # Clear Llama models for RTX 3060 memory optimization
             if self.llama_model is not None or self.llama_tokenizer is not None or self.llama_pipeline is not None:
-                logger.info("🧹 Clearing Llama models to load Mistral (memory optimization)")
+                logger.info("🧹 RTX 3060 optimization: Clearing Llama models to load Mistral")
+                del self.llama_model, self.llama_tokenizer, self.llama_pipeline
                 self.llama_model = None
                 self.llama_tokenizer = None
                 self.llama_pipeline = None
+                
+                # Aggressive cleanup for RTX 3060
+                gc.collect()
                 if torch and torch.cuda.is_available():
                     torch.cuda.empty_cache()
+                    torch.cuda.synchronize()
+                    
         elif target_model == "llama":
-            # Clear Mistral models
+            # Clear Mistral models for RTX 3060 memory optimization
             if self.mistral_model is not None or self.mistral_tokenizer is not None or self.mistral_pipeline is not None:
-                logger.info("🧹 Clearing Mistral models to load Llama (memory optimization)")
+                logger.info("🧹 RTX 3060 optimization: Clearing Mistral models to load Llama")
+                del self.mistral_model, self.mistral_tokenizer, self.mistral_pipeline
                 self.mistral_model = None
                 self.mistral_tokenizer = None
                 self.mistral_pipeline = None
+                
+                # Aggressive cleanup for RTX 3060
+                gc.collect()
                 if torch and torch.cuda.is_available():
                     torch.cuda.empty_cache()
+                    torch.cuda.synchronize()
+        
+        # Log memory status after cleanup
+        if torch and torch.cuda.is_available():
+            allocated = torch.cuda.memory_allocated(0) / (1024**2)
+            total = torch.cuda.get_device_properties(0).total_memory / (1024**2)
+            logger.info(f"🚀 RTX 3060 memory after cleanup: {allocated:.0f}MB used / {total:.0f}MB total ({allocated/total*100:.1f}%)")
 
     def _load_mistral_model(self):
         """Load Mistral 7B model with RTX 3060 CPU-first debugging approach."""

@@ -146,6 +146,10 @@ Authentication: Persistent HuggingFace token storage with GUI input for seamless
 - **Device Mapping Solution**: Removed problematic accelerate device_map, using manual GPU placement instead
 - **RTX 3060 Environment Optimization**: Set proper compute capability (8.6) and disabled problematic debug flags
 - **Verified Working Configuration**: Forum fixes tested and confirmed working with RTX 3060 hardware
+- **RTX 3060 Memory Optimization**: Added model selection interface to load only ONE model at a time (prevents GPU overload)
+- **Smart Model Switching**: Implemented automatic model unloading when switching between Mistral/Llama for RTX 3060 12GB efficiency
+- **Enhanced Memory Management**: Raised embedding threshold from 85% to 95-98% for better RTX 3060 utilization
+- **GPU Memory Monitoring**: Real-time RTX 3060 memory status with intelligent CPU fallback only when truly necessary
 
 ### System Status
 - **Replit**: Clean development environment, ALL ONLINE OPERATIONS DISABLED (offline-only app)

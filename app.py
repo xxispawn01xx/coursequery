@@ -99,6 +99,8 @@ class RealEstateAIApp:
         # Initialize session state
         if 'models_loaded' not in st.session_state:
             st.session_state.models_loaded = False
+        if 'selected_model' not in st.session_state:
+            st.session_state.selected_model = None
         if 'available_courses' not in st.session_state:
             st.session_state.available_courses = []
         if 'selected_course' not in st.session_state:
@@ -227,8 +229,37 @@ class RealEstateAIApp:
         
         return False
 
+    def model_selection_interface(self):
+        """RTX 3060 GPU Memory Optimization - Choose ONE model to prevent GPU overload."""
+        st.subheader("🚀 RTX 3060 Model Selection")
+        
+        st.info("RTX 3060 12GB Memory Optimization: Load only ONE model at a time to prevent GPU overload")
+        
+        # Model selection
+        model_options = {
+            "mistral": "🔥 Mistral 7B Instruct (Recommended for most tasks)",
+            "llama": "🦙 Llama 2 7B Chat (Alternative conversation model)"
+        }
+        
+        selected_model = st.radio(
+            "Choose AI Model for RTX 3060:",
+            options=list(model_options.keys()),
+            format_func=lambda x: model_options[x],
+            index=0,  # Default to Mistral
+            help="Only one model will be loaded to optimize RTX 3060 12GB memory usage"
+        )
+        
+        # Show current model status
+        if st.session_state.get('selected_model'):
+            if st.session_state.selected_model == selected_model:
+                st.success(f"✅ Currently loaded: {model_options[selected_model]}")
+            else:
+                st.warning(f"⚠️ Model change detected. Current: {model_options[st.session_state.selected_model]} → New: {model_options[selected_model]}")
+        
+        return selected_model
+
     def load_models(self):
-        """Load local models if not already loaded."""
+        """Load local models with RTX 3060 optimization - only one model at a time."""
         # Check if model loading should be skipped (only on Replit to prevent bloat)
         if hasattr(self.config, 'skip_model_loading') and self.config.skip_model_loading:
             if self.config.is_replit:
@@ -270,11 +301,19 @@ class RealEstateAIApp:
             else:
                 if not self.setup_authentication():
                     return False
-            
-        if not st.session_state.models_loaded:
+        
+        # RTX 3060 Model Selection Interface
+        selected_model = self.model_selection_interface()
+        
+        # Check if model needs loading or switching
+        model_needs_loading = (not st.session_state.models_loaded or 
+                               st.session_state.get('selected_model') != selected_model)
+        
+        if model_needs_loading:
             # Skip model loading if configured to do so
             if hasattr(self.config, 'skip_model_loading') and self.config.skip_model_loading:
                 st.session_state.models_loaded = True  # Mark as "loaded" (development mode)
+                st.session_state.selected_model = selected_model
                 return True
                 
             # Check if AI dependencies are available
@@ -286,11 +325,17 @@ class RealEstateAIApp:
                 st.error("❌ Model manager not available. Please install AI dependencies.")
                 return False
             
-            with st.spinner("Loading local models (cached models load quickly, first download takes longer)..."):
+            # Show loading message based on model change
+            if st.session_state.models_loaded and st.session_state.get('selected_model') != selected_model:
+                loading_msg = f"Switching from {st.session_state.get('selected_model', 'unknown')} to {selected_model} (RTX 3060 memory optimization)..."
+            else:
+                loading_msg = f"Loading {selected_model} model (cached models load quickly, first download takes longer)..."
+            
+            with st.spinner(loading_msg):
                 try:
-                    # Load models first
-                    self.model_manager.load_models()
-                    logger.info("Model manager loaded successfully")
+                    # Load specific model for RTX 3060 optimization
+                    self.model_manager.load_models(model_type=selected_model)
+                    logger.info(f"Model manager loaded successfully with {selected_model}")
                     
                     # Store model manager in session state to persist across requests
                     st.session_state.model_manager = self.model_manager
@@ -306,8 +351,9 @@ class RealEstateAIApp:
                         return False
                     
                     st.session_state.models_loaded = True
-                    st.success("✅ Local models and query engine loaded successfully!")
-                    logger.info("Models and query engine loaded successfully")
+                    st.session_state.selected_model = selected_model
+                    st.success(f"✅ {selected_model.title()} model loaded successfully on RTX 3060!")
+                    logger.info(f"Models and query engine loaded successfully with {selected_model}")
                 except Exception as e:
                     # Show more helpful error message for authentication issues
                     error_msg = str(e)
