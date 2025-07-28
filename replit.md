@@ -141,6 +141,10 @@ Authentication: Persistent HuggingFace token storage with GUI input for seamless
 - **GPU Health Testing**: Added comprehensive GPU memory test for RTX 3060 to diagnose potential hardware issues with used graphics card
 - **CUDA Debugging Enhanced**: Implemented TORCH_USE_CUDA_DSA for better device-side assert error reporting
 - **Performance Monitoring**: Clear visual warnings when CPU fallback is used instead of GPU for embedding generation
+- **RTX 3060 Device-Side Assert Fix**: Resolved GitHub issue #28284 by changing device_map from {0: "0"} to "cuda:0" format
+- **Debug Mode Integration**: Added CUDA_LAUNCH_BLOCKING=1 and TORCH_USE_CUDA_DSA=1 for proper error reporting
+- **Single GPU Enforcement**: Applied CUDA_VISIBLE_DEVICES=0 to prevent multi-GPU confusion on RTX 3060
+- **HF_TOKEN Validation**: Enhanced authentication verification to distinguish CUDA errors from auth failures
 
 ### System Status
 - **Replit**: Clean development environment, ALL ONLINE OPERATIONS DISABLED (offline-only app)

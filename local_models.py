@@ -126,6 +126,13 @@ class LocalModelManager:
             if hasattr(torch.cuda, 'reset_peak_memory_stats'):
                 torch.cuda.reset_peak_memory_stats()
             
+            # Fix 4: Verify HF_TOKEN is available
+            hf_token = os.getenv("HF_TOKEN")
+            if hf_token:
+                logger.info(f"✅ HF_TOKEN found: {hf_token[:8]}...{hf_token[-4:]}")  # Show partial token
+            else:
+                logger.warning("⚠️  HF_TOKEN not found - may cause authentication issues")
+            
             logger.info("✅ RTX 3060 debug configuration applied")
             logger.info("🔍 Testing GPU with debug flags enabled...")
             
@@ -358,7 +365,7 @@ class LocalModelManager:
                         "low_cpu_mem_usage": True,
                         "max_memory": {0: "6GB"},  # Reasonable for RTX 3060 12GB
                         "torch_dtype": torch.float16,
-                        "device_map": {0: "0"},  # Explicit single GPU mapping (fix device_map="auto" issues)
+                        "device_map": "cuda:0",  # RTX 3060 specific fix (GitHub issue #28284)
                         "offload_folder": "./temp",
                     })
                     
@@ -379,12 +386,18 @@ class LocalModelManager:
             except Exception as e:
                 logger.warning(f"Failed to load {model_display_name}: {e}")
                 if model_name == model_attempts[-1][0]:  # Last attempt
-                    logger.error("Both Llama 2 and Mistral model loading failed. Please check authentication.")
-                    logger.info("To use these models, you need Hugging Face authentication:")
-                    logger.info("1. Get token from https://huggingface.co/settings/tokens")
-                    logger.info("2. Run: huggingface-cli login")
-                    logger.info("3. Or set HF_TOKEN environment variable")
-                    raise e
+                    # Check if this is a CUDA error masquerading as auth error
+                    if "device-side assert" in str(e) or "CUDA" in str(e):
+                        logger.error(f"RTX 3060 CUDA Error (not authentication): {e}")
+                        logger.error("This is the RTX 3060 device mapping issue from GitHub #28284")
+                        raise e
+                    else:
+                        logger.error("Model loading failed. Please check authentication.")
+                        logger.info("To use these models, you need Hugging Face authentication:")
+                        logger.info("1. Get token from https://huggingface.co/settings/tokens")
+                        logger.info("2. Run: huggingface-cli login")
+                        logger.info("3. Or set HF_TOKEN environment variable")
+                        raise e
                 continue  # Try next model
         
         try:
@@ -444,7 +457,7 @@ class LocalModelManager:
                 model_name,
                 cache_dir=str(self.config.models_dir),
                 quantization_config=quantization_config,
-                device_map={0: "0"},  # Explicit GPU 0 mapping (Hugging Face forum fix)
+                device_map="cuda:0",  # RTX 3060 specific fix (GitHub issue #28284)
                 trust_remote_code=True,
                 torch_dtype=torch.float16,
                 token=os.getenv("HUGGINGFACE_TOKEN"),
