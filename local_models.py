@@ -460,16 +460,29 @@ class LocalModelManager:
                 raise RuntimeError(f"No model loaded (current: {self.current_model}). Models: mistral={self.mistral_model is not None}, llama={self.llama_model is not None}, pipelines: mistral_pipeline={self.mistral_pipeline is not None}, llama_pipeline={self.llama_pipeline is not None}")
         
         try:
-            # Generate response
-            response = pipe(
-                formatted_prompt,
-                max_new_tokens=max_new_tokens,
-                do_sample=True,
-                temperature=0.7,
-                top_p=0.9,
-                repetition_penalty=1.1,
-                return_full_text=False
-            )
+            # Generate response with timeout and optimized settings for RTX 3060
+            import signal
+            
+            def timeout_handler(signum, frame):
+                raise TimeoutError("Response generation timed out after 30 seconds")
+            
+            # Set timeout for response generation
+            signal.signal(signal.SIGALRM, timeout_handler)
+            signal.alarm(30)  # 30 second timeout
+            
+            try:
+                response = pipe(
+                    formatted_prompt,
+                    max_new_tokens=min(max_new_tokens, 256),  # Limit tokens for faster generation
+                    do_sample=True,
+                    temperature=0.7,
+                    top_p=0.9,
+                    repetition_penalty=1.1,
+                    return_full_text=False,
+                    pad_token_id=pipe.tokenizer.eos_token_id
+                )
+            finally:
+                signal.alarm(0)  # Clear timeout
             
             # Extract generated text
             generated_text = response[0]['generated_text']
@@ -485,6 +498,13 @@ class LocalModelManager:
             
             return cleaned_response
             
+        except TimeoutError as e:
+            logger.error(f"Response generation timed out: {e}")
+            # Clear CUDA cache and return fallback response
+            if TORCH_AVAILABLE and torch.cuda.is_available():
+                torch.cuda.empty_cache()
+                torch.cuda.synchronize()
+            return "I apologize, but the response generation took too long. Please try asking a shorter or more specific question."
         except Exception as e:
             # Handle CUDA errors specifically
             if "CUDA" in str(e):

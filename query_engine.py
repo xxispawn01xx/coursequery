@@ -77,7 +77,8 @@ class LocalQueryEngine:
         Returns:
             Dictionary containing answer and optional sources
         """
-        logger.info(f"Processing query for course '{course_name}': {query[:100]}...")
+        query_start_time = time.time()
+        logger.info(f"🔍 Processing query for course '{course_name}': {query[:100]}... - Start: {datetime.now().strftime('%H:%M:%S.%f')[:-3]}")
         
         try:
             # Get course index
@@ -118,11 +119,16 @@ class LocalQueryEngine:
             if include_sources:
                 sources = self._extract_sources(weighted_nodes[:max_results])
             
+            # Log query performance metrics
+            total_query_time = time.time() - query_start_time
+            logger.info(f"⚡ Query completed in {total_query_time:.2f}s | Course: {course_name} | Nodes: {len(retrieved_nodes)} | Context: {len(context)} chars")
+            
             result = {
                 'answer': response,
                 'sources': sources,
                 'context_length': len(context),
-                'nodes_retrieved': len(retrieved_nodes)
+                'nodes_retrieved': len(retrieved_nodes),
+                'query_time_seconds': total_query_time
             }
             
             logger.info(f"Query processed successfully for course '{course_name}'")

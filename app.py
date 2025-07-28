@@ -5,6 +5,7 @@ Main entry point for the course analysis application.
 
 import streamlit as st
 import os
+import json
 import logging
 from pathlib import Path
 from typing import List, Optional, Dict, Any
