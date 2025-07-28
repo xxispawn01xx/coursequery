@@ -183,18 +183,30 @@ class LocalModelManager:
             # Clear any existing models to ensure only one is loaded at a time
             self._clear_unused_models(model_type)
             
-            # Only load language models if GPU is healthy or using CPU
+            # Load language models (GPU or CPU fallback)
             if self.device != 'cpu':
-                if model_type == "mistral":
-                    self._load_mistral_model()
-                elif model_type == "llama":
-                    self._load_llama_model()
-                else:
-                    # Load default Mistral if unknown type
-                    self._load_mistral_model()
-                    model_type = "mistral"
+                try:
+                    if model_type == "mistral":
+                        self._load_mistral_model()
+                    elif model_type == "llama":
+                        self._load_llama_model()
+                    else:
+                        # Load default Mistral if unknown type
+                        self._load_mistral_model()
+                        model_type = "mistral"
+                except Exception as model_error:
+                    if "device-side assert" in str(model_error):
+                        logger.error("🚨 Device-side assert during model loading - switching to CPU mode")
+                        self.device = 'cpu'
+                        # Try CPU-only loading as fallback
+                        self._load_mistral_cpu_fallback()
+                        model_type = "mistral_cpu"
+                    else:
+                        raise model_error
             else:
-                logger.error("GPU required for this application - CPU mode disabled")
+                logger.info("Loading models in CPU-only mode (GPU issues detected)")
+                self._load_mistral_cpu_fallback()
+                model_type = "mistral_cpu"
                 
             self._load_embedding_model()
             self.current_model = model_type if self.device != 'cpu' else 'cpu_embeddings_only'
@@ -380,25 +392,59 @@ class LocalModelManager:
         
         # If we get here, all models failed
         raise Exception("No models could be loaded successfully")
+
+    def _load_mistral_cpu_fallback(self):
+        """Load a smaller model on CPU when GPU has issues."""
+        logger.info("🔄 Loading CPU fallback model for RTX 3060 compatibility...")
         
-        try:
-            
-            # Create pipeline with default configuration
-            self.mistral_pipeline = pipeline(
-                "text-generation",
-                model=self.mistral_model,
-                tokenizer=self.mistral_tokenizer,
-                max_length=512,
-                temperature=0.7,
-                do_sample=True,
-                pad_token_id=self.mistral_tokenizer.eos_token_id
-            )
-            
-            logger.info("Mistral 7B model loaded successfully")
-            
-        except Exception as e:
-            logger.error(f"Failed to load Mistral model: {e}")
-            raise
+        # Use a smaller model that works well on CPU
+        cpu_models = [
+            ("microsoft/DialoGPT-medium", "DialoGPT Medium"),
+            ("gpt2", "GPT-2"),
+        ]
+        
+        for model_name, model_display_name in cpu_models:
+            try:
+                logger.info(f"Loading {model_display_name} on CPU...")
+                
+                # Load tokenizer
+                self.mistral_tokenizer = AutoTokenizer.from_pretrained(
+                    model_name,
+                    cache_dir=str(self.config.models_dir),
+                    token=os.getenv("HF_TOKEN") or os.getenv("HUGGINGFACE_TOKEN")
+                )
+                if self.mistral_tokenizer.pad_token is None:
+                    self.mistral_tokenizer.pad_token = self.mistral_tokenizer.eos_token
+                
+                # Load model on CPU
+                self.mistral_model = AutoModelForCausalLM.from_pretrained(
+                    model_name,
+                    cache_dir=str(self.config.models_dir),
+                    token=os.getenv("HF_TOKEN") or os.getenv("HUGGINGFACE_TOKEN"),
+                    device_map="cpu",
+                    torch_dtype=torch.float32,
+                    low_cpu_mem_usage=True
+                )
+                
+                # Create pipeline
+                self.mistral_pipeline = pipeline(
+                    "text-generation",
+                    model=self.mistral_model,
+                    tokenizer=self.mistral_tokenizer,
+                    max_length=256,  # Smaller for CPU
+                    temperature=0.7,
+                    do_sample=True,
+                    pad_token_id=self.mistral_tokenizer.eos_token_id
+                )
+                
+                logger.info(f"✅ Successfully loaded {model_display_name} on CPU")
+                return
+                
+            except Exception as e:
+                logger.error(f"Failed to load {model_display_name} on CPU: {e}")
+                continue
+        
+        raise Exception("CPU fallback models also failed to load")
     
     def _load_llama_model(self):
         """Load Llama 2 7B model with 4-bit quantization."""
