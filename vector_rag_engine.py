@@ -252,6 +252,10 @@ class VectorRAGEngine:
             logger.info(f"Processing indexed documents from {indexed_course_dir}")
             self._process_indexed_documents(indexed_course_dir, all_chunks, chunk_metadata, processed_sources, chunking_method)
         
+        # 1.5. Extract content from LlamaIndex storage (for existing courses like vcpe)
+        logger.info(f"Attempting to extract content from LlamaIndex for {course_name}")
+        self._process_llama_index_content(course_name, all_chunks, chunk_metadata, processed_sources, chunking_method)
+        
         # 2. Process raw documents (PDFs, DOCX, PPTX, etc.)
         raw_course_dir = self.config.raw_docs_dir / course_name
         if raw_course_dir.exists() and doc_processor:
@@ -265,7 +269,13 @@ class VectorRAGEngine:
             self._process_transcriptions(transcriptions_dir, all_chunks, chunk_metadata, processed_sources, chunking_method)
         
         if not all_chunks:
-            raise ValueError(f"No content found for course: {course_name}")
+            error_msg = f"No content found for course: {course_name}\n"
+            error_msg += f"Checked locations:\n"
+            error_msg += f"- Indexed dir: {self.config.indexed_courses_dir / course_name} (exists: {(self.config.indexed_courses_dir / course_name).exists()})\n"
+            error_msg += f"- Raw docs dir: {self.config.raw_docs_dir / course_name} (exists: {(self.config.raw_docs_dir / course_name).exists()})\n"
+            error_msg += f"- Transcriptions dir: {Path('./transcriptions') / course_name} (exists: {(Path('./transcriptions') / course_name).exists()})\n"
+            error_msg += f"- Processed sources: {list(processed_sources)}"
+            raise ValueError(error_msg)
         
         # Generate embeddings for all content
         logger.info(f"Generating embeddings for {len(all_chunks)} chunks from {len(processed_sources)} sources...")
@@ -374,6 +384,53 @@ class VectorRAGEngine:
                                                   all_chunks, chunk_metadata, chunking_method)
                 except Exception as e:
                     logger.warning(f"Could not read indexed file {file_path}: {e}")
+    
+    def _process_llama_index_content(self, course_name: str, all_chunks: List[str], 
+                                   chunk_metadata: List[Dict], processed_sources: set, chunking_method: str):
+        """Extract content from LlamaIndex storage for courses that exist in the system."""
+        try:
+            # Try to get content from course indexer
+            from course_indexer import CourseIndexer
+            course_indexer = CourseIndexer()
+            
+            # Check if course has indexed content  
+            course_index_dir = self.config.indexed_courses_dir / course_name
+            if not course_index_dir.exists():
+                logger.info(f"No indexed course directory for {course_name}")
+                return
+                
+            # Get the course index
+            index = course_indexer.get_course_index(course_name)
+            if not index:
+                logger.warning(f"No LlamaIndex found for course {course_name}")
+                return
+            
+            # Extract documents from the index
+            docstore = index.storage_context.docstore
+            documents = list(docstore.docs.values())
+            
+            logger.info(f"Found {len(documents)} documents in LlamaIndex for {course_name}")
+            
+            for i, doc in enumerate(documents):
+                content = doc.text if hasattr(doc, 'text') else str(doc)
+                
+                if content.strip():
+                    # Get source info from metadata
+                    source_name = f"document_{i+1}"
+                    if hasattr(doc, 'metadata') and doc.metadata:
+                        file_name = doc.metadata.get('file_name') or doc.metadata.get('filename') or doc.metadata.get('source')
+                        if file_name:
+                            source_name = file_name
+                        if not source_name.endswith(('.pdf', '.docx', '.pptx', '.txt', '.md')):
+                            source_name = f"{source_name}.pdf"  # Default extension
+                    
+                    processed_sources.add(source_name)
+                    logger.info(f"Processing LlamaIndex document: {source_name} ({len(content)} chars)")
+                    self._chunk_and_add_content(content, source_name, "llama_index_document", 
+                                              all_chunks, chunk_metadata, chunking_method)
+                    
+        except Exception as e:
+            logger.warning(f"Could not extract content from LlamaIndex for {course_name}: {e}")
     
     def _process_raw_documents(self, raw_dir: Path, doc_processor, all_chunks: List[str], 
                              chunk_metadata: List[Dict], processed_sources: set, chunking_method: str):

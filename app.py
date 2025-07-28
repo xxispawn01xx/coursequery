@@ -2423,6 +2423,8 @@ class RealEstateAIApp:
                 if st.button("🔄 Generate Vector Embeddings from ALL Course Materials", type="primary"):
                     with st.spinner("Processing documents, transcriptions, and indexed materials..."):
                         try:
+
+                            
                             # Process ALL course content
                             vector_data = rag_engine.process_course_content(
                                 selected_course, chunking_method
@@ -2450,8 +2452,30 @@ class RealEstateAIApp:
                         except Exception as e:
                             st.error(f"Error generating embeddings: {e}")
             else:
-                st.warning("⚠️ No content found for this course.")
+                st.warning("⚠️ No content found for this course in this environment.")
                 st.info("**To add content**: Use Upload Documents tab for PDFs/DOCX, or Bulk Transcription tab for videos/audio.")
+                
+                # Show how the system will work
+                with st.expander("💡 How Vector RAG Works with Your Content"):
+                    st.markdown("""
+                    **When you have course materials, the system will:**
+                    
+                    1. **Extract ALL content** from your course materials:
+                       - 📄 PDFs, DOCX, PowerPoint slides  
+                       - 🎬 Video/audio transcriptions
+                       - 📝 Any indexed documents
+                    
+                    2. **Create vector embeddings** using local models (free)
+                    
+                    3. **Enable intelligent querying** via OpenAI/Perplexity:
+                       - Search across ALL materials simultaneously
+                       - Find relevant content using semantic similarity
+                       - Generate responses with proper context
+                       - Pay only for actual usage (~$0.001-0.01 per query)
+                    
+                    **Your workflow on local system:**
+                    - Your "vcpe" course with 29 documents → Vector embeddings → Query with OpenAI/Perplexity
+                    """)
         
         # API Key Management
         st.subheader("🔑 API Key Setup")

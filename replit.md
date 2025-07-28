@@ -135,6 +135,9 @@ Authentication: Persistent HuggingFace token storage with GUI input for seamless
 - **Comprehensive Vector RAG**: Fixed to process ALL course materials (PDFs, DOCX, PPTX, transcriptions, indexed docs) not just transcriptions
 - **Multi-Source Processing**: Vector embeddings now combine documents, transcriptions, and indexed materials for complete course coverage
 - **Enhanced Interface**: Clear display of document counts, transcription counts, and comprehensive source breakdown after processing
+- **Debug and Error Handling**: Added comprehensive error reporting to show exactly what content sources are being checked
+- **Multi-Environment Support**: System works in both Replit (development) and local environments with actual course content
+- **Complete Documentation**: Clear explanation of how Vector RAG processes all course materials for intelligent querying
 
 ### System Status
 - **Replit**: Clean development environment, ALL ONLINE OPERATIONS DISABLED (offline-only app)
