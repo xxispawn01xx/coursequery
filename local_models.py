@@ -274,167 +274,112 @@ class LocalModelManager:
                     torch.cuda.empty_cache()
 
     def _load_mistral_model(self):
-        """Load Mistral 7B model with 4-bit quantization or GGUF if available."""
-        logger.info("Loading Mistral 7B model...")
-        
-        # Check for GGUF models first
-        gguf_path = self._check_gguf_models()
-        if gguf_path:
-            logger.info(f"Using GGUF model: {gguf_path}")
-            # GGUF loading would require llama-cpp-python or similar
-            # For now, show detected but continue with HuggingFace model
-            logger.info("GGUF detected but using HuggingFace model for compatibility")
+        """Load Mistral 7B model with RTX 3060 CPU-first debugging approach."""
+        logger.info("Loading Mistral 7B model with RTX 3060 compatibility fixes...")
         
         # Try models in order of preference - RTX 3060 12GB can handle full models
         model_attempts = [
-            ("meta-llama/Llama-2-7b-chat-hf", "Llama 2 7B Chat", "causal"),  # Primary choice
-            ("mistralai/Mistral-7B-Instruct-v0.1", "Mistral 7B", "causal"),  # Fallback
-            ("microsoft/DialoGPT-medium", "DialoGPT Medium", "causal"),       # System RAM fallback
+            ("meta-llama/Llama-2-7b-chat-hf", "Llama 2 7B Chat"),
+            ("mistralai/Mistral-7B-Instruct-v0.1", "Mistral 7B Instruct"),
+            ("microsoft/DialoGPT-medium", "DialoGPT Medium"),
         ]
         
-        for model_name, model_display_name, model_type in model_attempts:
+        for model_name, model_display_name in model_attempts:
+            logger.info(f"🔄 Attempting {model_display_name}...")
+            
+            # CRITICAL RTX 3060 FIX: Test on CPU first to reveal real errors
             try:
-                cache_status = self._check_cache_status(model_name)
-                logger.info(f"Attempting to load {model_display_name}... {cache_status}")
+                logger.info("🔍 Step 1: RTX 3060 Fix - Testing model on CPU first...")
+                cpu_test_model = AutoModelForCausalLM.from_pretrained(
+                    model_name,
+                    cache_dir=str(self.config.models_dir),
+                    token=os.getenv("HF_TOKEN") or os.getenv("HUGGINGFACE_TOKEN"),
+                    device_map="cpu",
+                    torch_dtype=torch.float32,
+                    low_cpu_mem_usage=True,
+                    trust_remote_code=True
+                )
+                logger.info("✅ CPU test successful - model integrity verified!")
+                del cpu_test_model
+                torch.cuda.empty_cache()
                 
-                # Configure quantization and memory optimization
-                quantization_config = None
-                low_cpu_mem_usage = True
-                
-                # Use 4-bit quantization for RTX 3060 efficiency
-                if torch and BitsAndBytesConfig and ("Mistral" in model_name or "Llama" in model_name):
-                    if torch.cuda.is_available():
-                        logger.info("Using 4-bit quantization for RTX 3060 12GB efficiency")
-                        quantization_config = BitsAndBytesConfig(
-                            load_in_4bit=True,
-                            bnb_4bit_quant_type="nf4",
-                            bnb_4bit_compute_dtype=torch.float16,
-                            bnb_4bit_use_double_quant=True,
-                        )
-                    else:
-                        # CPU fallback if GPU fails
-                        logger.info("GPU not available, using CPU mode")
-                
-                # Load tokenizer first (this will fail fast if authentication is wrong)
-                logger.info(f"Loading tokenizer from cache: {self.config.models_dir}")
+            except Exception as cpu_error:
+                logger.error(f"🚨 CPU test failed - REAL ERROR: {cpu_error}")
+                if model_name == model_attempts[-1][0]:  # Last attempt
+                    logger.error("All models failed CPU test - this is not RTX 3060 hardware issue!")
+                    raise cpu_error
+                continue  # Try next model
+            
+            # Step 2: Load tokenizer
+            try:
+                logger.info("📝 Loading tokenizer...")
                 self.mistral_tokenizer = AutoTokenizer.from_pretrained(
                     model_name,
                     cache_dir=str(self.config.models_dir),
-                    trust_remote_code=True,
-                    local_files_only=False,  # Allow download if needed but prefer cache
+                    token=os.getenv("HF_TOKEN") or os.getenv("HUGGINGFACE_TOKEN"),
+                    trust_remote_code=True
                 )
-                
-                # Set pad token if not present
                 if self.mistral_tokenizer.pad_token is None:
                     self.mistral_tokenizer.pad_token = self.mistral_tokenizer.eos_token
-                
-                # Load model with memory optimization
-                model_kwargs = {
-                    "cache_dir": str(self.config.models_dir),
-                    "trust_remote_code": True,
-                    "low_cpu_mem_usage": low_cpu_mem_usage,
-                    "local_files_only": False,
-                }
-                
-                if torch:
-                    # Use smaller float precision to save memory
-                    if torch.cuda.is_available():
-                        model_kwargs["torch_dtype"] = torch.float16
-                    else:
-                        # For CPU, use float32 but with smaller batch sizes
-                        model_kwargs["torch_dtype"] = torch.float32
-                
-                # Add quantization and device mapping only if accelerate is available
-                try:
-                    import accelerate
-                    if quantization_config and BitsAndBytesConfig:
-                        model_kwargs["quantization_config"] = quantization_config
-                    if torch and torch.cuda.is_available():
-                        model_kwargs["device_map"] = "auto"
-                except ImportError:
-                    logger.info("Accelerate not available, using CPU-only mode")
-                
-                if model_type == "causal":
-                    logger.info(f"Loading model from cache: {self.config.models_dir}")
-                    model_kwargs["local_files_only"] = False  # Allow download if needed but prefer cache
-                    model_kwargs["use_safetensors"] = True  # Force safetensors to avoid torch.load security issue
-                    model_kwargs["trust_remote_code"] = False  # Security best practice
                     
-                    # RTX 3060 CPU-first debug approach (Hugging Face forum solution)
-                    logger.info("🔍 Step 1: Loading on CPU first to identify actual error (forum recommendation)")
-                    cpu_model_kwargs = model_kwargs.copy()
-                    cpu_model_kwargs.update({
-                        "low_cpu_mem_usage": True,
-                        "torch_dtype": torch.float32,  # CPU uses float32
-                        "device_map": "cpu",  # Load on CPU first
-                        "trust_remote_code": True,
-                    })
-                    
-                    try:
-                        # Test load on CPU first - this will show the real error
-                        logger.info("Loading model on CPU to verify it works...")
-                        cpu_model = AutoModelForCausalLM.from_pretrained(model_name, **cpu_model_kwargs)
-                        logger.info("✅ CPU loading successful! Now moving to GPU...")
-                        del cpu_model  # Free CPU memory
-                        torch.cuda.empty_cache()
-                        
-                        # Now try GPU with proper settings
-                        model_kwargs.update({
-                            "low_cpu_mem_usage": True,
-                            "max_memory": {0: "6GB"},  # Conservative for RTX 3060
-                            "torch_dtype": torch.float16,
-                            "device_map": "cuda:0",  # Single GPU explicit mapping
-                            "offload_folder": "./temp",
-                        })
-                        
-                    except Exception as cpu_error:
-                        logger.error(f"🚨 Real error revealed by CPU test: {cpu_error}")
-                        logger.error("This is the actual problem - not a GPU hardware issue")
-                        raise cpu_error
-                    
-                    self.mistral_model = AutoModelForCausalLM.from_pretrained(
-                        model_name,
-                        **model_kwargs
-                    )
-                else:  # seq2seq models like T5
-                    from transformers import AutoModelForSeq2SeqLM
-                    self.mistral_model = AutoModelForSeq2SeqLM.from_pretrained(
-                        model_name,
-                        **model_kwargs
+            except Exception as tokenizer_error:
+                logger.error(f"Tokenizer failed: {tokenizer_error}")
+                continue
+                
+            # Step 3: Load model on GPU with RTX 3060 optimizations
+            try:
+                logger.info("🚀 Step 3: Loading on RTX 3060 GPU with optimizations...")
+                
+                # Configure 4-bit quantization for RTX 3060 efficiency
+                quantization_config = None
+                if torch and BitsAndBytesConfig:
+                    logger.info("Using 4-bit quantization for RTX 3060 12GB efficiency")
+                    quantization_config = BitsAndBytesConfig(
+                        load_in_4bit=True,
+                        bnb_4bit_quant_type="nf4",
+                        bnb_4bit_compute_dtype=torch.float16,
+                        bnb_4bit_use_double_quant=True,
                     )
                 
-                logger.info(f"Successfully loaded {model_display_name}")
-                break  # Success! Exit the loop
+                # Load model with RTX 3060 specific settings
+                logger.info("Loading model on GPU...")
+                self.mistral_model = AutoModelForCausalLM.from_pretrained(
+                    model_name,
+                    cache_dir=str(self.config.models_dir),
+                    token=os.getenv("HF_TOKEN") or os.getenv("HUGGINGFACE_TOKEN"),
+                    quantization_config=quantization_config,
+                    device_map="cuda:0",  # RTX 3060 specific fix (GitHub #28284)
+                    torch_dtype=torch.float16,
+                    low_cpu_mem_usage=True,
+                    max_memory={0: "6GB"},  # Conservative for RTX 3060 12GB
+                    trust_remote_code=True,
+                    offload_folder="./temp"
+                )
                 
-            except Exception as e:
-                logger.warning(f"Failed to load {model_display_name}: {e}")
+                # Step 4: Create pipeline
+                logger.info("🔧 Creating text generation pipeline...")
+                self.mistral_pipeline = pipeline(
+                    "text-generation",
+                    model=self.mistral_model,
+                    tokenizer=self.mistral_tokenizer,
+                    max_length=512,
+                    temperature=0.7,
+                    do_sample=True,
+                    pad_token_id=self.mistral_tokenizer.eos_token_id
+                )
+                
+                logger.info(f"✅ Successfully loaded {model_display_name} with RTX 3060 optimizations!")
+                return  # Success - exit the loop
+                
+            except Exception as gpu_error:
+                logger.error(f"GPU loading failed for {model_display_name}: {gpu_error}")
                 if model_name == model_attempts[-1][0]:  # Last attempt
-                    # Enhanced error classification
-                    error_str = str(e).lower()
-                    if "device-side assert" in error_str or "cuda" in error_str:
-                        logger.error(f"🔧 RTX 3060 Hardware Configuration Issue: {e}")
-                        logger.error("💡 Solution: CPU-first debugging revealed the actual problem")
-                        logger.error("This is NOT hardware corruption - it's a software configuration issue")
-                        
-                        # Try one more approach - pipeline method
-                        logger.info("🔄 Attempting pipeline method as final fallback...")
-                        try:
-                            from transformers import pipeline
-                            test_pipe = pipeline("text-generation", model=model_name, device=0, torch_dtype=torch.float16)
-                            logger.info("✅ Pipeline method worked! Using pipeline instead of direct model loading")
-                            # Store pipeline instead of model
-                            if hasattr(self, 'mistral_model'):
-                                self.mistral_pipeline = test_pipe
-                            return  # Success via pipeline
-                        except Exception as pipe_error:
-                            logger.error(f"Pipeline method also failed: {pipe_error}")
-                            raise e
-                    else:
-                        logger.error("Authentication or model access issue:")
-                        logger.info("1. Get token from https://huggingface.co/settings/tokens")
-                        logger.info("2. Set HF_TOKEN environment variable")
-                        raise e
+                    logger.error("All models failed - RTX 3060 configuration issue")
+                    raise gpu_error
                 continue  # Try next model
+        
+        # If we get here, all models failed
+        raise Exception("No models could be loaded successfully")
         
         try:
             
