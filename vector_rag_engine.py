@@ -665,7 +665,16 @@ Please provide a comprehensive answer based on the context provided. If the cont
             )
             
             content = response.choices[0].message.content
-            return content if content is not None else "No response from OpenAI"
+            if content is None:
+                return "No response from OpenAI"
+            
+            # Check if response contains structured data that should be Excel
+            if self._should_convert_to_excel(content):
+                excel_file = self._convert_response_to_excel(content, "OpenAI_Analysis")
+                if excel_file:
+                    content += f"\n\n📊 **Excel file generated**: {excel_file}\n*Download available in the file explorer*"
+            
+            return content
             
         except Exception as e:
             logger.error(f"OpenAI API error: {e}")
@@ -701,7 +710,15 @@ Please provide a comprehensive answer based on the context provided. If the cont
             
             if response.status_code == 200:
                 result = response.json()
-                return result["choices"][0]["message"]["content"]
+                content = result["choices"][0]["message"]["content"]
+                
+                # Check if response contains structured data that should be Excel
+                if self._should_convert_to_excel(content):
+                    excel_file = self._convert_response_to_excel(content, "Perplexity_Analysis")
+                    if excel_file:
+                        content += f"\n\n📊 **Excel file generated**: {excel_file}\n*Download available in the file explorer*"
+                
+                return content
             else:
                 error_details = ""
                 try:
@@ -733,3 +750,133 @@ Please provide a comprehensive answer based on the context provided. If the cont
             'total_estimated_cost': input_cost + output_cost,
             'traditional_flat_rate_cost': 20.0 / 30  # $20/month ÷ 30 days
         }
+    
+    def _should_convert_to_excel(self, content: str) -> bool:
+        """Check if API response contains structured data that should be converted to Excel."""
+        excel_indicators = [
+            'valuation', 'dcf', 'financial model', 'cash flow', 'spreadsheet',
+            'table', 'analysis', 'projection', 'forecast', 'budget',
+            '|', '---', 'Year', 'Revenue', 'NPV', 'IRR', 'ROI'
+        ]
+        
+        content_lower = content.lower()
+        
+        # Check for table-like structures (markdown tables)
+        if '|' in content and ('---' in content or 'Year' in content):
+            return True
+        
+        # Check for financial keywords
+        financial_count = sum(1 for indicator in excel_indicators 
+                            if indicator.lower() in content_lower)
+        
+        return financial_count >= 3
+    
+    def _convert_response_to_excel(self, content: str, prefix: str) -> str:
+        """Convert API response with structured data to Excel file."""
+        try:
+            import pandas as pd
+            from datetime import datetime
+            import re
+            from pathlib import Path
+            
+            # Create temp directory
+            temp_dir = Path("temp")
+            temp_dir.mkdir(exist_ok=True)
+            
+            # Extract tables from markdown format
+            tables = self._extract_tables_from_text(content)
+            
+            if not tables:
+                # Create a simple analysis sheet with the full response
+                data = {'Analysis': [content]}
+                tables = [('Response', pd.DataFrame(data))]
+            
+            # Generate filename
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            filename = f"{prefix}_{timestamp}.xlsx"
+            filepath = temp_dir / filename
+            
+            # Create Excel file
+            with pd.ExcelWriter(filepath, engine='openpyxl') as writer:
+                for sheet_name, df in tables:
+                    # Clean sheet name (Excel has restrictions)
+                    clean_name = re.sub(r'[\\/*?[\]:]', '_', sheet_name)[:31]
+                    df.to_excel(writer, sheet_name=clean_name, index=False)
+            
+            logger.info(f"Excel file created: {filename}")
+            return filename
+            
+        except Exception as e:
+            logger.error(f"Error converting to Excel: {e}")
+            return None
+    
+    def _extract_tables_from_text(self, text: str) -> list:
+        """Extract table data from text response."""
+        try:
+            import pandas as pd
+            import re
+            
+            tables = []
+            
+            # Look for markdown tables
+            table_pattern = r'\|.*?\|\n\|[-\s\|]+\|\n((?:\|.*?\|\n?)+)'
+            matches = re.findall(table_pattern, text, re.MULTILINE)
+            
+            for i, match in enumerate(matches):
+                try:
+                    # Extract header and data rows
+                    lines = text.split('\n')
+                    table_start = None
+                    
+                    for j, line in enumerate(lines):
+                        if '|' in line and '---' in lines[j+1:j+2]:
+                            table_start = j
+                            break
+                    
+                    if table_start is not None:
+                        # Extract header
+                        header_line = lines[table_start]
+                        headers = [col.strip() for col in header_line.split('|')[1:-1]]
+                        
+                        # Extract data rows
+                        data_rows = []
+                        for line in lines[table_start+2:]:
+                            if '|' not in line or line.strip() == '':
+                                break
+                            row_data = [col.strip() for col in line.split('|')[1:-1]]
+                            if len(row_data) == len(headers):
+                                data_rows.append(row_data)
+                        
+                        if data_rows:
+                            df = pd.DataFrame(data_rows, columns=headers)
+                            tables.append((f'Table_{i+1}', df))
+                
+                except Exception as e:
+                    logger.error(f"Error parsing table {i}: {e}")
+                    continue
+            
+            # If no tables found, look for key-value pairs
+            if not tables:
+                lines = text.split('\n')
+                data = []
+                
+                for line in lines:
+                    # Look for patterns like "Revenue: $1,000,000"
+                    if ':' in line and any(keyword in line.lower() 
+                                         for keyword in ['revenue', 'profit', 'cash', 'value', 'rate', 'cost']):
+                        parts = line.split(':', 1)
+                        if len(parts) == 2:
+                            data.append({
+                                'Metric': parts[0].strip(),
+                                'Value': parts[1].strip()
+                            })
+                
+                if data:
+                    df = pd.DataFrame(data)
+                    tables.append(('Financial_Metrics', df))
+            
+            return tables
+            
+        except Exception as e:
+            logger.error(f"Error extracting tables: {e}")
+            return []
