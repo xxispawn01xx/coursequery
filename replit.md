@@ -158,6 +158,7 @@ Authentication: Persistent HuggingFace token storage with GUI input for seamless
 - **Memory Allocator Fix**: Prevents impossible 22GB allocation reports on 12GB RTX 3060 GPU
 - **Safetensors Model Selection**: Switched to DialoGPT/GPT-2 models with secure loading format
 - **Comprehensive Error Resolution**: Fixed both security vulnerabilities and memory management issues
+- **Persistent API Key Storage**: Added secure local storage for OpenAI/Perplexity keys with auto-save functionality
 
 ### System Status
 - **Replit**: Development environment for testing and sync

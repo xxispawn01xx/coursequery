@@ -2558,63 +2558,111 @@ class RealEstateAIApp:
                     - Your "vcpe" course with 29 documents → Vector embeddings → Query with OpenAI/Perplexity
                     """)
         
-        # API Key Management
+        # API Key Management with Persistent Storage
         st.subheader("🔑 API Key Setup")
-        st.info("**Manual API Key Input**: Paste your keys below to enable cloud AI responses")
+        st.info("**Persistent API Key Storage**: Keys are securely saved locally and persist between sessions")
         
-        # Initialize session state for API keys
+        # Initialize API key storage
+        from api_key_storage import APIKeyStorage
+        key_storage = APIKeyStorage()
+        
+        # Load stored keys on first run
+        if 'keys_loaded' not in st.session_state:
+            stored_keys = key_storage.load_keys()
+            st.session_state.manual_openai_key = stored_keys.get('openai', '')
+            st.session_state.manual_perplexity_key = stored_keys.get('perplexity', '')
+            st.session_state.keys_loaded = True
+        
+        # Initialize session state for API keys if not present
         if 'manual_openai_key' not in st.session_state:
             st.session_state.manual_openai_key = ""
         if 'manual_perplexity_key' not in st.session_state:
             st.session_state.manual_perplexity_key = ""
         
-        # Check current API key status (environment + manual)
+        # Check current API key status (stored + environment)
         import os
         env_openai_key = os.getenv("OPENAI_API_KEY")
         env_perplexity_key = os.getenv("PERPLEXITY_API_KEY")
         
-        # Use manual keys if available, otherwise environment keys
+        # Use stored keys first, then manual session, then environment
         active_openai_key = st.session_state.manual_openai_key or env_openai_key
         active_perplexity_key = st.session_state.manual_perplexity_key or env_perplexity_key
         
         openai_key_status = "✅ Set" if active_openai_key and len(active_openai_key.strip()) > 0 else "❌ Missing"
         perplexity_key_status = "✅ Set" if active_perplexity_key and len(active_perplexity_key.strip()) > 0 else "❌ Missing"
         
-        # Manual API key input
+        # Manual API key input with storage
         col1, col2 = st.columns(2)
         with col1:
             st.write(f"**OpenAI API Key**: {openai_key_status}")
             manual_openai = st.text_input(
-                "Paste OpenAI API Key:",
+                "OpenAI API Key:",
                 value=st.session_state.manual_openai_key,
                 type="password",
                 placeholder="sk-proj-...",
-                help="Get from: https://platform.openai.com/api-keys"
+                help="Auto-saved locally • Get from: https://platform.openai.com/api-keys"
             )
             if manual_openai != st.session_state.manual_openai_key:
                 st.session_state.manual_openai_key = manual_openai
+                # Auto-save when changed
+                if manual_openai.strip():
+                    key_storage.save_keys(openai_key=manual_openai)
+                    st.success("OpenAI key saved!")
                 st.rerun()
         
         with col2:
             st.write(f"**Perplexity API Key**: {perplexity_key_status}")
             manual_perplexity = st.text_input(
-                "Paste Perplexity API Key:",
+                "Perplexity API Key:",
                 value=st.session_state.manual_perplexity_key,
                 type="password", 
                 placeholder="pplx-...",
-                help="Get from: https://www.perplexity.ai/settings/api"
+                help="Auto-saved locally • Get from: https://www.perplexity.ai/settings/api"
             )
             if manual_perplexity != st.session_state.manual_perplexity_key:
                 st.session_state.manual_perplexity_key = manual_perplexity
+                # Auto-save when changed
+                if manual_perplexity.strip():
+                    key_storage.save_keys(perplexity_key=manual_perplexity)
+                    st.success("Perplexity key saved!")
                 st.rerun()
         
-        # Show key sources
+        # Key management buttons
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            if st.button("💾 Save Current Keys"):
+                success = key_storage.save_keys(
+                    openai_key=st.session_state.manual_openai_key,
+                    perplexity_key=st.session_state.manual_perplexity_key
+                )
+                if success:
+                    st.success("Keys saved successfully!")
+                else:
+                    st.error("Failed to save keys")
+        
+        with col2:
+            if st.button("🔄 Reload Stored Keys"):
+                stored_keys = key_storage.load_keys()
+                st.session_state.manual_openai_key = stored_keys.get('openai', '')
+                st.session_state.manual_perplexity_key = stored_keys.get('perplexity', '')
+                st.success("Keys reloaded from storage!")
+                st.rerun()
+        
+        with col3:
+            if st.button("🗑️ Clear All Keys"):
+                key_storage.clear_keys()
+                st.session_state.manual_openai_key = ""
+                st.session_state.manual_perplexity_key = ""
+                st.success("Keys cleared!")
+                st.rerun()
+        
+        # Show key sources and status
         if active_openai_key:
-            source = "Manual Input" if st.session_state.manual_openai_key else "Environment"
-            st.success(f"OpenAI key loaded from: {source}")
+            source = "Local Storage" if st.session_state.manual_openai_key else "Environment"
+            st.info(f"✅ OpenAI key active from: {source}")
         if active_perplexity_key:
-            source = "Manual Input" if st.session_state.manual_perplexity_key else "Environment"
-            st.success(f"Perplexity key loaded from: {source}")
+            source = "Local Storage" if st.session_state.manual_perplexity_key else "Environment"  
+            st.info(f"✅ Perplexity key active from: {source}")
         
         # Step 2: Query with Vector Search
         st.subheader("🔍 Step 2: Query with Vector Search")
