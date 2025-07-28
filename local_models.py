@@ -6,6 +6,7 @@ Handles model loading, caching, and inference without external API calls.
 import logging
 import os
 import json
+import time
 from datetime import datetime
 from typing import Optional, Dict, Any, List
 import gc
@@ -92,7 +93,8 @@ class LocalModelManager:
     
     def load_models(self, model_type: str = "mistral"):
         """Load all required models with caching optimization."""
-        logger.info(f"Loading local models (type: {model_type})...")
+        start_time = time.time()
+        logger.info(f"⏱️ Loading local models (type: {model_type}) - Start time: {datetime.now().strftime('%H:%M:%S')}")
         
         # Check memory status - RTX 3060 12GB should handle large models
         if MEMORY_OPTIMIZER_AVAILABLE:
@@ -147,7 +149,8 @@ class LocalModelManager:
             if self.embedding_model is None:
                 logger.warning("Embedding model failed to load - Q&A functionality will be limited")
             
-            logger.info(f"All models loaded successfully ({model_type})")
+            total_time = time.time() - start_time
+            logger.info(f"✅ All models loaded successfully ({model_type}) - Total time: {total_time:.2f}s")
         except Exception as e:
             logger.error(f"Failed to load models: {e}")
             raise
@@ -421,6 +424,8 @@ class LocalModelManager:
         Returns:
             Generated response text
         """
+        start_time = time.time()
+        logger.info(f"🤔 Starting response generation - {datetime.now().strftime('%H:%M:%S.%f')[:-3]}")
         # Use appropriate model based on current selection
         if self.current_model == "llama" and self.llama_pipeline is not None:
             pipe = self.llama_pipeline
@@ -469,11 +474,26 @@ class LocalModelManager:
             # Clean up the response
             cleaned_response = self._clean_response(generated_text)
             
+            # Log performance metrics
+            total_time = time.time() - start_time
+            tokens_generated = len(cleaned_response.split())
+            tokens_per_second = tokens_generated / total_time if total_time > 0 else 0
+            logger.info(f"⚡ Response generated in {total_time:.2f}s | {tokens_generated} tokens | {tokens_per_second:.1f} tokens/sec | Device: {self.device}")
+            
             return cleaned_response
             
         except Exception as e:
-            logger.error(f"Error generating response: {e}")
-            raise
+            # Handle CUDA errors specifically
+            if "CUDA" in str(e):
+                logger.error(f"CUDA error during response generation: {e}")
+                logger.info("Attempting to clear CUDA cache and retry...")
+                if TORCH_AVAILABLE and torch.cuda.is_available():
+                    torch.cuda.empty_cache()
+                    torch.cuda.synchronize()
+                raise RuntimeError(f"CUDA error in text generation. Try restarting the app: {e}")
+            else:
+                logger.error(f"Error generating response: {e}")
+                raise
     
     def _format_instruction_prompt(self, user_query: str) -> str:
         """Format prompt for instruction following."""
@@ -520,6 +540,8 @@ If asked to create spreadsheets, tables, or Excel files, provide:
         Returns:
             List of embedding vectors
         """
+        start_time = time.time()
+        logger.info(f"🔍 Generating embeddings for {len(texts)} texts - {datetime.now().strftime('%H:%M:%S')}")
         if self.embedding_model is None:
             logger.error("Embedding model not loaded - trying to reload...")
             try:
@@ -530,11 +552,30 @@ If asked to create spreadsheets, tables, or Excel files, provide:
                 raise RuntimeError(f"Embedding model not loaded: {e}")
         
         try:
+            # Clear CUDA cache before encoding to prevent memory issues
+            if TORCH_AVAILABLE and torch.cuda.is_available():
+                torch.cuda.empty_cache()
+            
             embeddings = self.embedding_model.encode(texts, convert_to_numpy=True)
+            
+            # Log embedding performance
+            total_time = time.time() - start_time
+            texts_per_second = len(texts) / total_time if total_time > 0 else 0
+            logger.info(f"📊 Embeddings generated in {total_time:.2f}s | {len(texts)} texts | {texts_per_second:.1f} texts/sec")
+            
             return embeddings.tolist()
         except Exception as e:
-            logger.error(f"Error generating embeddings: {e}")
-            raise
+            # Handle CUDA errors specifically
+            if "CUDA" in str(e):
+                logger.error(f"CUDA error during embedding generation: {e}")
+                logger.info("Attempting to clear CUDA cache and retry...")
+                if TORCH_AVAILABLE and torch.cuda.is_available():
+                    torch.cuda.empty_cache()
+                    torch.cuda.synchronize()
+                raise RuntimeError(f"CUDA error in embeddings. Try restarting the app or reducing batch size: {e}")
+            else:
+                logger.error(f"Error generating embeddings: {e}")
+                raise
     
     def get_model_info(self) -> Dict[str, Any]:
         """Get information about loaded models."""
