@@ -108,53 +108,44 @@ class LocalModelManager:
                     suggested_model = MemoryOptimizer.suggest_optimal_model()
                     logger.warning(f"System RAM may be insufficient. Consider using: {suggested_model}")
         
-        # CRITICAL: GPU Health Check with Hardware Issue Workaround
+        # RTX 3060 Debug Configuration (Hugging Face Forum Solutions)
         if torch and torch.cuda.is_available():
+            # Apply RTX 3060 fixes from Hugging Face forums
+            logger.info("🔧 Applying RTX 3060 device-side assert fixes from Hugging Face forums...")
+            
+            # Fix 1: Enable debug mode to see real errors (most important)
+            os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
+            os.environ['TORCH_USE_CUDA_DSA'] = '1'
+            
+            # Fix 2: Force single GPU (RTX 3060 multi-GPU confusion)
+            os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+            
+            # Fix 3: Memory management for 12GB VRAM
+            torch.cuda.empty_cache()
+            torch.cuda.synchronize()
+            if hasattr(torch.cuda, 'reset_peak_memory_stats'):
+                torch.cuda.reset_peak_memory_stats()
+            
+            logger.info("✅ RTX 3060 debug configuration applied")
+            logger.info("🔍 Testing GPU with debug flags enabled...")
+            
             try:
-                logger.info("🔍 Performing GPU health check for RTX 3060...")
-                
-                # Clear any existing state first
-                torch.cuda.empty_cache()
-                torch.cuda.synchronize()
-                
-                # Test basic CUDA operations with smaller tensors
+                # Simple test with debug mode enabled
                 test_tensor = torch.tensor([1.0]).cuda()
                 result = test_tensor * 2
                 del test_tensor, result
                 torch.cuda.empty_cache()
                 
-                # Check memory availability
                 total_memory = torch.cuda.get_device_properties(0).total_memory / (1024**3)
                 allocated = torch.cuda.memory_allocated(0) / (1024**3)
-                logger.info(f"✅ GPU health check passed - {allocated:.1f}GB/{total_memory:.1f}GB used")
+                logger.info(f"✅ RTX 3060 test passed - {allocated:.1f}GB/{total_memory:.1f}GB used")
                 
             except Exception as gpu_error:
-                error_msg = str(gpu_error).lower()
-                if "device-side assert" in error_msg or "cuda" in error_msg:
-                    logger.error(f"🚨 RTX 3060 HARDWARE ISSUE: {gpu_error}")
-                    logger.error("⚠️  Used GPU has corrupted memory regions - implementing workaround")
-                    logger.error("💡 STRATEGY: Skip problematic memory areas, use conservative settings")
-                    
-                    # Implement hardware workaround
-                    try:
-                        # Reset CUDA context completely
-                        if hasattr(torch.cuda, 'reset_peak_memory_stats'):
-                            torch.cuda.reset_peak_memory_stats()
-                        torch.cuda.empty_cache()
-                        torch.cuda.synchronize()
-                        torch.cuda.ipc_collect()
-                        
-                        # Set conservative memory management for damaged GPU
-                        os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'max_split_size_mb:512'
-                        os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
-                        
-                        logger.info("🔧 Applied hardware workaround - conservative memory allocation")
-                        
-                    except Exception as reset_error:
-                        logger.error(f"CUDA reset failed: {reset_error}")
-                        logger.error("⚠️  Proceeding with damaged GPU - expect instability")
-                else:
-                    raise gpu_error
+                logger.error(f"RTX 3060 Debug Error (now shows real cause): {gpu_error}")
+                logger.info("🔧 Debug mode enabled - error details above show actual problem")
+                
+                # Continue with fixes - don't give up on GPU
+                torch.cuda.empty_cache()
         
         # Check if models are already loaded in memory
         if self._models_already_loaded(model_type):
@@ -362,13 +353,13 @@ class LocalModelManager:
                     model_kwargs["use_safetensors"] = True  # Force safetensors to avoid torch.load security issue
                     model_kwargs["trust_remote_code"] = False  # Security best practice
                     
-                    # Conservative memory settings for damaged RTX 3060
+                    # RTX 3060 optimized settings (Hugging Face forum recommendations)
                     model_kwargs.update({
                         "low_cpu_mem_usage": True,
-                        "max_memory": {0: "2GB"},  # Very conservative for damaged GPU
-                        "torch_dtype": torch.float16 if torch.cuda.is_available() else torch.float32,
-                        "device_map": {"": 0},  # Force single GPU mapping
-                        "offload_folder": "./temp",  # Offload to avoid bad memory regions
+                        "max_memory": {0: "6GB"},  # Reasonable for RTX 3060 12GB
+                        "torch_dtype": torch.float16,
+                        "device_map": {0: "0"},  # Explicit single GPU mapping (fix device_map="auto" issues)
+                        "offload_folder": "./temp",
                     })
                     
                     self.mistral_model = AutoModelForCausalLM.from_pretrained(
@@ -453,14 +444,14 @@ class LocalModelManager:
                 model_name,
                 cache_dir=str(self.config.models_dir),
                 quantization_config=quantization_config,
-                device_map={"": 0},  # Force single GPU mapping
+                device_map={0: "0"},  # Explicit GPU 0 mapping (Hugging Face forum fix)
                 trust_remote_code=True,
-                torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
+                torch_dtype=torch.float16,
                 token=os.getenv("HUGGINGFACE_TOKEN"),
-                # Conservative settings for damaged RTX 3060
+                # RTX 3060 optimized settings
                 low_cpu_mem_usage=True,
-                max_memory={0: "3GB"},  # Very conservative for damaged GPU
-                offload_folder="./temp"  # Offload to avoid bad memory regions
+                max_memory={0: "5GB"},  # Reasonable for RTX 3060 12GB
+                offload_folder="./temp"
             )
             
             # Create pipeline
@@ -538,30 +529,31 @@ class LocalModelManager:
                     
                     logger.info(f"GPU Memory Check: {allocated_memory:.1f}GB used, {free_memory:.1f}GB free of {total_memory:.1f}GB total")
                     
-                    if free_memory < 1.0:  # Reduced threshold - be more aggressive
-                        logger.warning(f"⚠️  Low GPU memory for embedding model: only {free_memory:.1f}GB available")
-                        logger.info("🔧 Applying ultra-aggressive memory optimization")
-                        # Clear everything and continue with minimal footprint
+                    if free_memory < 2.0:  # Reasonable threshold for RTX 3060
+                        logger.warning(f"⚠️  Memory optimization needed: {free_memory:.1f}GB available")
+                        logger.info("🔧 Clearing CUDA cache for RTX 3060")
                         torch.cuda.empty_cache()
                         torch.cuda.synchronize()
-                        torch.cuda.ipc_collect()
+                        if hasattr(torch.cuda, 'ipc_collect'):
+                            torch.cuda.ipc_collect()
                     
-                    # Use half precision to reduce memory by ~50%
+                    # RTX 3060 optimized embedding model loading
                     self.embedding_model = SentenceTransformer(
                         model_name,
                         cache_folder=str(self.config.models_dir),
-                        device='cuda',
+                        device='cuda:0',  # Explicit GPU 0 (forum recommendation)
                         token=os.getenv("HF_TOKEN")
                     )
                     
-                    # Convert to half precision after loading to save memory
-                    if hasattr(self.embedding_model._modules, 'values'):
-                        for module in self.embedding_model._modules.values():
-                            if hasattr(module, 'half'):
-                                module.half()
+                    # Apply optimizations for RTX 3060
+                    try:
+                        self.embedding_model.half()  # FP16 for memory efficiency
+                        logger.info("✅ Applied FP16 optimization for RTX 3060")
+                    except Exception as half_error:
+                        logger.warning(f"FP16 conversion failed: {half_error}")
                     
-                    # Set smaller batch size for encoding
-                    self.embedding_model.encode_kwargs = {'batch_size': 8}  # Reduced from default 32
+                    # RTX 3060 optimized batch size
+                    self.embedding_model.encode_kwargs = {'batch_size': 16}  # Balanced for 12GB
                     logger.info("✅ Embedding model loaded on CUDA - OPTIMAL PERFORMANCE")
                     return
                     
