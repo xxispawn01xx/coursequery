@@ -1,0 +1,42 @@
+INFO:course_indexer:Loaded index for course: vcpe
+Loading llama_index.core.storage.kvstore.simple_kvstore from C:\Users\AliDesktop\Desktop\CoursQueryRemote\coursequery\indexed_courses\vcpe\index\docstore.json.
+Loading llama_index.core.storage.kvstore.simple_kvstore from C:\Users\AliDesktop\Desktop\CoursQueryRemote\coursequery\indexed_courses\vcpe\index\index_store.json.
+INFO:llama_index.core.indices.loading:Loading all indices.
+INFO:course_indexer:Loaded index for course: vcpe
+Loading llama_index.core.storage.kvstore.simple_kvstore from C:\Users\AliDesktop\Desktop\CoursQueryRemote\coursequery\indexed_courses\vcpe\index\docstore.json.
+Loading llama_index.core.storage.kvstore.simple_kvstore from C:\Users\AliDesktop\Desktop\CoursQueryRemote\coursequery\indexed_courses\vcpe\index\index_store.json.
+INFO:llama_index.core.indices.loading:Loading all indices.
+INFO:course_indexer:Loaded index for course: vcpe
+ERROR:__main__:Error extracting course content: 'Config' object has no attribute 'courses_dir'
+Loading llama_index.core.storage.kvstore.simple_kvstore from C:\Users\AliDesktop\Desktop\CoursQueryRemote\coursequery\indexed_courses\vcpe\index\docstore.json.
+Loading llama_index.core.storage.kvstore.simple_kvstore from C:\Users\AliDesktop\Desktop\CoursQueryRemote\coursequery\indexed_courses\vcpe\index\index_store.json.
+INFO:llama_index.core.indices.loading:Loading all indices.
+INFO:course_indexer:Loaded index for course: vcpe
+Loading llama_index.core.storage.kvstore.simple_kvstore from C:\Users\AliDesktop\Desktop\CoursQueryRemote\coursequery\indexed_courses\vcpe\index\docstore.json.
+Loading llama_index.core.storage.kvstore.simple_kvstore from C:\Users\AliDesktop\Desktop\CoursQueryRemote\coursequery\indexed_courses\vcpe\index\index_store.json.
+INFO:llama_index.core.indices.loading:Loading all indices.
+INFO:course_indexer:Loaded index for course: vcpe
+Loading llama_index.core.storage.kvstore.simple_kvstore from C:\Users\AliDesktop\Desktop\CoursQueryRemote\coursequery\indexed_courses\vcpe\index\docstore.json.
+Loading llama_index.core.storage.kvstore.simple_kvstore from C:\Users\AliDesktop\Desktop\CoursQueryRemote\coursequery\indexed_courses\vcpe\index\index_store.json.
+INFO:llama_index.core.indices.loading:Loading all indices.
+INFO:course_indexer:Loaded index for course: vcpe
+ERROR:__main__:Error extracting course content: 'Config' object has no attribute 'courses_dir'
+Loading llama_index.core.storage.kvstore.simple_kvstore from C:\Users\AliDesktop\Desktop\CoursQueryRemote\coursequery\indexed_courses\vcpe\index\docstore.json.
+Loading llama_index.core.storage.kvstore.simple_kvstore from C:\Users\AliDesktop\Desktop\CoursQueryRemote\coursequery\indexed_courses\vcpe\index\index_store.json.
+INFO:llama_index.core.indices.loading:Loading all indices.
+INFO:course_indexer:Loaded index for course: vcpe
+Loading llama_index.core.storage.kvstore.simple_kvstore from C:\Users\AliDesktop\Desktop\CoursQueryRemote\coursequery\indexed_courses\vcpe\index\docstore.json.
+Loading llama_index.core.storage.kvstore.simple_kvstore from C:\Users\AliDesktop\Desktop\CoursQueryRemote\coursequery\indexed_courses\vcpe\index\index_store.json.
+INFO:llama_index.core.indices.loading:Loading all indices.
+INFO:course_indexer:Loaded index for course: vcpe
+ERROR:__main__:Error extracting course content: 'Config' object has no attribute 'courses_dir'
+Loading llama_index.core.storage.kvstore.simple_kvstore from C:\Users\AliDesktop\Desktop\CoursQueryRemote\coursequery\indexed_courses\vcpe\index\docstore.json.
+Loading llama_index.core.storage.kvstore.simple_kvstore from C:\Users\AliDesktop\Desktop\CoursQueryRemote\coursequery\indexed_courses\vcpe\index\index_store.json.
+INFO:llama_index.core.indices.loading:Loading all indices.
+INFO:course_indexer:Loaded index for course: vcpe
+Loading llama_index.core.storage.kvstore.simple_kvstore from C:\Users\AliDesktop\Desktop\CoursQueryRemote\coursequery\indexed_courses\vcpe\index\docstore.json.
+Loading llama_index.core.storage.kvstore.simple_kvstore from C:\Users\AliDesktop\Desktop\CoursQueryRemote\coursequery\indexed_courses\vcpe\index\index_store.json.
+INFO:llama_index.core.indices.loading:Loading all indices.
+INFO:course_indexer:Loaded index for course: vcpe
+
+

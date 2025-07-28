@@ -1606,11 +1606,75 @@ class RealEstateAIApp:
             st.error(f"Error in document analysis: {str(e)}")
             logger.error(f"Document analysis error: {e}")
     
+    def _get_comprehensive_analytics(self, course_name: str) -> Optional[Dict[str, Any]]:
+        """Get comprehensive analytics from multiple sources."""
+        try:
+            analytics = {}
+            
+            # Try course indexer first
+            if self.course_indexer:
+                indexer_analytics = self.course_indexer.get_course_analytics(course_name)
+                if indexer_analytics:
+                    analytics.update(indexer_analytics)
+            
+            # Check for indexed course directory
+            indexed_course_dir = self.config.indexed_courses_dir / course_name
+            if indexed_course_dir.exists():
+                metadata_file = indexed_course_dir / "metadata.json"
+                if metadata_file.exists():
+                    try:
+                        with open(metadata_file, 'r') as f:
+                            metadata = json.load(f)
+                        analytics.update(metadata)
+                    except Exception:
+                        pass
+                
+                # Count files in the directory
+                index_files = list(indexed_course_dir.rglob("*"))
+                analytics['total_files'] = len([f for f in index_files if f.is_file()])
+            
+            # Check raw docs
+            raw_course_dir = self.config.raw_docs_dir / course_name  
+            if raw_course_dir.exists():
+                raw_files = list(raw_course_dir.rglob("*"))
+                analytics['raw_documents'] = len([f for f in raw_files if f.is_file()])
+            
+            # Check transcriptions
+            transcriptions_dir = Path("./transcriptions") / course_name
+            if transcriptions_dir.exists():
+                trans_files = list(transcriptions_dir.rglob("*.txt"))
+                analytics['transcriptions'] = len(trans_files)
+            
+            # Check vectors
+            vectors_dir = Path("./vectors")
+            vector_file = vectors_dir / f"{course_name}_vectors.json"
+            if vector_file.exists():
+                try:
+                    with open(vector_file, 'r') as f:
+                        vector_data = json.load(f)
+                    analytics['vector_chunks'] = len(vector_data.get('chunks', []))
+                    analytics['vector_embeddings'] = True
+                except Exception:
+                    analytics['vector_embeddings'] = False
+            
+            # Set defaults if we found any data
+            if analytics:
+                analytics.setdefault('total_documents', analytics.get('raw_documents', analytics.get('total_files', 0)))
+                analytics.setdefault('total_chunks', analytics.get('vector_chunks', 0))
+                analytics.setdefault('syllabus_documents', 0)
+                analytics.setdefault('document_types', {})
+            
+            return analytics if analytics else None
+            
+        except Exception as e:
+            logger.error(f"Error getting comprehensive analytics: {e}")
+            return None
+    
     def _extract_course_content(self, course_name: str) -> tuple:
         """Extract actual document content and names from course index."""
         try:
             # Get course directory
-            course_dir = self.config.courses_dir / course_name
+            course_dir = self.config.indexed_courses_dir / course_name
             documents = []
             doc_names = []
             

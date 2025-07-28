@@ -129,6 +129,9 @@ Authentication: Persistent HuggingFace token storage with GUI input for seamless
 - **Vector RAG System**: Complete implementation for $400+/year savings with local embeddings + cloud API optimization
 - **Bulk Transcription Interface**: Dedicated tab for folder structure preservation and RTX 3060 optimization
 - **Cost-Efficient Querying**: Vector similarity search with pay-per-token vs flat-rate subscription savings
+- **Clear Billing Interface**: Added explicit billing warnings and tab labeling to distinguish free vs paid features
+- **Comprehensive Course Detection**: Fixed analytics to properly detect indexed courses like "vcpe" with 29 documents
+- **Enhanced User Clarity**: Overview section explaining exact billing structure and which tabs charge money
 
 ### System Status
 - **Replit**: Clean development environment, ALL ONLINE OPERATIONS DISABLED (offline-only app)
