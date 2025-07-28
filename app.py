@@ -1196,13 +1196,13 @@ class RealEstateAIApp:
                 col1, col2, col3 = st.columns(3)
                 
                 with col1:
-                    st.metric("Total Documents", analytics['total_documents'])
+                    st.metric("Total Documents", analytics.get('total_documents', 0))
                 
                 with col2:
-                    st.metric("Total Chunks", analytics['total_chunks'])
+                    st.metric("Total Chunks", analytics.get('total_chunks', 0))
                 
                 with col3:
-                    st.metric("Syllabus Documents", analytics['syllabus_documents'])
+                    st.metric("Syllabus Documents", analytics.get('syllabus_documents', 0))
                 
                 # Document type distribution
                 if analytics.get('document_types'):
