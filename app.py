@@ -2664,6 +2664,46 @@ class RealEstateAIApp:
             source = "Local Storage" if st.session_state.manual_perplexity_key else "Environment"  
             st.info(f"✅ Perplexity key active from: {source}")
         
+        # Generated Files Section
+        st.subheader("📊 Generated Excel Files")
+        
+        # Check for generated files in temp directory
+        import os
+        from pathlib import Path
+        
+        temp_dir = Path("temp")
+        if temp_dir.exists():
+            excel_files = list(temp_dir.glob("*.xlsx"))
+            
+            if excel_files:
+                st.info("When APIs generate tables or financial data, they're automatically converted to downloadable Excel files:")
+                
+                for file_path in sorted(excel_files, key=lambda x: x.stat().st_mtime, reverse=True):
+                    col1, col2, col3 = st.columns([3, 2, 1])
+                    
+                    with col1:
+                        st.write(f"📊 **{file_path.name}**")
+                    
+                    with col2:
+                        from datetime import datetime
+                        mod_time = datetime.fromtimestamp(file_path.stat().st_mtime)
+                        st.write(f"*{mod_time.strftime('%Y-%m-%d %H:%M')}*")
+                    
+                    with col3:
+                        # Create download button
+                        with open(file_path, 'rb') as f:
+                            st.download_button(
+                                label="📥",
+                                data=f.read(),
+                                file_name=file_path.name,
+                                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                                key=f"download_{file_path.name}"
+                            )
+            else:
+                st.info("💡 **Excel Auto-Generation**: When you ask for valuations, tables, or financial analysis, the AI responses with structured data are automatically converted to downloadable Excel files")
+        else:
+            st.info("💡 **Excel Auto-Generation**: When you ask for valuations, tables, or financial analysis, the AI responses with structured data are automatically converted to downloadable Excel files")
+        
         # Step 2: Query with Vector Search
         st.subheader("🔍 Step 2: Query with Vector Search")
         
