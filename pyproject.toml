@@ -4,6 +4,10 @@ version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.11"
 dependencies = [
+    "google-api-python-client",
+    "google-auth",
+    "google-auth-httplib2",
+    "google-auth-oauthlib",
     "llama-index-core>=0.12.52.post1",
     "llama-index-embeddings-huggingface>=0.5.5",
     "openai>=1.97.1",

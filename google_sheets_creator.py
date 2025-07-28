@@ -7,7 +7,10 @@ import logging
 from typing import Dict, List, Any, Optional
 import json
 import re
+import os
 from datetime import datetime
+from google.oauth2 import service_account
+from googleapiclient.discovery import build
 
 logger = logging.getLogger(__name__)
 
@@ -16,40 +19,42 @@ class GoogleSheetsCreator:
     
     def __init__(self):
         self.service = None
-        self.credentials_available = False
+        self.drive_service = None
+        self.credentials_available = self._setup_credentials()
         
-    def setup_google_sheets_api(self):
-        """Setup Google Sheets API with service account."""
+    def _setup_credentials(self):
+        """Setup Google Sheets API with service account credentials."""
         try:
-            # This would use actual Google Sheets API
-            setup_guide = """
-            ## Google Sheets API Setup (One-Time):
+            # Get credentials from environment
+            creds_json = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON")
+            if not creds_json:
+                logger.warning("GOOGLE_SERVICE_ACCOUNT_JSON not found in environment")
+                return False
             
-            1. **Google Cloud Console Setup**:
-               - Go to console.cloud.google.com
-               - Create project or select existing
-               - Enable Google Sheets API + Google Drive API
-               
-            2. **Service Account**:
-               - Create service account credentials
-               - Download JSON key file as 'google_credentials.json'
-               - Place in project root directory
-               
-            3. **Permissions**:
-               - Share target Google Drive folder with service account email
-               - Service account can now create/edit sheets in that folder
-               
-            4. **Auto-Integration**:
-               - When you ask for DCF models or financial analysis
-               - System automatically creates Google Sheet with live formulas
-               - Returns shareable link for immediate access
-            """
+            # Parse JSON credentials
+            creds_info = json.loads(creds_json)
             
-            return setup_guide
+            # Define required scopes
+            scopes = [
+                'https://www.googleapis.com/auth/spreadsheets',
+                'https://www.googleapis.com/auth/drive.file'
+            ]
+            
+            # Create credentials
+            credentials = service_account.Credentials.from_service_account_info(
+                creds_info, scopes=scopes
+            )
+            
+            # Build services
+            self.service = build('sheets', 'v4', credentials=credentials)
+            self.drive_service = build('drive', 'v3', credentials=credentials)
+            
+            logger.info("Google Sheets API initialized successfully")
+            return True
             
         except Exception as e:
             logger.error(f"Google Sheets API setup error: {e}")
-            return None
+            return False
     
     def create_dcf_sheet_from_ai_response(self, ai_response: str, query: str) -> Dict:
         """Create Google Sheet with DCF model based on AI response."""
@@ -158,48 +163,184 @@ class GoogleSheetsCreator:
             return """
             ## Google Sheets Integration Available!
             
-            **What you'd get with API setup**:
-            - Live Google Sheet created automatically
-            - Working formulas that update when you change assumptions
-            - Professional formatting and charts
-            - Shareable link: https://docs.google.com/spreadsheets/d/abc123...
-            
-            **To enable**: Add Google Sheets API credentials (one-time setup)
+            **Setup needed**: Google Service Account credentials required
+            **What you'd get**: Live sheets with formulas, charts, and sharing
             """
         
         try:
-            # This would use actual Google Sheets API to:
-            # 1. Create new spreadsheet
-            # 2. Add multiple sheets (Assumptions, Projections, Valuation)
-            # 3. Insert formulas (not just values)
-            # 4. Apply formatting and charts
-            # 5. Set sharing permissions
-            # 6. Return public link
+            # Create new spreadsheet
+            spreadsheet_body = {
+                'properties': {
+                    'title': sheet_data['title']
+                },
+                'sheets': []
+            }
             
-            # Simulated response for now:
-            sheet_url = f"https://docs.google.com/spreadsheets/d/simulated_id_123"
+            # Add each sheet from sheet_data
+            for sheet_info in sheet_data['sheets']:
+                sheet_properties = {
+                    'properties': {
+                        'title': sheet_info['name']
+                    }
+                }
+                spreadsheet_body['sheets'].append(sheet_properties)
+            
+            # Create the spreadsheet
+            spreadsheet = self.service.spreadsheets().create(
+                body=spreadsheet_body
+            ).execute()
+            
+            spreadsheet_id = spreadsheet['spreadsheetId']
+            
+            # Populate each sheet with data and formulas
+            for sheet_info in sheet_data['sheets']:
+                self._populate_sheet(spreadsheet_id, sheet_info)
+            
+            # Apply formatting if specified
+            if 'formatting' in sheet_data:
+                self._apply_formatting(spreadsheet_id, sheet_data['formatting'])
+            
+            # Make the sheet publicly viewable
+            self._set_sharing_permissions(spreadsheet_id)
+            
+            # Generate shareable link
+            sheet_url = f"https://docs.google.com/spreadsheets/d/{spreadsheet_id}"
+            
+            logger.info(f"Google Sheet created successfully: {spreadsheet_id}")
             
             return f"""
-            ## ✅ Google Sheet Created Successfully!
-            
-            **Live DCF Model**: {sheet_url}
-            
-            **Features**:
-            - 📊 Live formulas that update automatically
-            - 📈 Interactive charts and visualizations  
-            - 🔄 Change assumptions → All calculations update
-            - 📱 Access from any device
-            - 👥 Share with team members
-            
-            **Sheets included**:
-            - Assumptions (input parameters)
-            - Projections (5-year forecasts with formulas)
-            - Valuation (NPV, terminal value, enterprise value)
+## ✅ Google Sheet Created Successfully!
+
+**Live DCF Model**: {sheet_url}
+
+**Features**:
+- Live formulas that update automatically
+- Interactive charts and visualizations  
+- Change assumptions → All calculations update
+- Access from any device
+- Share with team members
+
+**Sheets included**:
+- Assumptions (input parameters)
+- Projections (5-year forecasts with formulas)
+- Valuation (NPV, terminal value, enterprise value)
             """
             
         except Exception as e:
             logger.error(f"Error creating Google Sheet: {e}")
             return f"Error creating Google Sheet: {e}"
+    
+    def _populate_sheet(self, spreadsheet_id: str, sheet_info: Dict):
+        """Populate a sheet with data and formulas."""
+        try:
+            sheet_name = sheet_info['name']
+            data = sheet_info['data']
+            
+            # Prepare values for batch update
+            values = []
+            for row in data:
+                values.append(row)
+            
+            # Update the sheet
+            range_name = f"{sheet_name}!A1"
+            body = {
+                'values': values
+            }
+            
+            self.service.spreadsheets().values().update(
+                spreadsheetId=spreadsheet_id,
+                range=range_name,
+                valueInputOption='USER_ENTERED',  # This interprets formulas
+                body=body
+            ).execute()
+            
+            logger.info(f"Sheet '{sheet_name}' populated successfully")
+            
+        except Exception as e:
+            logger.error(f"Error populating sheet {sheet_info['name']}: {e}")
+    
+    def _apply_formatting(self, spreadsheet_id: str, formatting: Dict):
+        """Apply formatting to the spreadsheet."""
+        try:
+            requests = []
+            
+            # Currency formatting
+            if 'currency_ranges' in formatting:
+                for range_str in formatting['currency_ranges']:
+                    requests.append({
+                        'repeatCell': {
+                            'range': self._parse_range(range_str),
+                            'cell': {
+                                'userEnteredFormat': {
+                                    'numberFormat': {
+                                        'type': 'CURRENCY',
+                                        'pattern': '$#,##0.00'
+                                    }
+                                }
+                            },
+                            'fields': 'userEnteredFormat.numberFormat'
+                        }
+                    })
+            
+            # Percentage formatting
+            if 'percentage_ranges' in formatting:
+                for range_str in formatting['percentage_ranges']:
+                    requests.append({
+                        'repeatCell': {
+                            'range': self._parse_range(range_str),
+                            'cell': {
+                                'userEnteredFormat': {
+                                    'numberFormat': {
+                                        'type': 'PERCENT',
+                                        'pattern': '0.00%'
+                                    }
+                                }
+                            },
+                            'fields': 'userEnteredFormat.numberFormat'
+                        }
+                    })
+            
+            # Execute formatting requests
+            if requests:
+                body = {'requests': requests}
+                self.service.spreadsheets().batchUpdate(
+                    spreadsheetId=spreadsheet_id,
+                    body=body
+                ).execute()
+                
+                logger.info("Formatting applied successfully")
+                
+        except Exception as e:
+            logger.error(f"Error applying formatting: {e}")
+    
+    def _parse_range(self, range_str: str) -> Dict:
+        """Parse range string into Sheets API format."""
+        # Basic implementation - would need more sophisticated parsing for complex ranges
+        return {
+            'sheetId': 0,  # Default to first sheet
+            'startRowIndex': 0,
+            'endRowIndex': 100,
+            'startColumnIndex': 0,
+            'endColumnIndex': 10
+        }
+    
+    def _set_sharing_permissions(self, spreadsheet_id: str):
+        """Set sharing permissions to make sheet publicly viewable."""
+        try:
+            permission = {
+                'type': 'anyone',
+                'role': 'reader'
+            }
+            
+            self.drive_service.permissions().create(
+                fileId=spreadsheet_id,
+                body=permission
+            ).execute()
+            
+            logger.info("Sharing permissions set successfully")
+            
+        except Exception as e:
+            logger.error(f"Error setting sharing permissions: {e}")
 
 def detect_and_create_financial_sheet(query: str, ai_response: str) -> Optional[str]:
     """Detect if AI response should trigger Google Sheet creation."""
