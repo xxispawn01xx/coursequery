@@ -2560,63 +2560,61 @@ class RealEstateAIApp:
         
         # API Key Management
         st.subheader("🔑 API Key Setup")
-        st.info("**This is where you pay for AI responses**: Add your API keys to enable cloud LLM responses")
+        st.info("**Manual API Key Input**: Paste your keys below to enable cloud AI responses")
         
-        # Check current API key status
+        # Initialize session state for API keys
+        if 'manual_openai_key' not in st.session_state:
+            st.session_state.manual_openai_key = ""
+        if 'manual_perplexity_key' not in st.session_state:
+            st.session_state.manual_perplexity_key = ""
+        
+        # Check current API key status (environment + manual)
         import os
-        openai_key = os.getenv("OPENAI_API_KEY")
-        perplexity_key = os.getenv("PERPLEXITY_API_KEY")
+        env_openai_key = os.getenv("OPENAI_API_KEY")
+        env_perplexity_key = os.getenv("PERPLEXITY_API_KEY")
         
-        openai_key_status = "✅ Set" if openai_key and len(openai_key.strip()) > 0 else "❌ Missing"
-        perplexity_key_status = "✅ Set" if perplexity_key and len(perplexity_key.strip()) > 0 else "❌ Missing"
+        # Use manual keys if available, otherwise environment keys
+        active_openai_key = st.session_state.manual_openai_key or env_openai_key
+        active_perplexity_key = st.session_state.manual_perplexity_key or env_perplexity_key
         
+        openai_key_status = "✅ Set" if active_openai_key and len(active_openai_key.strip()) > 0 else "❌ Missing"
+        perplexity_key_status = "✅ Set" if active_perplexity_key and len(active_perplexity_key.strip()) > 0 else "❌ Missing"
+        
+        # Manual API key input
         col1, col2 = st.columns(2)
         with col1:
             st.write(f"**OpenAI API Key**: {openai_key_status}")
-            if openai_key_status == "❌ Missing":
-                if st.button("🔧 Add OpenAI API Key"):
-                    st.info("Click the 'Add API Keys' button below to securely add your OpenAI key")
+            manual_openai = st.text_input(
+                "Paste OpenAI API Key:",
+                value=st.session_state.manual_openai_key,
+                type="password",
+                placeholder="sk-proj-...",
+                help="Get from: https://platform.openai.com/api-keys"
+            )
+            if manual_openai != st.session_state.manual_openai_key:
+                st.session_state.manual_openai_key = manual_openai
+                st.rerun()
         
         with col2:
             st.write(f"**Perplexity API Key**: {perplexity_key_status}")
-            if perplexity_key_status == "❌ Missing":
-                if st.button("🔧 Add Perplexity API Key"):
-                    st.info("Click the 'Add API Keys' button below to securely add your Perplexity key")
+            manual_perplexity = st.text_input(
+                "Paste Perplexity API Key:",
+                value=st.session_state.manual_perplexity_key,
+                type="password", 
+                placeholder="pplx-...",
+                help="Get from: https://www.perplexity.ai/settings/api"
+            )
+            if manual_perplexity != st.session_state.manual_perplexity_key:
+                st.session_state.manual_perplexity_key = manual_perplexity
+                st.rerun()
         
-        # Request API keys if missing
-        missing_keys = []
-        if openai_key_status == "❌ Missing":
-            missing_keys.append("OPENAI_API_KEY")
-        if perplexity_key_status == "❌ Missing":
-            missing_keys.append("PERPLEXITY_API_KEY")
-        
-        if missing_keys:
-            if st.button("🔐 Add API Keys", type="primary"):
-                try:
-                    from ask_secrets import ask_secrets
-                    ask_secrets(
-                        secret_keys=missing_keys,
-                        user_message="""To enable cloud LLM responses in the Vector RAG system, please add your API keys:
-
-**OpenAI API Key**: Required for GPT-4 responses
-- Get from: https://platform.openai.com/api-keys
-- Cost: ~$0.001-0.01 per query (much cheaper than $20/month subscription)
-
-**Perplexity API Key**: Required for Perplexity Sonar responses  
-- Get from: https://www.perplexity.ai/settings/api
-- Cost: Similar to OpenAI, pay-per-token instead of flat rate
-
-These keys enable the cost-saving Vector RAG workflow where you only pay for actual usage instead of flat monthly subscriptions."""
-                    )
-                except:
-                    # Fallback instruction
-                    st.markdown("""
-                    **To add API keys:**
-                    
-                    1. **OpenAI**: Get key from https://platform.openai.com/api-keys
-                    2. **Perplexity**: Get key from https://www.perplexity.ai/settings/api
-                    3. **Add to Secrets**: Add `OPENAI_API_KEY` and `PERPLEXITY_API_KEY` in your environment
-                    """)
+        # Show key sources
+        if active_openai_key:
+            source = "Manual Input" if st.session_state.manual_openai_key else "Environment"
+            st.success(f"OpenAI key loaded from: {source}")
+        if active_perplexity_key:
+            source = "Manual Input" if st.session_state.manual_perplexity_key else "Environment"
+            st.success(f"Perplexity key loaded from: {source}")
         
         # Step 2: Query with Vector Search
         st.subheader("🔍 Step 2: Query with Vector Search")
@@ -2636,9 +2634,9 @@ These keys enable the cost-saving Vector RAG workflow where you only pay for act
                 providers = []
                 provider_labels = {}
                 
-                # Fresh API key check in this scope
-                fresh_openai_key = os.getenv("OPENAI_API_KEY")
-                fresh_perplexity_key = os.getenv("PERPLEXITY_API_KEY")
+                # Use manual keys if available, otherwise environment keys
+                fresh_openai_key = st.session_state.get('manual_openai_key') or os.getenv("OPENAI_API_KEY")
+                fresh_perplexity_key = st.session_state.get('manual_perplexity_key') or os.getenv("PERPLEXITY_API_KEY")
                 
                 if fresh_openai_key and len(fresh_openai_key.strip()) > 0:
                     providers.append("openai")
@@ -2700,8 +2698,15 @@ These keys enable the cost-saving Vector RAG workflow where you only pay for act
                                 st.warning(f"💳 **BILLING**: Now charging your {provider_labels[api_provider]} account...")
                                 
                                 with st.spinner(f"🤖 Generating response using {provider_labels[api_provider]}..."):
+                                    # Get the appropriate API key from manual input or environment
+                                    selected_api_key = None
+                                    if api_provider == "openai":
+                                        selected_api_key = fresh_openai_key
+                                    elif api_provider == "perplexity":
+                                        selected_api_key = fresh_perplexity_key
+                                    
                                     response = rag_engine.generate_response_with_context(
-                                        query, search_results, api_provider
+                                        query, search_results, api_provider, selected_api_key
                                     )
                                 
                                 # Display response

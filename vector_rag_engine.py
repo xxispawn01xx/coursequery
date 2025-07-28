@@ -615,7 +615,7 @@ class VectorRAGEngine:
         return all_results
     
     def generate_response_with_context(self, query: str, context_chunks: List[Dict[str, Any]], 
-                                     api_provider: str = "openai") -> str:
+                                     api_provider: str = "openai", api_key: str = None) -> str:
         """Generate response using cloud API with relevant context."""
         # Prepare context
         context_text = "\n\n".join([
@@ -635,19 +635,24 @@ Please provide a comprehensive answer based on the context provided. If the cont
         
         # Call appropriate API
         if api_provider == "openai":
-            return self._call_openai_api(prompt)
+            return self._call_openai_api(prompt, api_key)
         elif api_provider == "perplexity":
-            return self._call_perplexity_api(prompt)
+            return self._call_perplexity_api(prompt, api_key)
         else:
             raise ValueError(f"Unknown API provider: {api_provider}")
     
-    def _call_openai_api(self, prompt: str) -> str:
+    def _call_openai_api(self, prompt: str, api_key: str = None) -> str:
         """Call OpenAI API with context."""
         try:
             import os
             from openai import OpenAI
             
-            client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+            # Use provided API key or fall back to environment
+            key = api_key or os.getenv("OPENAI_API_KEY")
+            if not key:
+                return "OpenAI API key not available"
+            
+            client = OpenAI(api_key=key)
             
             response = client.chat.completions.create(
                 model="gpt-4",  # Use GPT-4 for best quality
@@ -666,20 +671,21 @@ Please provide a comprehensive answer based on the context provided. If the cont
             logger.error(f"OpenAI API error: {e}")
             return f"Error calling OpenAI API: {e}"
     
-    def _call_perplexity_api(self, prompt: str) -> str:
+    def _call_perplexity_api(self, prompt: str, api_key: str = None) -> str:
         """Call Perplexity API with context."""
         try:
             import os
             import requests
             
-            api_key = os.getenv("PERPLEXITY_API_KEY")
-            if not api_key:
-                return "Perplexity API key not found"
+            # Use provided API key or fall back to environment
+            key = api_key or os.getenv("PERPLEXITY_API_KEY")
+            if not key:
+                return "Perplexity API key not available"
             
             response = requests.post(
                 "https://api.perplexity.ai/chat/completions",
                 headers={
-                    "Authorization": f"Bearer {api_key}",
+                    "Authorization": f"Bearer {key}",
                     "Content-Type": "application/json"
                 },
                 json={
