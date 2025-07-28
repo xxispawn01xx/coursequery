@@ -7,7 +7,7 @@ This is a comprehensive, privacy-focused real estate course analysis application
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
-Model preference: Llama 2 7B primary, Mistral 7B fallback (DialoGPT and GPT-2 removed per user request).
+Model preference: ChatGPT/Perplexity cloud APIs preferred for better response quality and internet access over local models.
 Workflow: Replit → GitHub sync → GitHub Desktop → local development with browser refresh.
 Deployment strategy: Replit for development (models disabled), local for AI functionality.
 Authentication: Persistent HuggingFace token storage with GUI input for seamless local usage.
