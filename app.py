@@ -2632,17 +2632,21 @@ These keys enable the cost-saving Vector RAG workflow where you only pay for act
                     help="Ask questions about your course content"
                 )
                 
-                # API provider selection with status check
+                # API provider selection with fresh key check
                 providers = []
                 provider_labels = {}
                 
-                if openai_key and len(openai_key.strip()) > 0:
+                # Fresh API key check in this scope
+                fresh_openai_key = os.getenv("OPENAI_API_KEY")
+                fresh_perplexity_key = os.getenv("PERPLEXITY_API_KEY")
+                
+                if fresh_openai_key and len(fresh_openai_key.strip()) > 0:
                     providers.append("openai")
                     provider_labels["openai"] = "OpenAI GPT-4 ✅"
                 else:
                     provider_labels["openai"] = "OpenAI GPT-4 ❌ (Key Missing)"
                 
-                if perplexity_key and len(perplexity_key.strip()) > 0:
+                if fresh_perplexity_key and len(fresh_perplexity_key.strip()) > 0:
                     providers.append("perplexity") 
                     provider_labels["perplexity"] = "Perplexity Sonar ✅"
                 else:
