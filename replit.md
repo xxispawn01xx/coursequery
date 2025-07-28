@@ -138,6 +138,9 @@ Authentication: Persistent HuggingFace token storage with GUI input for seamless
 - **Debug and Error Handling**: Added comprehensive error reporting to show exactly what content sources are being checked
 - **Multi-Environment Support**: System works in both Replit (development) and local environments with actual course content
 - **Complete Documentation**: Clear explanation of how Vector RAG processes all course materials for intelligent querying
+- **GPU Health Testing**: Added comprehensive GPU memory test for RTX 3060 to diagnose potential hardware issues with used graphics card
+- **CUDA Debugging Enhanced**: Implemented TORCH_USE_CUDA_DSA for better device-side assert error reporting
+- **Performance Monitoring**: Clear visual warnings when CPU fallback is used instead of GPU for embedding generation
 
 ### System Status
 - **Replit**: Clean development environment, ALL ONLINE OPERATIONS DISABLED (offline-only app)
