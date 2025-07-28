@@ -40,10 +40,10 @@ class Config:
     
     def setup_model_config(self):
         """Configure model settings."""
-        # Force development mode for testing (app should show content)
-        self.is_replit = False  # Override detection for testing
-        # Enable model loading for testing the fixes
-        self.skip_model_loading = False
+        # Disable local models since Vector RAG with cloud APIs is working
+        self.is_replit = True  # Keep local models disabled
+        # Skip problematic local model loading, focus on Vector RAG
+        self.skip_model_loading = True
         
         self.model_config = {
             'mistral': {

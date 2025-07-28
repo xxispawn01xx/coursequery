@@ -2564,8 +2564,11 @@ class RealEstateAIApp:
         
         # Check current API key status
         import os
-        openai_key_status = "✅ Set" if os.getenv("OPENAI_API_KEY") else "❌ Missing"
-        perplexity_key_status = "✅ Set" if os.getenv("PERPLEXITY_API_KEY") else "❌ Missing"
+        openai_key = os.getenv("OPENAI_API_KEY")
+        perplexity_key = os.getenv("PERPLEXITY_API_KEY")
+        
+        openai_key_status = "✅ Set" if openai_key and len(openai_key.strip()) > 0 else "❌ Missing"
+        perplexity_key_status = "✅ Set" if perplexity_key and len(perplexity_key.strip()) > 0 else "❌ Missing"
         
         col1, col2 = st.columns(2)
         with col1:
@@ -2633,13 +2636,13 @@ These keys enable the cost-saving Vector RAG workflow where you only pay for act
                 providers = []
                 provider_labels = {}
                 
-                if os.getenv("OPENAI_API_KEY"):
+                if openai_key and len(openai_key.strip()) > 0:
                     providers.append("openai")
                     provider_labels["openai"] = "OpenAI GPT-4 ✅"
                 else:
                     provider_labels["openai"] = "OpenAI GPT-4 ❌ (Key Missing)"
                 
-                if os.getenv("PERPLEXITY_API_KEY"):
+                if perplexity_key and len(perplexity_key.strip()) > 0:
                     providers.append("perplexity") 
                     provider_labels["perplexity"] = "Perplexity Sonar ✅"
                 else:
