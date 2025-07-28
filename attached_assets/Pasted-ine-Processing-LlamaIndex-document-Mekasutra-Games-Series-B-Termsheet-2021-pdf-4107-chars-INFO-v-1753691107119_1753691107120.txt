@@ -1,0 +1,92 @@
+ine:Processing LlamaIndex document: Mekasutra Games Series B Termsheet 2021.pdf (4107 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Mekasutra Games Series B Termsheet 2021.pdf (3492 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Mekasutra Games Series B Termsheet 2021.pdf (3983 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Mekasutra Games Series B Termsheet 2021.pdf (4426 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Mekasutra Games Series B Termsheet 2021.pdf (3749 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Structuring_the_Financing.pdf (892 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: The_wave_of_unicorn_IPO_s_reveals_Silicon_Valley_s_groupthink.pdf (4005 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: The_wave_of_unicorn_IPO_s_reveals_Silicon_Valley_s_groupthink.pdf (4005 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: The_wave_of_unicorn_IPO_s_reveals_Silicon_Valley_s_groupthink.pdf (4037 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: The_wave_of_unicorn_IPO_s_reveals_Silicon_Valley_s_groupthink.pdf (3632 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: The_wave_of_unicorn_IPO_s_reveals_Silicon_Valley_s_groupthink.pdf (3646 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: The_wave_of_unicorn_IPO_s_reveals_Silicon_Valley_s_groupthink.pdf (3717 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: The_wave_of_unicorn_IPO_s_reveals_Silicon_Valley_s_groupthink.pdf (3874 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: The_wave_of_unicorn_IPO_s_reveals_Silicon_Valley_s_groupthink.pdf (3933 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: The_wave_of_unicorn_IPO_s_reveals_Silicon_Valley_s_groupthink.pdf (2649 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Company Inc term sheet discussion questions (Missing-Toka uploaded from previous years).pdf (2536 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Company__Inc__--_Series_A_Term_Sheet.pdf (3368 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Company__Inc__--_Series_A_Term_Sheet.pdf (3255 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Company__Inc__--_Series_A_Term_Sheet.pdf (3888 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Company__Inc__--_Series_A_Term_Sheet.pdf (3886 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Company__Inc__--_Series_A_Term_Sheet.pdf (4053 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Company__Inc__--_Series_A_Term_Sheet.pdf (3534 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Company__Inc__--_Series_A_Term_Sheet.pdf (3809 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Company__Inc__--_Series_B_Term_Sheet.pdf (3614 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Company__Inc__--_Series_B_Term_Sheet.pdf (3100 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Company__Inc__--_Series_B_Term_Sheet.pdf (3809 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Company__Inc__--_Series_B_Term_Sheet.pdf (4058 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Company__Inc__--_Series_B_Term_Sheet.pdf (4138 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Company__Inc__--_Series_B_Term_Sheet.pdf (3957 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Company__Inc__--_Series_B_Term_Sheet.pdf (2771 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Company__Inc__--_Series_B_Term_Sheet.pdf (1558 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Company__Inc__--_Series_B_Term_Sheet.pdf (1029 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Company__Inc__--_Series_C_Term_Sheet.pdf (2506 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Company__Inc__--_Series_C_Term_Sheet.pdf (3908 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Company__Inc__--_Series_C_Term_Sheet.pdf (4041 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Company__Inc__--_Series_C_Term_Sheet.pdf (4113 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Company__Inc__--_Series_D_Term_Sheet.pdf (3695 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Company__Inc__--_Series_D_Term_Sheet.pdf (3914 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Company__Inc__--_Series_D_Term_Sheet.pdf (3894 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Company__Inc__--_Series_D_Term_Sheet.pdf (3812 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Company__Inc__--_Series_D_Term_Sheet.pdf (3975 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Company__Inc__--_Series_D_Term_Sheet.pdf (4030 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Company__Inc__--_Series_D_Term_Sheet.pdf (3912 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Company__Inc__--_Series_D_Term_Sheet.pdf (4180 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Company__Inc__--_Series_D_Term_Sheet.pdf (3773 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Company__Inc__--_Series_D_Term_Sheet.pdf (1656 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Company__Inc__--_Series_D_Term_Sheet.pdf (1771 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Note_on_Private_Equity_Securities.pdf (3851 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Note_on_Private_Equity_Securities.pdf (4237 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Note_on_Private_Equity_Securities.pdf (4410 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Note_on_Private_Equity_Securities.pdf (4436 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Note_on_Private_Equity_Securities.pdf (4678 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Note_on_Private_Equity_Securities.pdf (4408 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Note_on_Private_Equity_Securities.pdf (4291 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Note_on_Private_Equity_Securities.pdf (4446 chars)
+INFO:vector_rag_engine:Processing LlamaIndex document: Note_on_Private_Equity_Securities.pdf (3487 chars)
+INFO:vector_rag_engine:Generating embeddings for 674 chunks from 28 sources...
+INFO:vector_rag_engine:RTX 3060 Memory: 165MB used / 12287MB total (1.3%)
+INFO:vector_rag_engine:RTX 3060 memory healthy: 1.3% - proceeding with GPU embeddings
+INFO:sentence_transformers.SentenceTransformer:Use pytorch device_name: cuda:0
+INFO:sentence_transformers.SentenceTransformer:Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+INFO:vector_rag_engine:Loaded embedding model: all-MiniLM-L6-v2
+Batches:   0%|                                                                             | 0/22 [00:00<?, ?it/s]C:\Program Files\Python312\Lib\site-packages\torch\nn\modules\module.py:1747: FutureWarning:
+
+`encoder_attention_mask` is deprecated and will be removed in version 4.55.0 for `BertSdpaSelfAttention.forward`.
+
+Batches: 100%|████████████████████████████████████████████████████████████████████| 22/22 [00:01<00:00, 12.07it/s]
+INFO:vector_rag_engine:Created 674 vector embeddings for vcpe from 28 sources
+Loading llama_index.core.storage.kvstore.simple_kvstore from C:\Users\AliDesktop\Desktop\CoursQueryRemote\coursequery\indexed_courses\vcpe\index\docstore.json.
+Loading llama_index.core.storage.kvstore.simple_kvstore from C:\Users\AliDesktop\Desktop\CoursQueryRemote\coursequery\indexed_courses\vcpe\index\index_store.json.
+INFO:llama_index.core.indices.loading:Loading all indices.
+INFO:course_indexer:Loaded index for course: vcpe
+Loading llama_index.core.storage.kvstore.simple_kvstore from C:\Users\AliDesktop\Desktop\CoursQueryRemote\coursequery\indexed_courses\vcpe\index\docstore.json.
+Loading llama_index.core.storage.kvstore.simple_kvstore from C:\Users\AliDesktop\Desktop\CoursQueryRemote\coursequery\indexed_courses\vcpe\index\index_store.json.
+INFO:llama_index.core.indices.loading:Loading all indices.
+INFO:course_indexer:Loaded index for course: vcpe
+Loading llama_index.core.storage.kvstore.simple_kvstore from C:\Users\AliDesktop\Desktop\CoursQueryRemote\coursequery\indexed_courses\vcpe\index\docstore.json.
+Loading llama_index.core.storage.kvstore.simple_kvstore from C:\Users\AliDesktop\Desktop\CoursQueryRemote\coursequery\indexed_courses\vcpe\index\index_store.json.
+INFO:llama_index.core.indices.loading:Loading all indices.
+INFO:course_indexer:Loaded index for course: vcpe
+Loading llama_index.core.storage.kvstore.simple_kvstore from C:\Users\AliDesktop\Desktop\CoursQueryRemote\coursequery\indexed_courses\vcpe\index\docstore.json.
+Loading llama_index.core.storage.kvstore.simple_kvstore from C:\Users\AliDesktop\Desktop\CoursQueryRemote\coursequery\indexed_courses\vcpe\index\index_store.json.
+INFO:llama_index.core.indices.loading:Loading all indices.
+INFO:course_indexer:Loaded index for course: vcpe
+Loading llama_index.core.storage.kvstore.simple_kvstore from C:\Users\AliDesktop\Desktop\CoursQueryRemote\coursequery\indexed_courses\vcpe\index\docstore.json.
+Loading llama_index.core.storage.kvstore.simple_kvstore from C:\Users\AliDesktop\Desktop\CoursQueryRemote\coursequery\indexed_courses\vcpe\index\index_store.json.
+INFO:llama_index.core.indices.loading:Loading all indices.
+INFO:course_indexer:Loaded index for course: vcpe
+Loading llama_index.core.storage.kvstore.simple_kvstore from C:\Users\AliDesktop\Desktop\CoursQueryRemote\coursequery\indexed_courses\vcpe\index\docstore.json.
+Loading llama_index.core.storage.kvstore.simple_kvstore from C:\Users\AliDesktop\Desktop\CoursQueryRemote\coursequery\indexed_courses\vcpe\index\index_store.json.
+INFO:llama_index.core.indices.loading:Loading all indices.
+INFO:course_indexer:Loaded index for course: vcpe
