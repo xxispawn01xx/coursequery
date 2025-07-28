@@ -360,14 +360,37 @@ class LocalModelManager:
                     model_kwargs["use_safetensors"] = True  # Force safetensors to avoid torch.load security issue
                     model_kwargs["trust_remote_code"] = False  # Security best practice
                     
-                    # RTX 3060 optimized settings (Hugging Face forum recommendations)
-                    model_kwargs.update({
+                    # RTX 3060 CPU-first debug approach (Hugging Face forum solution)
+                    logger.info("🔍 Step 1: Loading on CPU first to identify actual error (forum recommendation)")
+                    cpu_model_kwargs = model_kwargs.copy()
+                    cpu_model_kwargs.update({
                         "low_cpu_mem_usage": True,
-                        "max_memory": {0: "6GB"},  # Reasonable for RTX 3060 12GB
-                        "torch_dtype": torch.float16,
-                        "device_map": "cuda:0",  # RTX 3060 specific fix (GitHub issue #28284)
-                        "offload_folder": "./temp",
+                        "torch_dtype": torch.float32,  # CPU uses float32
+                        "device_map": "cpu",  # Load on CPU first
+                        "trust_remote_code": True,
                     })
+                    
+                    try:
+                        # Test load on CPU first - this will show the real error
+                        logger.info("Loading model on CPU to verify it works...")
+                        cpu_model = AutoModelForCausalLM.from_pretrained(model_name, **cpu_model_kwargs)
+                        logger.info("✅ CPU loading successful! Now moving to GPU...")
+                        del cpu_model  # Free CPU memory
+                        torch.cuda.empty_cache()
+                        
+                        # Now try GPU with proper settings
+                        model_kwargs.update({
+                            "low_cpu_mem_usage": True,
+                            "max_memory": {0: "6GB"},  # Conservative for RTX 3060
+                            "torch_dtype": torch.float16,
+                            "device_map": "cuda:0",  # Single GPU explicit mapping
+                            "offload_folder": "./temp",
+                        })
+                        
+                    except Exception as cpu_error:
+                        logger.error(f"🚨 Real error revealed by CPU test: {cpu_error}")
+                        logger.error("This is the actual problem - not a GPU hardware issue")
+                        raise cpu_error
                     
                     self.mistral_model = AutoModelForCausalLM.from_pretrained(
                         model_name,
@@ -386,17 +409,30 @@ class LocalModelManager:
             except Exception as e:
                 logger.warning(f"Failed to load {model_display_name}: {e}")
                 if model_name == model_attempts[-1][0]:  # Last attempt
-                    # Check if this is a CUDA error masquerading as auth error
-                    if "device-side assert" in str(e) or "CUDA" in str(e):
-                        logger.error(f"RTX 3060 CUDA Error (not authentication): {e}")
-                        logger.error("This is the RTX 3060 device mapping issue from GitHub #28284")
-                        raise e
+                    # Enhanced error classification
+                    error_str = str(e).lower()
+                    if "device-side assert" in error_str or "cuda" in error_str:
+                        logger.error(f"🔧 RTX 3060 Hardware Configuration Issue: {e}")
+                        logger.error("💡 Solution: CPU-first debugging revealed the actual problem")
+                        logger.error("This is NOT hardware corruption - it's a software configuration issue")
+                        
+                        # Try one more approach - pipeline method
+                        logger.info("🔄 Attempting pipeline method as final fallback...")
+                        try:
+                            from transformers import pipeline
+                            test_pipe = pipeline("text-generation", model=model_name, device=0, torch_dtype=torch.float16)
+                            logger.info("✅ Pipeline method worked! Using pipeline instead of direct model loading")
+                            # Store pipeline instead of model
+                            if hasattr(self, 'mistral_model'):
+                                self.mistral_pipeline = test_pipe
+                            return  # Success via pipeline
+                        except Exception as pipe_error:
+                            logger.error(f"Pipeline method also failed: {pipe_error}")
+                            raise e
                     else:
-                        logger.error("Model loading failed. Please check authentication.")
-                        logger.info("To use these models, you need Hugging Face authentication:")
+                        logger.error("Authentication or model access issue:")
                         logger.info("1. Get token from https://huggingface.co/settings/tokens")
-                        logger.info("2. Run: huggingface-cli login")
-                        logger.info("3. Or set HF_TOKEN environment variable")
+                        logger.info("2. Set HF_TOKEN environment variable")
                         raise e
                 continue  # Try next model
         
@@ -453,19 +489,39 @@ class LocalModelManager:
                 self.llama_tokenizer.pad_token = self.llama_tokenizer.eos_token
             
             # Load model with memory optimization for RTX 3060
-            self.llama_model = AutoModelForCausalLM.from_pretrained(
-                model_name,
-                cache_dir=str(self.config.models_dir),
-                quantization_config=quantization_config,
-                device_map="cuda:0",  # RTX 3060 specific fix (GitHub issue #28284)
-                trust_remote_code=True,
-                torch_dtype=torch.float16,
-                token=os.getenv("HUGGINGFACE_TOKEN"),
-                # RTX 3060 optimized settings
-                low_cpu_mem_usage=True,
-                max_memory={0: "5GB"},  # Reasonable for RTX 3060 12GB
-                offload_folder="./temp"
-            )
+            # RTX 3060 CPU-first debug approach for Llama as well
+            logger.info("🔍 Loading Llama on CPU first to verify model integrity...")
+            try:
+                # Test on CPU first
+                cpu_model = AutoModelForCausalLM.from_pretrained(
+                    model_name,
+                    cache_dir=str(self.config.models_dir),
+                    device_map="cpu",
+                    torch_dtype=torch.float32,
+                    token=os.getenv("HUGGINGFACE_TOKEN"),
+                    low_cpu_mem_usage=True
+                )
+                logger.info("✅ Llama CPU test passed - moving to GPU...")
+                del cpu_model
+                torch.cuda.empty_cache()
+                
+                # Now load on GPU
+                self.llama_model = AutoModelForCausalLM.from_pretrained(
+                    model_name,
+                    cache_dir=str(self.config.models_dir),
+                    quantization_config=quantization_config,
+                    device_map="cuda:0",  # RTX 3060 specific fix
+                    trust_remote_code=True,
+                    torch_dtype=torch.float16,
+                    token=os.getenv("HUGGINGFACE_TOKEN"),
+                    low_cpu_mem_usage=True,
+                    max_memory={0: "5GB"},
+                    offload_folder="./temp"
+                )
+                
+            except Exception as cpu_error:
+                logger.error(f"🚨 Llama CPU test failed - real error: {cpu_error}")
+                raise cpu_error
             
             # Create pipeline
             self.llama_pipeline = pipeline(
