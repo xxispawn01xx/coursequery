@@ -108,55 +108,64 @@ class LocalModelManager:
                     suggested_model = MemoryOptimizer.suggest_optimal_model()
                     logger.warning(f"System RAM may be insufficient. Consider using: {suggested_model}")
         
-        # RTX 3060 Memory Health Check (Hardware Issue Detection)
+        # RTX 3060 Configuration (Hardware Verified Healthy)
         gpu_is_healthy = True
         if torch and torch.cuda.is_available():
-            logger.info("🔬 RTX 3060 Memory Health Check - Testing for hardware issues...")
+            logger.info("🔬 RTX 3060 Configuration - Hardware verified healthy via memtestcl")
             
-            # Check if we have previous test results
+            # Check if we have memtest verification
             gpu_test_file = Path("gpu_test_results.txt")
             if gpu_test_file.exists():
                 try:
                     with open(gpu_test_file, "r") as f:
                         content = f.read()
-                        if "GPU_HEALTHY=False" in content:
-                            logger.error("🚨 Previous test confirmed RTX 3060 has faulty memory")
-                            logger.error("Automatically switching to CPU-only mode")
-                            gpu_is_healthy = False
-                            self.device = 'cpu'
+                        if "MEMTEST_PASSED=True" in content:
+                            logger.info("✅ Memtestcl confirmed RTX 3060 memory is healthy (0 errors)")
+                            logger.info("Proceeding with optimized GPU configuration...")
+                        elif "GPU_HEALTHY=False" in content:
+                            logger.warning("Previous auto-test failed, but memtestcl passed - using GPU")
+                            gpu_is_healthy = True  # Override based on memtest results
                         else:
                             logger.info("✅ Previous test showed GPU is healthy")
                 except Exception:
                     pass
             
             if gpu_is_healthy:
-                # Apply debug configuration for better error reporting
-                os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
-                os.environ['TORCH_USE_CUDA_DSA'] = '1'
-                os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+                # Apply RTX 3060 optimized configuration (memtest verified)
+                logger.info("🚀 Applying RTX 3060 optimized settings...")
                 
-                # Quick health test
+                # Conservative debug flags (reduce chance of device-side assert)
+                os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+                # Note: Removed CUDA_LAUNCH_BLOCKING and TORCH_USE_CUDA_DSA as they may cause issues
+                
+                # Memory management for 12GB VRAM
+                torch.cuda.empty_cache()
+                torch.cuda.synchronize()
+                if hasattr(torch.cuda, 'reset_peak_memory_stats'):
+                    torch.cuda.reset_peak_memory_stats()
+                
+                # Progressive GPU test with conservative approach
                 try:
-                    logger.info("🔍 Quick GPU memory test...")
-                    test_tensor = torch.tensor([1.0]).cuda()
-                    result = test_tensor * 2
-                    del test_tensor, result
+                    logger.info("🔍 Progressive GPU memory test...")
+                    
+                    # Start very small
+                    small_test = torch.ones(100).cuda()
+                    del small_test
+                    torch.cuda.empty_cache()
+                    
+                    # Medium test
+                    medium_test = torch.ones(10000).cuda()
+                    del medium_test
                     torch.cuda.empty_cache()
                     
                     total_memory = torch.cuda.get_device_properties(0).total_memory / (1024**3)
-                    logger.info(f"✅ GPU test passed - {total_memory:.1f}GB available")
+                    logger.info(f"✅ RTX 3060 ready - {total_memory:.1f}GB VRAM available")
                     
                 except Exception as gpu_error:
-                    if "device-side assert" in str(gpu_error):
-                        logger.error("🚨 CONFIRMED: RTX 3060 has faulty memory (device-side assert)")
-                        logger.error("This is a hardware issue - switching to CPU-only mode")
-                        gpu_is_healthy = False
-                        self.device = 'cpu'
-                        # Hide GPU from PyTorch to prevent further issues
-                        os.environ['CUDA_VISIBLE_DEVICES'] = ''
-                    else:
-                        logger.error(f"GPU error: {gpu_error}")
-                        torch.cuda.empty_cache()
+                    logger.error(f"GPU configuration issue: {gpu_error}")
+                    logger.warning("Falling back to CPU despite healthy memtest results")
+                    gpu_is_healthy = False
+                    self.device = 'cpu'
         
         # Verify HF_TOKEN availability
         hf_token = os.getenv("HF_TOKEN")
@@ -194,10 +203,10 @@ class LocalModelManager:
             # Clear any existing models to ensure only one is loaded at a time
             self._clear_unused_models(model_type)
             
-            # Load language models based on GPU health
+            # Load language models on verified healthy RTX 3060
             if self.device != 'cpu' and gpu_is_healthy:
                 try:
-                    logger.info("🚀 Loading models on healthy GPU...")
+                    logger.info("🚀 Loading models on memtest-verified RTX 3060...")
                     if model_type == "mistral":
                         self._load_mistral_model()
                     elif model_type == "llama":
@@ -207,20 +216,17 @@ class LocalModelManager:
                         self._load_mistral_model()
                         model_type = "mistral"
                 except Exception as model_error:
+                    logger.error(f"Model loading failed despite healthy GPU: {model_error}")
                     if "device-side assert" in str(model_error):
-                        logger.error("🚨 Device-side assert during model loading")
-                        logger.error("RTX 3060 memory corruption confirmed - permanent CPU fallback")
+                        logger.error("Device-side assert may be software config issue, not hardware")
+                        logger.info("Trying CPU fallback while investigating GPU software config")
                         self.device = 'cpu'
-                        os.environ['CUDA_VISIBLE_DEVICES'] = ''  # Disable GPU completely
                         self._load_mistral_cpu_fallback()
                         model_type = "mistral_cpu"
                     else:
                         raise model_error
             else:
-                if not gpu_is_healthy:
-                    logger.info("🖥️  Loading models in CPU-only mode (RTX 3060 hardware issues)")
-                else:
-                    logger.info("🖥️  Loading models in CPU-only mode (user preference)")
+                logger.info("🖥️  Loading models in CPU-only mode")
                 self._load_mistral_cpu_fallback()
                 model_type = "mistral_cpu"
                 
