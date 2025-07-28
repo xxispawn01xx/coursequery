@@ -84,8 +84,13 @@ class LocalModelManager:
             return "cpu"
     
     def load_models(self, model_type: str = "mistral"):
-        """Load all required models."""
+        """Load all required models with caching optimization."""
         logger.info(f"Loading local models (type: {model_type})...")
+        
+        # Check if models are already loaded in memory
+        if self._models_already_loaded(model_type):
+            logger.info("Models already loaded in memory, skipping reload")
+            return
         
         try:
             if model_type == "mistral":
@@ -102,6 +107,26 @@ class LocalModelManager:
         except Exception as e:
             logger.error(f"Failed to load models: {e}")
             raise
+
+    def _models_already_loaded(self, model_type: str) -> bool:
+        """Check if models are already loaded in memory."""
+        if model_type == "mistral":
+            return (self.mistral_model is not None and 
+                   self.mistral_tokenizer is not None and 
+                   self.embedding_model is not None)
+        elif model_type == "llama":
+            return (self.llama_model is not None and 
+                   self.llama_tokenizer is not None and 
+                   self.embedding_model is not None)
+        return False
+
+    def _check_cache_status(self, model_name: str) -> str:
+        """Check if model is already cached locally."""
+        cache_path = self.config.models_dir / "models--" / model_name.replace("/", "--")
+        if cache_path.exists():
+            return "📦 Loading from cache (fast)"
+        else:
+            return "⬇️  First download (may take several minutes)"
     
     def _check_gguf_models(self) -> Optional[str]:
         """Check for available GGUF models in the models/gguf directory."""
@@ -136,7 +161,8 @@ class LocalModelManager:
         
         for model_name, model_display_name, model_type in model_attempts:
             try:
-                logger.info(f"Attempting to load {model_display_name}...")
+                cache_status = self._check_cache_status(model_name)
+                logger.info(f"Attempting to load {model_display_name}... {cache_status}")
                 
                 # Configure quantization only for larger models
                 quantization_config = None
@@ -149,10 +175,12 @@ class LocalModelManager:
                     )
                 
                 # Load tokenizer first (this will fail fast if authentication is wrong)
+                logger.info(f"Loading tokenizer from cache: {self.config.models_dir}")
                 self.mistral_tokenizer = AutoTokenizer.from_pretrained(
                     model_name,
                     cache_dir=str(self.config.models_dir),
-                    trust_remote_code=True
+                    trust_remote_code=True,
+                    local_files_only=False,  # Allow download if needed but prefer cache
                 )
                 
                 # Set pad token if not present
@@ -179,6 +207,8 @@ class LocalModelManager:
                     logger.info("Accelerate not available, using CPU-only mode")
                 
                 if model_type == "causal":
+                    logger.info(f"Loading model from cache: {self.config.models_dir}")
+                    model_kwargs["local_files_only"] = False  # Allow download if needed but prefer cache
                     self.mistral_model = AutoModelForCausalLM.from_pretrained(
                         model_name,
                         **model_kwargs
@@ -290,10 +320,12 @@ class LocalModelManager:
             model_name = model_config['model_name']
             device = model_config['device']
             
+            logger.info(f"Loading embedding model from cache: {self.config.models_dir}")
             self.embedding_model = SentenceTransformer(
                 model_name,
                 cache_folder=str(self.config.models_dir),
-                device=device
+                device=device,
+                use_auth_token=os.getenv("HF_TOKEN")  # Use token if available
             )
             
             logger.info(f"Embedding model loaded on {device}")

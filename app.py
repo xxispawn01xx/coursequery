@@ -241,7 +241,7 @@ class RealEstateAIApp:
                 st.error("❌ Model manager not available. Please install AI dependencies.")
                 return False
             
-            with st.spinner("Loading local models (this may take a few minutes on first run)..."):
+            with st.spinner("Loading local models (cached models load quickly, first download takes longer)..."):
                 try:
                     # Load models first
                     self.model_manager.load_models()
