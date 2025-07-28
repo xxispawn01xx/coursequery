@@ -207,19 +207,7 @@ class RealEstateAIApp:
 
     def load_models(self):
         """Load local models if not already loaded."""
-        # Skip model loading on Replit to save resources
-        if self.config.skip_model_loading:
-            st.info("🏠 **Development Mode**: Models disabled on Replit to save resources.")
-            st.markdown("""
-            **For Local Development:**
-            1. Sync this code to GitHub
-            2. Pull to local machine with GitHub Desktop  
-            3. Run locally: `streamlit run app.py --server.port 5000`
-            4. Models will load automatically with your HF_TOKEN
-            
-            **On Replit:** Document processing and course management work normally.
-            """)
-            return False
+        # This is a fully local app - always try to load models
         
         # Check authentication first for local usage
         if not st.session_state.get('hf_token_set', False):
@@ -255,11 +243,22 @@ class RealEstateAIApp:
             
             with st.spinner("Loading local models (this may take a few minutes on first run)..."):
                 try:
+                    # Load models first
                     self.model_manager.load_models()
-                    self.query_engine = LocalQueryEngine(self.model_manager)
+                    logger.info("Model manager loaded successfully")
+                    
+                    # Initialize query engine
+                    if QUERY_ENGINE_AVAILABLE:
+                        self.query_engine = LocalQueryEngine(self.model_manager)
+                        logger.info("Query engine initialized successfully")
+                    else:
+                        logger.error("Query engine not available")
+                        st.error("❌ Query engine not available. Please check dependencies.")
+                        return False
+                    
                     st.session_state.models_loaded = True
-                    st.success("✅ Local models loaded successfully!")
-                    logger.info("Models loaded successfully")
+                    st.success("✅ Local models and query engine loaded successfully!")
+                    logger.info("Models and query engine loaded successfully")
                 except Exception as e:
                     # Show more helpful error message for authentication issues
                     error_msg = str(e)
@@ -967,51 +966,34 @@ class RealEstateAIApp:
 
     def process_query(self, query: str, max_results: int, include_sources: bool):
         """Process a user query with comprehensive metrics tracking."""
-        # Try to initialize query engine if not already available
+        # Check if query engine is available
         if not self.query_engine:
-            if self.config.skip_model_loading:
-                st.error("❌ Q&A features are disabled in development mode.")
-                st.markdown("""
-                **For Local Development:**
-                1. Sync this code to GitHub
-                2. Pull to local machine with GitHub Desktop  
-                3. Run locally: `streamlit run app.py --server.port 5000`
-                4. Q&A will work with your local models
-                
-                **On Replit:** Document processing and course management work normally.
-                """)
-                return
-            
-            # Try to load models if not already loaded
-            if self.model_manager and not st.session_state.models_loaded:
-                # Check authentication first
-                if not st.session_state.get('hf_token_set', False):
-                    st.error("❌ HuggingFace authentication required for Q&A")
-                    if st.button("🔐 Setup Authentication"):
-                        st.session_state.show_auth_setup = True
-                        st.rerun()
-                    
-                    if st.session_state.get('show_auth_setup', False):
-                        self.setup_authentication()
-                    return
-                
+            # Check if models are loaded but query engine is missing
+            if st.session_state.models_loaded and self.model_manager:
                 try:
-                    self.model_manager.load_models()
+                    # Try to recreate query engine
                     self.query_engine = LocalQueryEngine(self.model_manager)
-                    st.session_state.models_loaded = True
-                    st.success("✅ Models loaded successfully!")
+                    logger.info("Query engine recreated successfully")
                 except Exception as e:
-                    st.error(f"❌ Failed to load models: {e}")
-                    st.markdown("""
-                    **If authentication failed:**
-                    - Check your token is correct
-                    - For Llama 2, request access at: https://huggingface.co/meta-llama/Llama-2-7b-chat-hf
-                    - Reload this page after getting access
-                    """)
+                    st.error(f"❌ Failed to initialize query engine: {e}")
                     return
-            elif not self.model_manager:
-                st.error("❌ Model manager not available. Please check system dependencies.")
-                return
+            else:
+                # Models not loaded, try to load them
+                if not self.load_models():
+                    st.error("❌ Cannot load models. Q&A functionality unavailable.")
+                    return
+        
+        # Double check query engine is now available
+        if not self.query_engine:
+            st.error("❌ Query engine still not available after initialization attempts.")
+            st.markdown("""
+            **Troubleshooting Steps:**
+            1. Check if all dependencies are installed properly
+            2. Verify model files are accessible
+            3. Check logs for specific error messages
+            4. Try restarting the application
+            """)
+            return
         
         # Initialize metrics evaluator if not exists
         if 'model_evaluator' not in st.session_state:

@@ -6,13 +6,21 @@ This simulates the app flow to find exactly where initialization fails.
 
 import logging
 import sys
+import os
 from pathlib import Path
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, patch, MagicMock
 import traceback
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(levelname)s - %(name)s - %(message)s')
 logger = logging.getLogger(__name__)
+
+# Mock Streamlit to avoid import issues
+sys.modules['streamlit'] = Mock()
+sys.modules['plotly'] = Mock()
+sys.modules['plotly.express'] = Mock()
+sys.modules['plotly.graph_objects'] = Mock()
+sys.modules['pandas'] = Mock()
 
 def test_imports():
     """Test if all required modules can be imported."""

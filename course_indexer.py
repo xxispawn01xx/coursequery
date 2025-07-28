@@ -10,53 +10,10 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime
 import pickle
 
-# LlamaIndex imports with fallbacks for Replit environment
-try:
-    from llama_index.core import Document, VectorStoreIndex, StorageContext, load_index_from_storage, Settings
-    from llama_index.core.node_parser import SentenceSplitter
-    from llama_index.core.embeddings import BaseEmbedding
-    from llama_index.embeddings.huggingface import HuggingFaceEmbedding
-    LLAMA_INDEX_AVAILABLE = True
-except ImportError:
-    # Mock classes for development environment
-    LLAMA_INDEX_AVAILABLE = False
-    
-    class Document:
-        def __init__(self, text="", metadata=None, excluded_llm_metadata_keys=None):
-            self.text = text
-            self.metadata = metadata or {}
-    
-    class VectorStoreIndex:
-        def __init__(self, documents=None, embed_model=None):
-            self.documents = documents or []
-        
-        def insert(self, document):
-            self.documents.append(document)
-    
-    class StorageContext:
-        @staticmethod
-        def from_defaults(persist_dir=None):
-            return StorageContext()
-    
-    def load_index_from_storage(storage_context):
-        return VectorStoreIndex()
-    
-    class Settings:
-        llm = None
-        embed_model = None
-    
-    class SentenceSplitter:
-        def __init__(self, chunk_size=1000, chunk_overlap=200):
-            self.chunk_size = chunk_size
-            self.chunk_overlap = chunk_overlap
-    
-    class BaseEmbedding:
-        def __init__(self, **kwargs):
-            pass
-    
-    class HuggingFaceEmbedding:
-        def __init__(self, model_name="", **kwargs):
-            self.model_name = model_name
+from llama_index.core import Document, VectorStoreIndex, StorageContext, load_index_from_storage, Settings
+from llama_index.core.node_parser import SentenceSplitter
+from llama_index.core.embeddings import BaseEmbedding
+from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 
 from config import Config
 from local_models import LocalModelManager

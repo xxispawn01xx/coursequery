@@ -33,9 +33,9 @@ class Config:
     
     def setup_model_config(self):
         """Configure model settings."""
-        # Environment detection - skip model loading on Replit
-        self.is_replit = bool(os.getenv('REPLIT_DEPLOYMENT_ID') or os.getenv('REPL_ID'))
-        self.skip_model_loading = self.is_replit  # Skip expensive model loading on Replit
+        # This is a fully local app - never skip model loading
+        self.is_replit = False
+        self.skip_model_loading = False
         
         self.model_config = {
             'mistral': {
