@@ -395,7 +395,11 @@ class LocalModelManager:
             import torch
             device = 'cpu'
             
-            self.embedding_model = SentenceTransformer(model_name, device=device)
+            self.embedding_model = SentenceTransformer(
+                model_name, 
+                device=device,
+                token=os.getenv("HF_TOKEN")  # Updated from deprecated use_auth_token
+            )
             logger.info(f"✅ Embedding model loaded on CPU: {model_name}")
             
         except Exception as e:
@@ -423,11 +427,14 @@ class LocalModelManager:
             if torch and torch.cuda.is_available():
                 try:
                     logger.info("Attempting to load embedding model on CUDA...")
+                    # Set CUDA debug mode to get better error messages
+                    os.environ['TORCH_USE_CUDA_DSA'] = '1'
+                    
                     self.embedding_model = SentenceTransformer(
                         model_name,
                         cache_folder=str(self.config.models_dir),
                         device='cuda',
-                        use_auth_token=os.getenv("HF_TOKEN")
+                        token=os.getenv("HF_TOKEN")  # Updated from deprecated use_auth_token
                     )
                     logger.info("✅ Embedding model loaded on CUDA - OPTIMAL PERFORMANCE")
                     return
@@ -450,7 +457,7 @@ class LocalModelManager:
                 model_name,
                 cache_folder=str(self.config.models_dir),
                 device='cpu',
-                use_auth_token=os.getenv("HF_TOKEN")
+                token=os.getenv("HF_TOKEN")  # Updated from deprecated use_auth_token
             )
             logger.error("⚠️  CPU FALLBACK: Embedding model loaded on CPU - SIGNIFICANTLY SLOWER than GPU!")
             

@@ -8,8 +8,8 @@ from typing import Dict, Any
 
 # Set CUDA environment variables for RTX 3060 12GB stability
 os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
-os.environ['TORCH_USE_CUDA_DSA'] = '1'
-os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'max_split_size_mb:512'
+os.environ['TORCH_USE_CUDA_DSA'] = '1'  # Enable device-side assertions for debugging
+os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'max_split_size_mb:512,garbage_collection_threshold:0.6'
 
 class Config:
     """Application configuration."""
