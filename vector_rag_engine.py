@@ -11,6 +11,7 @@ from typing import Dict, List, Any, Optional, Tuple
 from datetime import datetime
 import hashlib
 from response_cache import ResponseCache
+from query_history import QueryHistory
 
 logger = logging.getLogger(__name__)
 
@@ -244,6 +245,7 @@ class VectorRAGEngine:
         self.chunker = TranscriptChunker()
         self.embeddings_engine = LocalEmbeddingsEngine()
         self.response_cache = ResponseCache()
+        self.query_history = QueryHistory()
         
         # Storage paths
         self.vectors_dir = Path("./vectors")
@@ -669,6 +671,18 @@ Please provide a comprehensive answer based on the context provided. If the cont
             
             self.response_cache.cache_response(
                 query, course_name, api_provider, response, context_chunks, metadata
+            )
+            
+            # Add to query history
+            self.query_history.add_query(
+                course_name, query, response, api_provider, 
+                cached=False, metadata=metadata
+            )
+        elif cached_response:
+            # Add cached response to history
+            self.query_history.add_query(
+                course_name, query, cached_response['response'], api_provider,
+                cached=True, metadata=cached_response.get('metadata', {})
             )
         
         return response

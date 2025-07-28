@@ -2401,26 +2401,55 @@ class RealEstateAIApp:
             rag_engine = st.session_state.vector_rag_engine
             tm = TranscriptionManager()
             
-            # Show cache statistics
+            # Show cache and history statistics
             cache_stats = rag_engine.response_cache.get_cache_stats()
-            if cache_stats and cache_stats.get('total_cached_responses', 0) > 0:
-                with st.expander("📊 Response Cache Status"):
-                    col1, col2, col3 = st.columns(3)
+            history_stats = rag_engine.query_history.get_history_stats()
+            
+            if (cache_stats and cache_stats.get('total_cached_responses', 0) > 0) or \
+               (history_stats and history_stats.get('total_queries', 0) > 0):
+                with st.expander("📊 Cache & Query History Status"):
+                    col1, col2, col3, col4 = st.columns(4)
+                    
                     with col1:
                         st.metric("Cached Responses", cache_stats.get('total_cached_responses', 0))
                     with col2:
-                        st.metric("Cache Size", f"{cache_stats.get('total_size_mb', 0):.1f} MB")
+                        st.metric("Total Queries", history_stats.get('total_queries', 0))
                     with col3:
-                        if st.button("🗑️ Clear Cache"):
-                            cleared = rag_engine.response_cache.clear_all_cache()
-                            st.success(f"Cleared {cleared} cached responses")
+                        st.metric("Cache Hit Rate", f"{history_stats.get('cache_hit_rate', 0):.1f}%")
+                    with col4:
+                        if st.button("🗑️ Clear All"):
+                            cleared_cache = rag_engine.response_cache.clear_all_cache()
+                            cleared_history = rag_engine.query_history.clear_all_history()
+                            st.success(f"Cleared {cleared_cache} cached responses and {cleared_history} query histories")
                             st.rerun()
                     
                     # Show provider breakdown
-                    if cache_stats.get('provider_breakdown'):
-                        st.write("**Cached by Provider:**")
-                        for provider, count in cache_stats['provider_breakdown'].items():
-                            st.write(f"• {provider}: {count} responses")
+                    if cache_stats.get('provider_breakdown') or history_stats.get('provider_usage'):
+                        st.write("**Provider Usage:**")
+                        providers = set()
+                        if cache_stats.get('provider_breakdown'):
+                            providers.update(cache_stats['provider_breakdown'].keys())
+                        if history_stats.get('provider_usage'):
+                            providers.update(history_stats['provider_usage'].keys())
+                        
+                        for provider in providers:
+                            cached = cache_stats.get('provider_breakdown', {}).get(provider, 0)
+                            total = history_stats.get('provider_usage', {}).get(provider, 0)
+                            st.write(f"• {provider}: {total} queries ({cached} cached)")
+            
+            # Show recent query history
+            recent_queries = rag_engine.query_history.get_recent_queries_across_courses(5)
+            if recent_queries:
+                with st.expander("🕒 Recent Queries Across All Courses"):
+                    from datetime import datetime
+                    for i, entry in enumerate(recent_queries):
+                        timestamp = datetime.fromisoformat(entry['timestamp']).strftime("%Y-%m-%d %H:%M")
+                        cache_indicator = "📋" if entry.get('cached') else "🔥"
+                        st.write(f"**{cache_indicator} {entry['course']}** ({timestamp})")
+                        st.write(f"Q: {entry['query'][:80]}...")
+                        st.write(f"A: {entry['response'][:100]}...")
+                        if i < len(recent_queries) - 1:
+                            st.divider()
             
         except Exception as e:
             st.error(f"Vector RAG engine not available: {e}")
