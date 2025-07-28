@@ -104,7 +104,7 @@ Authentication: Persistent HuggingFace token storage with GUI input for seamless
 
 ## Recent Changes
 
-### July 28, 2025 - Repository Optimization, Clean Deployment & Successful Local Deployment
+### July 28, 2025 - Security Fix for PyTorch CVE-2025-32434 & Enhanced Timing Logs
 - **Complete Repository Cleanup**: Eliminated 5.7GB package cache bloat, reduced to 22MB clean codebase
 - **Fresh Git History**: Removed bloated commit history (1.48GB), created clean repository for fast sync
 - **Persistent Token Storage**: GUI-based HuggingFace token input with secure file persistence

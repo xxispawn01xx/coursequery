@@ -278,6 +278,9 @@ class LocalModelManager:
                 if model_type == "causal":
                     logger.info(f"Loading model from cache: {self.config.models_dir}")
                     model_kwargs["local_files_only"] = False  # Allow download if needed but prefer cache
+                    model_kwargs["use_safetensors"] = True  # Force safetensors to avoid torch.load security issue
+                    model_kwargs["trust_remote_code"] = False  # Security best practice
+                    
                     self.mistral_model = AutoModelForCausalLM.from_pretrained(
                         model_name,
                         **model_kwargs

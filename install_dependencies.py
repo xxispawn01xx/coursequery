@@ -47,10 +47,13 @@ def main():
         "ebooklib>=0.18",
     ]
     
-    # AI/ML dependencies (for local models)
+    # AI/ML dependencies (for local models with RTX 3060 CUDA support)
     ai_packages = [
-        "torch>=2.0.0",
+        "torch>=2.6.0+cu121 --index-url https://download.pytorch.org/whl/cu121",
+        "torchvision --index-url https://download.pytorch.org/whl/cu121", 
+        "torchaudio --index-url https://download.pytorch.org/whl/cu121",
         "transformers>=4.35.0",
+        "safetensors>=0.4.0",
         "sentence-transformers>=2.2.2",
         "accelerate>=0.24.0",
         "openai-whisper>=20231117",
