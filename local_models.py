@@ -108,8 +108,28 @@ class LocalModelManager:
         
         # Check if models are already loaded in memory
         if self._models_already_loaded(model_type):
-            logger.info("Models already loaded in memory, skipping reload")
+            logger.info("Models and pipelines already loaded in memory, skipping reload")
             return
+        elif (model_type == "mistral" and 
+              self.mistral_model is not None and 
+              self.mistral_tokenizer is not None and 
+              self.mistral_pipeline is None):
+            logger.info("Models loaded but pipeline missing - recreating pipeline only")
+            try:
+                self.mistral_pipeline = pipeline(
+                    "text-generation",
+                    model=self.mistral_model,
+                    tokenizer=self.mistral_tokenizer,
+                    max_length=512,
+                    temperature=0.7,
+                    do_sample=True,
+                    pad_token_id=self.mistral_tokenizer.eos_token_id
+                )
+                logger.info("Pipeline recreated successfully")
+                return
+            except Exception as e:
+                logger.error(f"Failed to recreate pipeline: {e}")
+                # Continue with full reload
         
         try:
             if model_type == "mistral":
@@ -135,13 +155,19 @@ class LocalModelManager:
     def _models_already_loaded(self, model_type: str) -> bool:
         """Check if models are already loaded in memory."""
         if model_type == "mistral":
-            return (self.mistral_model is not None and 
-                   self.mistral_tokenizer is not None and 
-                   self.embedding_model is not None)
+            models_loaded = (self.mistral_model is not None and 
+                           self.mistral_tokenizer is not None and 
+                           self.embedding_model is not None)
+            pipeline_loaded = self.mistral_pipeline is not None
+            logger.info(f"Mistral check - Models: {models_loaded}, Pipeline: {pipeline_loaded}")
+            return models_loaded and pipeline_loaded
         elif model_type == "llama":
-            return (self.llama_model is not None and 
-                   self.llama_tokenizer is not None and 
-                   self.embedding_model is not None)
+            models_loaded = (self.llama_model is not None and 
+                           self.llama_tokenizer is not None and 
+                           self.embedding_model is not None)
+            pipeline_loaded = self.llama_pipeline is not None
+            logger.info(f"Llama check - Models: {models_loaded}, Pipeline: {pipeline_loaded}")
+            return models_loaded and pipeline_loaded
         return False
 
     def _check_cache_status(self, model_name: str) -> str:
@@ -403,7 +429,26 @@ class LocalModelManager:
             pipeline = self.mistral_pipeline
             formatted_prompt = self._format_instruction_prompt(prompt)
         else:
-            raise RuntimeError(f"No model loaded (current: {self.current_model})")
+            # Check if we have any loaded models and fix the issue
+            if self.mistral_model is not None and self.mistral_tokenizer is not None:
+                logger.info("Model loaded but pipeline missing - recreating pipeline...")
+                try:
+                    self.mistral_pipeline = pipeline(
+                        "text-generation",
+                        model=self.mistral_model,
+                        tokenizer=self.mistral_tokenizer,
+                        max_length=512,
+                        temperature=0.7,
+                        do_sample=True,
+                        pad_token_id=self.mistral_tokenizer.eos_token_id
+                    )
+                    pipeline = self.mistral_pipeline
+                    formatted_prompt = self._format_instruction_prompt(prompt)
+                    logger.info("Pipeline recreated successfully")
+                except Exception as e:
+                    raise RuntimeError(f"Failed to recreate pipeline: {e}")
+            else:
+                raise RuntimeError(f"No model loaded (current: {self.current_model}). Models: mistral={self.mistral_model is not None}, llama={self.llama_model is not None}, pipelines: mistral_pipeline={self.mistral_pipeline is not None}, llama_pipeline={self.llama_pipeline is not None}")
         
         try:
             # Generate response
