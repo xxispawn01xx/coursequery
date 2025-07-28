@@ -233,6 +233,71 @@ class VectorRAGEngine:
         # Course vectors cache
         self.course_vectors = {}
     
+    def process_course_content(self, course_name: str, chunking_method: str = "paragraphs") -> Dict[str, Any]:
+        """Process ALL course content including documents, transcriptions, and indexed materials."""
+        all_chunks = []
+        chunk_metadata = []
+        processed_sources = set()
+        
+        # Import document processor
+        try:
+            from document_processor import DocumentProcessor
+            doc_processor = DocumentProcessor()
+        except ImportError:
+            doc_processor = None
+        
+        # 1. Process indexed course documents (if available)
+        indexed_course_dir = self.config.indexed_courses_dir / course_name
+        if indexed_course_dir.exists():
+            logger.info(f"Processing indexed documents from {indexed_course_dir}")
+            self._process_indexed_documents(indexed_course_dir, all_chunks, chunk_metadata, processed_sources, chunking_method)
+        
+        # 2. Process raw documents (PDFs, DOCX, PPTX, etc.)
+        raw_course_dir = self.config.raw_docs_dir / course_name
+        if raw_course_dir.exists() and doc_processor:
+            logger.info(f"Processing raw documents from {raw_course_dir}")
+            self._process_raw_documents(raw_course_dir, doc_processor, all_chunks, chunk_metadata, processed_sources, chunking_method)
+        
+        # 3. Process transcriptions
+        transcriptions_dir = Path("./transcriptions") / course_name
+        if transcriptions_dir.exists():
+            logger.info(f"Processing transcriptions from {transcriptions_dir}")
+            self._process_transcriptions(transcriptions_dir, all_chunks, chunk_metadata, processed_sources, chunking_method)
+        
+        if not all_chunks:
+            raise ValueError(f"No content found for course: {course_name}")
+        
+        # Generate embeddings for all content
+        logger.info(f"Generating embeddings for {len(all_chunks)} chunks from {len(processed_sources)} sources...")
+        embeddings = self.embeddings_engine.generate_embeddings(all_chunks)
+        
+        # Create comprehensive vector database entry
+        vector_data = {
+            'course_name': course_name,
+            'chunks': chunk_metadata,
+            'embeddings': embeddings.tolist(),
+            'chunking_method': chunking_method,
+            'created': datetime.now().isoformat(),
+            'total_chunks': len(all_chunks),
+            'total_sources': len(processed_sources),
+            'source_types': list(set(chunk['source_type'] for chunk in chunk_metadata)),
+            'processed_sources': list(processed_sources)
+        }
+        
+        # Save vectors
+        vectors_file = self.vectors_dir / f"{course_name}_vectors.json"
+        with open(vectors_file, 'w', encoding='utf-8') as f:
+            json.dump(vector_data, f, indent=2, ensure_ascii=False)
+        
+        # Cache in memory
+        self.course_vectors[course_name] = {
+            'chunks': chunk_metadata,
+            'embeddings': embeddings
+        }
+        
+        logger.info(f"Created {len(all_chunks)} vector embeddings for {course_name} from {len(processed_sources)} sources")
+        return vector_data
+
     def process_transcripts(self, course_name: str, transcripts: List[Dict[str, Any]], 
                           chunking_method: str = "paragraphs") -> Dict[str, Any]:
         """Process transcripts into vector embeddings."""
@@ -291,6 +356,81 @@ class VectorRAGEngine:
         
         logger.info(f"Created {len(all_chunks)} vector embeddings for {course_name}")
         return vector_data
+    
+    def _process_indexed_documents(self, indexed_dir: Path, all_chunks: List[str], 
+                                 chunk_metadata: List[Dict], processed_sources: set, chunking_method: str):
+        """Process documents from indexed course directory."""
+        # Look for text files in the indexed directory
+        for file_path in indexed_dir.rglob("*"):
+            if file_path.is_file() and file_path.suffix.lower() in ['.txt', '.md']:
+                try:
+                    with open(file_path, 'r', encoding='utf-8') as f:
+                        content = f.read()
+                    
+                    if content.strip():
+                        source_name = f"indexed_{file_path.name}"
+                        processed_sources.add(source_name)
+                        self._chunk_and_add_content(content, source_name, "indexed_document", 
+                                                  all_chunks, chunk_metadata, chunking_method)
+                except Exception as e:
+                    logger.warning(f"Could not read indexed file {file_path}: {e}")
+    
+    def _process_raw_documents(self, raw_dir: Path, doc_processor, all_chunks: List[str], 
+                             chunk_metadata: List[Dict], processed_sources: set, chunking_method: str):
+        """Process raw documents (PDFs, DOCX, PPTX, etc.)."""
+        for file_path in raw_dir.rglob("*"):
+            if file_path.is_file() and file_path.suffix.lower() in ['.pdf', '.docx', '.pptx', '.epub', '.txt', '.md']:
+                try:
+                    # Extract content using document processor
+                    content = doc_processor.extract_text_from_file(str(file_path))
+                    
+                    if content.strip():
+                        source_name = file_path.name
+                        processed_sources.add(source_name)
+                        source_type = f"document_{file_path.suffix.lower()[1:]}"  # pdf, docx, etc.
+                        
+                        self._chunk_and_add_content(content, source_name, source_type, 
+                                                  all_chunks, chunk_metadata, chunking_method)
+                except Exception as e:
+                    logger.warning(f"Could not process document {file_path}: {e}")
+    
+    def _process_transcriptions(self, trans_dir: Path, all_chunks: List[str], 
+                              chunk_metadata: List[Dict], processed_sources: set, chunking_method: str):
+        """Process transcription files."""
+        for file_path in trans_dir.rglob("*.txt"):
+            try:
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                
+                if content.strip():
+                    source_name = file_path.name
+                    processed_sources.add(source_name)
+                    self._chunk_and_add_content(content, source_name, "transcription", 
+                                              all_chunks, chunk_metadata, chunking_method)
+            except Exception as e:
+                logger.warning(f"Could not read transcription {file_path}: {e}")
+    
+    def _chunk_and_add_content(self, content: str, source_name: str, source_type: str,
+                             all_chunks: List[str], chunk_metadata: List[Dict], chunking_method: str):
+        """Chunk content and add to collections."""
+        # Choose chunking method
+        if chunking_method == "paragraphs":
+            chunks = self.chunker.chunk_by_paragraphs(content)
+        elif chunking_method == "sliding_window":
+            chunks = self.chunker.chunk_by_sliding_window(content)
+        elif chunking_method == "topics":
+            chunks = self.chunker.chunk_by_topics(content)
+        else:
+            raise ValueError(f"Unknown chunking method: {chunking_method}")
+        
+        # Add metadata to chunks
+        for chunk in chunks:
+            chunk['source_file'] = source_name
+            chunk['source_type'] = source_type
+            chunk['chunk_index'] = len(all_chunks)
+            
+            all_chunks.append(chunk['content'])
+            chunk_metadata.append(chunk)
     
     def search_course(self, course_name: str, query: str, top_k: int = 5) -> List[Dict[str, Any]]:
         """Search within a specific course using vector similarity."""

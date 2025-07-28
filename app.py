@@ -2359,8 +2359,9 @@ class RealEstateAIApp:
             st.error(f"Vector RAG engine not available: {e}")
             return
         
-        # Step 1: Process Transcripts into Vectors
-        st.subheader("🔧 Step 1: Convert Transcripts to Vector Embeddings")
+        # Step 1: Process ALL Course Content into Vectors
+        st.subheader("🔧 Step 1: Process All Course Materials into Vector Embeddings")
+        st.info("**Comprehensive Processing**: Combines PDFs, Word docs, PowerPoints, transcriptions, and indexed materials")
         
         # Course selection
         available_courses = list(self.config.indexed_courses_dir.glob("*/"))
@@ -2373,59 +2374,84 @@ class RealEstateAIApp:
         selected_course = st.selectbox(
             "Select course to process:",
             course_names,
-            help="Choose a course with transcriptions to convert to vectors"
+            help="Choose a course with documents and/or transcriptions to convert to vectors"
         )
         
         # Chunking method selection
         chunking_method = st.radio(
             "Chunking Strategy:",
             ["paragraphs", "sliding_window", "topics"],
-            help="How to break transcripts into searchable chunks"
+            help="How to break all course content into searchable chunks"
         )
         
-        # Show transcription status
+        # Show comprehensive content status
         if selected_course:
+            # Get content from multiple sources
             transcriptions = tm.get_all_transcriptions(selected_course)
             
-            col1, col2, col3 = st.columns(3)
+            # Check for documents
+            raw_docs_dir = self.config.raw_docs_dir / selected_course
+            indexed_docs_dir = self.config.indexed_courses_dir / selected_course
+            
+            doc_count = 0
+            if raw_docs_dir.exists():
+                doc_files = list(raw_docs_dir.rglob("*"))
+                doc_count += len([f for f in doc_files if f.is_file() and f.suffix.lower() in ['.pdf', '.docx', '.pptx', '.epub', '.txt', '.md']])
+            
+            if indexed_docs_dir.exists():
+                indexed_files = list(indexed_docs_dir.rglob("*"))
+                doc_count += len([f for f in indexed_files if f.is_file()])
+            
+            col1, col2, col3, col4 = st.columns(4)
             with col1:
-                st.metric("Transcriptions Available", len(transcriptions))
+                st.metric("Documents", doc_count)
             with col2:
+                st.metric("Transcriptions", len(transcriptions))
+            with col3:
                 total_chars = sum(t.get('character_count', 0) for t in transcriptions)
                 st.metric("Total Characters", f"{total_chars:,}")
-            with col3:
+            with col4:
                 # Check if vectors exist
                 vectors_file = rag_engine.vectors_dir / f"{selected_course}_vectors.json"
                 vector_status = "✅ Ready" if vectors_file.exists() else "❌ Not Created"
                 st.metric("Vector Status", vector_status)
             
-            # Process button
-            if transcriptions:
-                if st.button("🔄 Generate Vector Embeddings", type="primary"):
-                    with st.spinner("Generating embeddings with your RTX 3060..."):
+            # Process button - available if any content exists
+            has_content = doc_count > 0 or len(transcriptions) > 0
+            
+            if has_content:
+                if st.button("🔄 Generate Vector Embeddings from ALL Course Materials", type="primary"):
+                    with st.spinner("Processing documents, transcriptions, and indexed materials..."):
                         try:
-                            # Process transcriptions
-                            vector_data = rag_engine.process_transcripts(
-                                selected_course, transcriptions, chunking_method
+                            # Process ALL course content
+                            vector_data = rag_engine.process_course_content(
+                                selected_course, chunking_method
                             )
                             
-                            st.success(f"✅ Created {vector_data['total_chunks']} vector embeddings!")
+                            st.success(f"✅ Created {vector_data['total_chunks']} vector embeddings from {vector_data['total_sources']} sources!")
                             
-                            # Show processing results
+                            # Show comprehensive processing results
                             col1, col2 = st.columns(2)
                             with col1:
                                 st.write(f"**Chunks Created**: {vector_data['total_chunks']}")
                                 st.write(f"**Method**: {vector_data['chunking_method']}")
+                                st.write(f"**Sources Processed**: {vector_data['total_sources']}")
                             with col2:
-                                st.write(f"**Source Files**: {vector_data['total_transcripts']}")
+                                st.write(f"**Source Types**: {', '.join(vector_data['source_types'])}")
                                 st.write(f"**Created**: {vector_data['created'][:19]}")
+                            
+                            # Show detailed source breakdown
+                            with st.expander("📄 Processed Sources"):
+                                for source in vector_data['processed_sources']:
+                                    st.write(f"• {source}")
                             
                             st.rerun()
                             
                         except Exception as e:
                             st.error(f"Error generating embeddings: {e}")
             else:
-                st.info("No transcriptions found for this course. Use the Bulk Transcription tab first.")
+                st.warning("⚠️ No content found for this course.")
+                st.info("**To add content**: Use Upload Documents tab for PDFs/DOCX, or Bulk Transcription tab for videos/audio.")
         
         # API Key Management
         st.subheader("🔑 API Key Setup")

@@ -132,6 +132,9 @@ Authentication: Persistent HuggingFace token storage with GUI input for seamless
 - **Clear Billing Interface**: Added explicit billing warnings and tab labeling to distinguish free vs paid features
 - **Comprehensive Course Detection**: Fixed analytics to properly detect indexed courses like "vcpe" with 29 documents
 - **Enhanced User Clarity**: Overview section explaining exact billing structure and which tabs charge money
+- **Comprehensive Vector RAG**: Fixed to process ALL course materials (PDFs, DOCX, PPTX, transcriptions, indexed docs) not just transcriptions
+- **Multi-Source Processing**: Vector embeddings now combine documents, transcriptions, and indexed materials for complete course coverage
+- **Enhanced Interface**: Clear display of document counts, transcription counts, and comprehensive source breakdown after processing
 
 ### System Status
 - **Replit**: Clean development environment, ALL ONLINE OPERATIONS DISABLED (offline-only app)
