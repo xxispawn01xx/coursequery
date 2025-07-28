@@ -1,0 +1,14 @@
+Loading checkpoint shards: 100%|█████████████████████████████████████████████████████████| 2/2 [01:50<00:00, 55.09s/it]
+INFO:local_models:Moving model to GPU manually (safer than device_map)
+ERROR:local_models:GPU loading failed for Mistral 7B Instruct: CUDA out of memory. Tried to allocate 112.00 MiB. GPU 0 has a total capacity of 12.00 GiB of which 0 bytes is free. Of the allocated memory 22.44 GiB is allocated by PyTorch, and 89.13 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+INFO:local_models:🔄 Attempting DialoGPT Medium...
+INFO:local_models:🔍 Step 1: RTX 3060 Fix - Testing model on CPU first...
+ERROR:local_models:🚨 CPU test failed - REAL ERROR: Due to a serious vulnerability issue in `torch.load`, even with `weights_only=True`, we now require users to upgrade torch to at least v2.6 in order to use the function. This version restriction does not apply when loading files with safetensors.
+See the vulnerability report here https://nvd.nist.gov/vuln/detail/CVE-2025-32434
+ERROR:local_models:All models failed CPU test - this is not RTX 3060 hardware issue!
+ERROR:local_models:Model loading failed despite healthy GPU: Due to a serious vulnerability issue in `torch.load`, even with `weights_only=True`, we now require users to upgrade torch to at least v2.6 in order to use the function. This version restriction does not apply when loading files with safetensors.
+See the vulnerability report here https://nvd.nist.gov/vuln/detail/CVE-2025-32434
+ERROR:local_models:Failed to load models: Due to a serious vulnerability issue in `torch.load`, even with `weights_only=True`, we now require users to upgrade torch to at least v2.6 in order to use the function. This version restriction does not apply when loading files with safetensors.
+See the vulnerability report here https://nvd.nist.gov/vuln/detail/CVE-2025-32434
+ERROR:__main__:Model loading failed: Due to a serious vulnerability issue in `torch.load`, even with `weights_only=True`, we now require users to upgrade torch to at least v2.6 in order to use the function. This version restriction does not apply when loading files with safetensors.
+See the vulnerability report here https://nvd.nist.gov/vuln/detail/CVE-2025-32434
