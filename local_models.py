@@ -383,6 +383,26 @@ class LocalModelManager:
             logger.error(f"Failed to load Llama model: {e}")
             raise
     
+    def _load_embedding_model_cpu(self):
+        """Load embedding model specifically on CPU for fallback."""
+        try:
+            logger.info("Loading embedding model on CPU (fallback)...")
+            from sentence_transformers import SentenceTransformer
+            
+            model_name = self.config.model_config['embeddings']['model_name']
+            
+            # Force CPU device
+            import torch
+            device = 'cpu'
+            
+            self.embedding_model = SentenceTransformer(model_name, device=device)
+            logger.info(f"✅ Embedding model loaded on CPU: {model_name}")
+            
+        except Exception as e:
+            logger.error(f"Failed to load embedding model on CPU: {e}")
+            self.embedding_model = None
+            raise
+
     def _load_embedding_model(self):
         """Load sentence transformer model for embeddings."""
         logger.info("Loading embedding model...")
@@ -609,18 +629,40 @@ If asked to create spreadsheets, tables, or Excel files, provide:
             logger.info(f"📊 Embeddings generated in {total_time:.2f}s | {len(texts)} texts | {texts_per_second:.1f} texts/sec")
             
             return embeddings.tolist()
-        except Exception as e:
-            # Handle CUDA errors specifically
-            if "CUDA" in str(e):
-                logger.error(f"CUDA error during embedding generation: {e}")
-                logger.info("Attempting to clear CUDA cache and retry...")
-                if TORCH_AVAILABLE and torch.cuda.is_available():
-                    torch.cuda.empty_cache()
-                    torch.cuda.synchronize()
-                raise RuntimeError(f"CUDA error in embeddings. Try restarting the app or reducing batch size: {e}")
+            
+        except RuntimeError as e:
+            if "CUDA" in str(e) and "device-side assert" in str(e):
+                logger.error(f"CUDA device-side assert error: {e}")
+                logger.info("Forcing CPU fallback due to CUDA error...")
+                
+                try:
+                    # Force CPU processing
+                    if TORCH_AVAILABLE and torch.cuda.is_available():
+                        torch.cuda.empty_cache()
+                        torch.cuda.synchronize()
+                    
+                    # Reload embedding model on CPU
+                    logger.info("Reloading embedding model on CPU...")
+                    self._load_embedding_model_cpu()
+                    
+                    # Generate embeddings on CPU
+                    embeddings = self.embedding_model.encode(texts, convert_to_numpy=True)
+                    
+                    total_time = time.time() - start_time
+                    logger.info(f"📊 Embeddings generated on CPU fallback in {total_time:.2f}s | {len(texts)} texts")
+                    
+                    return embeddings.tolist()
+                    
+                except Exception as cpu_error:
+                    logger.error(f"CPU fallback also failed: {cpu_error}")
+                    raise RuntimeError(f"Both CUDA and CPU embedding generation failed. Original CUDA error: {e}")
             else:
-                logger.error(f"Error generating embeddings: {e}")
+                logger.error(f"Non-CUDA runtime error: {e}")
                 raise
+                
+        except Exception as e:
+            logger.error(f"Error generating embeddings: {e}")
+            raise
     
     def get_model_info(self) -> Dict[str, Any]:
         """Get information about loaded models."""

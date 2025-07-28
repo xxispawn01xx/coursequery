@@ -282,7 +282,17 @@ class VectorRAGEngine:
         
         # Generate embeddings for all content
         logger.info(f"Generating embeddings for {len(all_chunks)} chunks from {len(processed_sources)} sources...")
-        embeddings = self.embeddings_engine.generate_embeddings(all_chunks)
+        
+        try:
+            embeddings = self.embeddings_engine.generate_embeddings(all_chunks)
+        except RuntimeError as e:
+            if "CUDA" in str(e):
+                logger.error(f"CUDA error during vector embedding generation: {e}")
+                logger.info("This is likely due to RTX 3060 memory constraints with large document sets")
+                logger.info("The system will automatically retry with CPU fallback")
+                raise RuntimeError(f"CUDA memory error with {len(all_chunks)} chunks. The system attempted CPU fallback. Original error: {e}")
+            else:
+                raise
         
         # Create comprehensive vector database entry
         vector_data = {
