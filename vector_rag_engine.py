@@ -138,10 +138,27 @@ class LocalEmbeddingsEngine:
                 logger.error("sentence-transformers not installed. Install with: pip install sentence-transformers")
                 raise
     
-    def generate_embeddings(self, texts: List[str]) -> np.ndarray:
-        """Generate embeddings for a list of texts."""
+    def generate_embeddings(self, texts: List[str], device: str = 'auto') -> np.ndarray:
+        """Generate embeddings for a list of texts with RTX 3060 optimization."""
         if self.model is None:
             self.load_model()
+        
+        # RTX 3060 memory optimization
+        try:
+            import torch
+            if torch.cuda.is_available() and device != 'cpu':
+                allocated = torch.cuda.memory_allocated(0) / (1024**2)
+                total = torch.cuda.get_device_properties(0).total_memory / (1024**2)
+                usage_percent = (allocated / total) * 100
+                
+                if usage_percent > 95:
+                    logger.warning(f"RTX 3060 memory at {usage_percent:.1f}% - using CPU for embeddings")
+                    # Force CPU for sentence transformers
+                    import os
+                    os.environ['CUDA_VISIBLE_DEVICES'] = ''
+                    device = 'cpu'
+        except ImportError:
+            pass
         
         # Check cache first
         cached_embeddings = []
@@ -283,20 +300,41 @@ class VectorRAGEngine:
         # Generate embeddings for all content
         logger.info(f"Generating embeddings for {len(all_chunks)} chunks from {len(processed_sources)} sources...")
         
-        # Clear CUDA cache before large embedding generation
+        # RTX 3060 optimized memory management
         try:
             import torch
             if torch.cuda.is_available():
+                # Clear cache and synchronize
                 torch.cuda.empty_cache()
+                torch.cuda.synchronize()
+                
                 allocated = torch.cuda.memory_allocated(0) / (1024**2)
                 total = torch.cuda.get_device_properties(0).total_memory / (1024**2)
-                logger.info(f"GPU Memory before embeddings: {allocated:.0f}MB used / {total:.0f}MB total")
+                usage_percent = (allocated / total) * 100
                 
-                # If GPU memory usage is above 90%, force CPU fallback
-                if allocated > total * 0.9:
-                    logger.error(f"🚨 GPU memory critically low: {allocated/total*100:.1f}% used!")
-                    logger.error("⚠️  Forcing CPU fallback to prevent CUDA errors")
-                    raise RuntimeError("GPU memory critically low - forcing CPU fallback")
+                logger.info(f"RTX 3060 Memory: {allocated:.0f}MB used / {total:.0f}MB total ({usage_percent:.1f}%)")
+                
+                # RTX 3060 12GB can handle higher memory usage - only fallback if truly critical
+                if usage_percent > 98:  # Much higher threshold for RTX 3060
+                    logger.warning(f"RTX 3060 memory very high: {usage_percent:.1f}% - attempting aggressive cleanup")
+                    
+                    # Try aggressive cleanup
+                    import gc
+                    gc.collect()
+                    torch.cuda.empty_cache()
+                    
+                    # Recheck
+                    allocated = torch.cuda.memory_allocated(0) / (1024**2)
+                    usage_percent = (allocated / total) * 100
+                    
+                    if usage_percent > 99:
+                        logger.error(f"RTX 3060 memory critically low after cleanup: {usage_percent:.1f}%")
+                        logger.info("Using CPU for embeddings to prevent GPU crash")
+                        # Don't raise error, just log - let embedding engine handle CPU fallback
+                    else:
+                        logger.info(f"RTX 3060 memory after cleanup: {usage_percent:.1f}% - proceeding with GPU")
+                else:
+                    logger.info(f"RTX 3060 memory healthy: {usage_percent:.1f}% - proceeding with GPU embeddings")
         except ImportError:
             pass
         
