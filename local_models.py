@@ -132,7 +132,7 @@ class LocalModelManager:
                     pass
             
             if gpu_is_healthy:
-                # Apply HuggingFace Forum RTX 3060 Fixes (verified working)
+                # Apply HuggingFace Forum RTX 3060 Fixes + Memory Fragmentation Fix
                 logger.info("🚀 Applying verified HuggingFace forum RTX 3060 fixes...")
                 
                 # RTX 3060 environment setup from forums
@@ -140,22 +140,57 @@ class LocalModelManager:
                 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
                 os.environ['ACCELERATE_USE_MPS_DEVICE'] = 'false'
                 
+                # CRITICAL: Fix memory fragmentation (22.51GB allocated on 12GB GPU)
+                os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'
+                
                 # Remove debug flags that cause device-side assert
                 os.environ.pop('CUDA_LAUNCH_BLOCKING', None)
                 os.environ.pop('TORCH_USE_CUDA_DSA', None)
                 
-                # Test GPU with working approach
+                # Aggressive memory cleanup before model loading
+                logger.info("🧹 Performing aggressive RTX 3060 memory cleanup...")
+                import gc
+                gc.collect()
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
+                    torch.cuda.synchronize()
+                    if hasattr(torch.cuda, 'reset_peak_memory_stats'):
+                        torch.cuda.reset_peak_memory_stats()
+                    if hasattr(torch.cuda, 'reset_accumulated_memory_stats'):
+                        torch.cuda.reset_accumulated_memory_stats()
+                
+                # Test GPU with working approach + memory check
                 try:
                     logger.info("🔍 Testing RTX 3060 with forum-verified method...")
+                    
+                    # Check memory BEFORE test
+                    allocated_before = torch.cuda.memory_allocated(0) / (1024**3)
+                    total_memory = torch.cuda.get_device_properties(0).total_memory / (1024**3)
+                    
+                    if allocated_before > total_memory * 0.8:
+                        logger.error(f"🚨 RTX 3060 memory already critically high: {allocated_before:.2f}GB / {total_memory:.1f}GB ({allocated_before/total_memory*100:.1f}%)")
+                        logger.error("Memory fragmentation detected - applying aggressive cleanup")
+                        
+                        # Multiple cleanup attempts
+                        for i in range(3):
+                            gc.collect()
+                            torch.cuda.empty_cache()
+                            torch.cuda.synchronize()
+                        
+                        allocated_after = torch.cuda.memory_allocated(0) / (1024**3)
+                        if allocated_after > total_memory * 0.5:
+                            logger.error(f"❌ RTX 3060 memory still high after cleanup: {allocated_after:.2f}GB")
+                            raise RuntimeError("RTX 3060 memory fragmentation - restart required")
+                    
+                    # Test allocation
                     test_tensor = torch.ones(100).cuda()
                     del test_tensor
                     torch.cuda.empty_cache()
                     
-                    total_memory = torch.cuda.get_device_properties(0).total_memory / (1024**3)
-                    logger.info(f"✅ RTX 3060 ready - {total_memory:.1f}GB VRAM (forum fixes applied)")
+                    logger.info(f"✅ RTX 3060 ready - {total_memory:.1f}GB VRAM (forum fixes + memory optimization applied)")
                     
                 except Exception as gpu_error:
-                    logger.error(f"RTX 3060 still has issues: {gpu_error}")
+                    logger.error(f"RTX 3060 memory issue: {gpu_error}")
                     gpu_is_healthy = False
                     self.device = 'cpu'
         
