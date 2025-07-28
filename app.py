@@ -70,9 +70,19 @@ class RealEstateAIApp:
         
         # Initialize available components
         self.doc_processor = DocumentProcessor() if DOCUMENT_PROCESSOR_AVAILABLE else None
-        self.model_manager = LocalModelManager() if LOCAL_MODELS_AVAILABLE else None
+        
+        # Use session state for model manager and query engine to persist across requests
+        if 'model_manager' in st.session_state:
+            self.model_manager = st.session_state.model_manager
+        else:
+            self.model_manager = LocalModelManager() if LOCAL_MODELS_AVAILABLE else None
+            
+        if 'query_engine' in st.session_state:
+            self.query_engine = st.session_state.query_engine
+        else:
+            self.query_engine = None
+            
         self.course_indexer = CourseIndexer() if COURSE_INDEXER_AVAILABLE else None
-        self.query_engine = None
         
         # Initialize session state
         if 'models_loaded' not in st.session_state:
@@ -270,9 +280,13 @@ class RealEstateAIApp:
                     self.model_manager.load_models()
                     logger.info("Model manager loaded successfully")
                     
+                    # Store model manager in session state to persist across requests
+                    st.session_state.model_manager = self.model_manager
+                    
                     # Initialize query engine
                     if QUERY_ENGINE_AVAILABLE:
                         self.query_engine = LocalQueryEngine(self.model_manager)
+                        st.session_state.query_engine = self.query_engine
                         logger.info("Query engine initialized successfully")
                     else:
                         logger.error("Query engine not available")
@@ -1004,13 +1018,21 @@ class RealEstateAIApp:
         # Check if query engine is available
         if not self.query_engine:
             # Check if models are loaded but query engine is missing
-            if st.session_state.models_loaded and self.model_manager:
-                try:
-                    # Try to recreate query engine
-                    self.query_engine = LocalQueryEngine(self.model_manager)
-                    logger.info("Query engine recreated successfully")
-                except Exception as e:
-                    st.error(f"❌ Failed to initialize query engine: {e}")
+            if st.session_state.models_loaded:
+                # Get model manager from session state or use current instance
+                model_manager = st.session_state.get('model_manager', self.model_manager)
+                if model_manager:
+                    try:
+                        # Try to recreate query engine
+                        self.query_engine = LocalQueryEngine(model_manager)
+                        st.session_state.query_engine = self.query_engine
+                        logger.info("Query engine recreated successfully")
+                    except Exception as e:
+                        st.error(f"❌ Failed to initialize query engine: {e}")
+                        logger.error(f"Query engine recreation failed: {e}")
+                        return
+                else:
+                    st.error("❌ Model manager not available in session state")
                     return
             else:
                 # Models not loaded, try to load them
@@ -1048,6 +1070,7 @@ class RealEstateAIApp:
                 # Final check to ensure query_engine is available
                 if self.query_engine is None:
                     st.error("❌ Query engine not initialized. Please reload the page and try again.")
+                    logger.error("Query engine is None in final check")
                     return
                 
                 result = self.query_engine.query(

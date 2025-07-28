@@ -423,10 +423,10 @@ class LocalModelManager:
         """
         # Use appropriate model based on current selection
         if self.current_model == "llama" and self.llama_pipeline is not None:
-            pipeline = self.llama_pipeline
+            pipe = self.llama_pipeline
             formatted_prompt = self._format_llama_prompt(prompt)
         elif self.mistral_pipeline is not None:
-            pipeline = self.mistral_pipeline
+            pipe = self.mistral_pipeline
             formatted_prompt = self._format_instruction_prompt(prompt)
         else:
             # Check if we have any loaded models and fix the issue
@@ -442,8 +442,9 @@ class LocalModelManager:
                         do_sample=True,
                         pad_token_id=self.mistral_tokenizer.eos_token_id
                     )
-                    pipeline = self.mistral_pipeline
+                    pipe = self.mistral_pipeline
                     formatted_prompt = self._format_instruction_prompt(prompt)
+                    pipeline = pipe  # Use the recreated pipeline
                     logger.info("Pipeline recreated successfully")
                 except Exception as e:
                     raise RuntimeError(f"Failed to recreate pipeline: {e}")
@@ -452,7 +453,7 @@ class LocalModelManager:
         
         try:
             # Generate response
-            response = pipeline(
+            response = pipe(
                 formatted_prompt,
                 max_new_tokens=max_new_tokens,
                 do_sample=True,
