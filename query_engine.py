@@ -203,11 +203,15 @@ class LocalQueryEngine:
         prompt = self._build_response_prompt(query, context, course_name)
         
         try:
-            # Generate response using local model
-            response = self.model_manager.generate_response(
-                prompt, 
-                max_new_tokens=512
-            )
+            # Generate response using local model manager directly
+            if self.model_manager and hasattr(self.model_manager, 'generate_response'):
+                response = self.model_manager.generate_response(
+                    prompt, 
+                    max_new_tokens=512
+                )
+            else:
+                # Fallback error message
+                return "Local model manager not available. Please ensure models are loaded properly."
             
             # Clean and format response
             cleaned_response = self._clean_and_format_response(response)

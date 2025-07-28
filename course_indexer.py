@@ -57,13 +57,38 @@ class CourseIndexer:
             chunk_overlap=self.config.chunk_config['chunk_overlap'],
         )
         
-        # Disable global LLM to prevent OpenAI usage
-        Settings.llm = None
+        # We'll set up our local LLM when model_manager is available
+        # No need to disable LLM globally since we want to use our local models
     
     def set_model_manager(self, model_manager: LocalModelManager):
-        """Set the model manager for embeddings."""
+        """Set the model manager for embeddings and LLM."""
         self.model_manager = model_manager
         self.embedding_wrapper = CustomEmbeddingWrapper(model_manager)
+        
+        # Configure LlamaIndex to use our local models
+        try:
+            from llama_index.llms.huggingface import HuggingFaceLLM
+            
+            # Create a local LLM wrapper for LlamaIndex
+            local_llm = HuggingFaceLLM(
+                model_name="mistralai/Mistral-7B-Instruct-v0.1",
+                tokenizer_name="mistralai/Mistral-7B-Instruct-v0.1",
+                context_window=4096,
+                max_new_tokens=512,
+                generate_kwargs={"temperature": 0.7, "do_sample": True},
+                device_map="auto",
+            )
+            
+            # Set global LlamaIndex settings to use our local models
+            Settings.llm = local_llm
+            Settings.embed_model = self.embedding_wrapper
+            
+            logger.info("LlamaIndex configured to use local models")
+            
+        except ImportError:
+            logger.warning("HuggingFaceLLM not available, using manual generation")
+            # Set embedding model only
+            Settings.embed_model = self.embedding_wrapper
     
     def index_course_documents(self, course_name: str, documents: List[Dict[str, Any]]):
         """
