@@ -505,7 +505,8 @@ class LocalModelManager:
                         torch_dtype=torch.float16,
                         low_cpu_mem_usage=True,
                         trust_remote_code=True,
-                        use_safetensors=True  # Secure format
+                        use_safetensors=True,  # Secure format
+                        device_map=None  # Remove device_map to avoid accelerate requirement
                     )
                 except Exception as safetensors_error:
                     if "safetensors" in str(safetensors_error).lower():
