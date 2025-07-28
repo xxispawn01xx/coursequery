@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Dict, List, Any, Optional, Tuple
 from datetime import datetime
 import hashlib
+from response_cache import ResponseCache
 
 logger = logging.getLogger(__name__)
 
@@ -242,6 +243,7 @@ class VectorRAGEngine:
         
         self.chunker = TranscriptChunker()
         self.embeddings_engine = LocalEmbeddingsEngine()
+        self.response_cache = ResponseCache()
         
         # Storage paths
         self.vectors_dir = Path("./vectors")
@@ -617,6 +619,21 @@ class VectorRAGEngine:
     def generate_response_with_context(self, query: str, context_chunks: List[Dict[str, Any]], 
                                      api_provider: str = "openai", api_key: str = None) -> str:
         """Generate response using cloud API with relevant context."""
+        
+        # Check cache first
+        course_name = context_chunks[0].get('source_file', 'unknown') if context_chunks else 'unknown'
+        cached_response = self.response_cache.get_cached_response(
+            query, course_name, api_provider, context_chunks
+        )
+        
+        if cached_response:
+            logger.info(f"Cache hit for query: {query[:50]}...")
+            response = cached_response['response']
+            
+            # Add cache indicator to response
+            response += f"\n\n*ℹ️ This response was retrieved from cache (saved: {cached_response.get('timestamp', 'unknown')})*"
+            return response
+        
         # Prepare context
         context_text = "\n\n".join([
             f"Source: {chunk['source_file']}\nContent: {chunk['content']}"
@@ -635,11 +652,26 @@ Please provide a comprehensive answer based on the context provided. If the cont
         
         # Call appropriate API
         if api_provider == "openai":
-            return self._call_openai_api(prompt, api_key)
+            response = self._call_openai_api(prompt, api_key)
         elif api_provider == "perplexity":
-            return self._call_perplexity_api(prompt, api_key)
+            response = self._call_perplexity_api(prompt, api_key)
         else:
             raise ValueError(f"Unknown API provider: {api_provider}")
+        
+        # Cache the response for future use
+        if response and not response.startswith("Error"):
+            metadata = {
+                'api_provider': api_provider,
+                'context_chunks_count': len(context_chunks),
+                'estimated_tokens': len(prompt.split()) + len(response.split()),
+                'sources': [chunk.get('source_file', 'unknown') for chunk in context_chunks]
+            }
+            
+            self.response_cache.cache_response(
+                query, course_name, api_provider, response, context_chunks, metadata
+            )
+        
+        return response
     
     def _call_openai_api(self, prompt: str, api_key: str = None) -> str:
         """Call OpenAI API with context."""

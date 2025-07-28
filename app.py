@@ -2401,6 +2401,27 @@ class RealEstateAIApp:
             rag_engine = st.session_state.vector_rag_engine
             tm = TranscriptionManager()
             
+            # Show cache statistics
+            cache_stats = rag_engine.response_cache.get_cache_stats()
+            if cache_stats and cache_stats.get('total_cached_responses', 0) > 0:
+                with st.expander("📊 Response Cache Status"):
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        st.metric("Cached Responses", cache_stats.get('total_cached_responses', 0))
+                    with col2:
+                        st.metric("Cache Size", f"{cache_stats.get('total_size_mb', 0):.1f} MB")
+                    with col3:
+                        if st.button("🗑️ Clear Cache"):
+                            cleared = rag_engine.response_cache.clear_all_cache()
+                            st.success(f"Cleared {cleared} cached responses")
+                            st.rerun()
+                    
+                    # Show provider breakdown
+                    if cache_stats.get('provider_breakdown'):
+                        st.write("**Cached by Provider:**")
+                        for provider, count in cache_stats['provider_breakdown'].items():
+                            st.write(f"• {provider}: {count} responses")
+            
         except Exception as e:
             st.error(f"Vector RAG engine not available: {e}")
             return
