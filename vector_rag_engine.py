@@ -661,11 +661,11 @@ Please provide a comprehensive answer based on the context provided. If the cont
             raise ValueError(f"Unknown API provider: {api_provider}")
         
         # Cache the response for future use
-        if response and not response.startswith("Error"):
+        if response and isinstance(response, str) and not response.startswith("Error"):
             metadata = {
                 'api_provider': api_provider,
                 'context_chunks_count': len(context_chunks),
-                'estimated_tokens': len(prompt.split()) + len(response.split()),
+                'estimated_tokens': len(prompt.split()) + len(str(response).split()),
                 'sources': [chunk.get('source_file', 'unknown') for chunk in context_chunks]
             }
             
@@ -763,6 +763,14 @@ Please provide a comprehensive answer based on the context provided. If the cont
             if response.status_code == 200:
                 result = response.json()
                 content = result["choices"][0]["message"]["content"]
+                
+                # Handle None content from API
+                if content is None:
+                    logger.warning("Perplexity API returned None content")
+                    return "No response from Perplexity API"
+                
+                # Ensure content is a string
+                content = str(content)
                 
                 # Check if response contains structured data that should be Excel
                 if self._should_convert_to_excel(content):

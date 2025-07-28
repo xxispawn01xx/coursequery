@@ -131,6 +131,13 @@ class GoogleSheetsCreator:
     def _extract_financial_parameters(self, ai_response: str) -> Dict:
         """Extract financial parameters from AI response text."""
         
+        # Handle None or empty response
+        if not ai_response or ai_response is None:
+            return {}
+        
+        # Ensure response is a string
+        ai_response = str(ai_response)
+        
         params = {}
         
         # Extract numerical values with regex patterns
@@ -144,15 +151,17 @@ class GoogleSheetsCreator:
         
         for param, pattern in patterns.items():
             match = re.search(pattern, ai_response.lower())
-            if match:
-                value = match.group(1).replace(',', '')
-                try:
-                    params[param] = float(value)
-                    # Convert percentages to decimals
-                    if param in ['growth', 'margin', 'wacc', 'terminal'] and params[param] > 1:
-                        params[param] = params[param] / 100
-                except ValueError:
-                    continue
+            if match and match.group(1):
+                value = match.group(1)
+                if value is not None:
+                    value = value.replace(',', '')
+                    try:
+                        params[param] = float(value)
+                        # Convert percentages to decimals
+                        if param in ['growth', 'margin', 'wacc', 'terminal'] and params[param] > 1:
+                            params[param] = params[param] / 100
+                    except ValueError:
+                        continue
         
         return params
     
@@ -344,6 +353,14 @@ class GoogleSheetsCreator:
 
 def detect_and_create_financial_sheet(query: str, ai_response: str) -> Optional[str]:
     """Detect if AI response should trigger Google Sheet creation."""
+    
+    # Handle None inputs
+    if not query or not ai_response:
+        return None
+        
+    # Ensure inputs are strings
+    query = str(query)
+    ai_response = str(ai_response)
     
     financial_keywords = ['dcf', 'valuation', 'financial model', 'cash flow', 'npv', 'irr', 'projection']
     
