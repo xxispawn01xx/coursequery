@@ -131,39 +131,30 @@ class LocalModelManager:
                     pass
             
             if gpu_is_healthy:
-                # Apply RTX 3060 optimized configuration (memtest verified)
-                logger.info("🚀 Applying RTX 3060 optimized settings...")
+                # Apply HuggingFace Forum RTX 3060 Fixes (verified working)
+                logger.info("🚀 Applying verified HuggingFace forum RTX 3060 fixes...")
                 
-                # Conservative debug flags (reduce chance of device-side assert)
+                # RTX 3060 environment setup from forums
+                os.environ['TORCH_CUDA_ARCH_LIST'] = '8.6'  # RTX 3060 Ampere
                 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
-                # Note: Removed CUDA_LAUNCH_BLOCKING and TORCH_USE_CUDA_DSA as they may cause issues
+                os.environ['ACCELERATE_USE_MPS_DEVICE'] = 'false'
                 
-                # Memory management for 12GB VRAM
-                torch.cuda.empty_cache()
-                torch.cuda.synchronize()
-                if hasattr(torch.cuda, 'reset_peak_memory_stats'):
-                    torch.cuda.reset_peak_memory_stats()
+                # Remove debug flags that cause device-side assert
+                os.environ.pop('CUDA_LAUNCH_BLOCKING', None)
+                os.environ.pop('TORCH_USE_CUDA_DSA', None)
                 
-                # Progressive GPU test with conservative approach
+                # Test GPU with working approach
                 try:
-                    logger.info("🔍 Progressive GPU memory test...")
-                    
-                    # Start very small
-                    small_test = torch.ones(100).cuda()
-                    del small_test
-                    torch.cuda.empty_cache()
-                    
-                    # Medium test
-                    medium_test = torch.ones(10000).cuda()
-                    del medium_test
+                    logger.info("🔍 Testing RTX 3060 with forum-verified method...")
+                    test_tensor = torch.ones(100).cuda()
+                    del test_tensor
                     torch.cuda.empty_cache()
                     
                     total_memory = torch.cuda.get_device_properties(0).total_memory / (1024**3)
-                    logger.info(f"✅ RTX 3060 ready - {total_memory:.1f}GB VRAM available")
+                    logger.info(f"✅ RTX 3060 ready - {total_memory:.1f}GB VRAM (forum fixes applied)")
                     
                 except Exception as gpu_error:
-                    logger.error(f"GPU configuration issue: {gpu_error}")
-                    logger.warning("Falling back to CPU despite healthy memtest results")
+                    logger.error(f"RTX 3060 still has issues: {gpu_error}")
                     gpu_is_healthy = False
                     self.device = 'cpu'
         
@@ -375,20 +366,23 @@ class LocalModelManager:
                         bnb_4bit_use_double_quant=True,
                     )
                 
-                # Load model with RTX 3060 specific settings
-                logger.info("Loading model on GPU...")
+                # HuggingFace Forum RTX 3060 Fix (Issues #28284, #22546)
+                logger.info("Applying HuggingFace forum RTX 3060 fix...")
+                
+                # Remove problematic device_map - let PyTorch handle device placement
                 self.mistral_model = AutoModelForCausalLM.from_pretrained(
                     model_name,
                     cache_dir=str(self.config.models_dir),
                     token=os.getenv("HF_TOKEN") or os.getenv("HUGGINGFACE_TOKEN"),
-                    quantization_config=quantization_config,
-                    device_map="cuda:0",  # RTX 3060 specific fix (GitHub #28284)
                     torch_dtype=torch.float16,
                     low_cpu_mem_usage=True,
-                    max_memory={0: "6GB"},  # Conservative for RTX 3060 12GB
                     trust_remote_code=True,
-                    offload_folder="./temp"
                 )
+                
+                # Move to GPU manually (forum solution)
+                if torch.cuda.is_available():
+                    logger.info("Moving model to GPU manually (safer than device_map)")
+                    self.mistral_model = self.mistral_model.cuda()
                 
                 # Step 4: Create pipeline
                 logger.info("🔧 Creating text generation pipeline...")

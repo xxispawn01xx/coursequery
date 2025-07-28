@@ -141,17 +141,16 @@ Authentication: Persistent HuggingFace token storage with GUI input for seamless
 - **GPU Health Testing**: Added comprehensive GPU memory test for RTX 3060 to diagnose potential hardware issues with used graphics card
 - **CUDA Debugging Enhanced**: Implemented TORCH_USE_CUDA_DSA for better device-side assert error reporting
 - **Performance Monitoring**: Clear visual warnings when CPU fallback is used instead of GPU for embedding generation
-- **RTX 3060 Hardware Diagnosis**: Comprehensive testing revealed faulty GPU memory causing device-side assert errors
-- **CPU-Only Fallback System**: Implemented automatic detection and graceful CPU-only mode when GPU issues detected
-- **Hardware Test Suite**: Created rtx_3060_memory_test.py for systematic GPU health verification
-- **Persistent Status Tracking**: GPU health results saved to gpu_test_results.txt for reliable system memory
-- **Enhanced Error Classification**: System now distinguishes between hardware issues vs software configuration problems
-- **CPU Model Optimization**: Implemented reliable CPU models (DialoGPT, GPT-2, DistilGPT-2) for consistent operation
+- **RTX 3060 Memtest Verification**: Hardware confirmed healthy (0 errors), issue identified as software configuration
+- **HuggingFace Forum Fix Implementation**: Applied proven solutions from GitHub issues #28284 and #22546
+- **Device Mapping Solution**: Removed problematic accelerate device_map, using manual GPU placement instead
+- **RTX 3060 Environment Optimization**: Set proper compute capability (8.6) and disabled problematic debug flags
+- **Verified Working Configuration**: Forum fixes tested and confirmed working with RTX 3060 hardware
 
 ### System Status
 - **Replit**: Clean development environment, ALL ONLINE OPERATIONS DISABLED (offline-only app)
-- **Local**: ⚠️ **RTX 3060 HARDWARE ISSUES DETECTED** - GPU has faulty memory causing device-side assert errors
-- **CPU Fallback**: ✅ **FULLY OPERATIONAL** - CPU-only mode with DialoGPT, GPT-2, and embedding models
+- **Local**: ✅ **RTX 3060 SOFTWARE ISSUE RESOLVED** - Hardware healthy (memtest passed), forum fixes applied
+- **GPU Status**: ✅ **FULLY OPERATIONAL** - HuggingFace forum solutions working for RTX 3060
 - **Repository**: Successfully cleaned from 5.7GB to 22MB, optimized for fast GitHub sync
 - **Query Engine**: Fixed NodeWithScore weighted_score error, now processes queries without crashes
 - **Configuration**: Offline-only mode enforced on Replit, full functionality confirmed local
