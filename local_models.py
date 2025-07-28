@@ -438,15 +438,14 @@ class LocalModelManager:
                 model_name,
                 cache_dir=str(self.config.models_dir),
                 quantization_config=quantization_config,
-                device_map="auto",
+                device_map={"": 0},  # Force single GPU mapping
                 trust_remote_code=True,
                 torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
                 token=os.getenv("HUGGINGFACE_TOKEN"),
                 # Ultra-aggressive memory optimizations for RTX 3060
                 low_cpu_mem_usage=True,
                 max_memory={0: "5GB"},  # Even more aggressive - limit to 5GB for Llama
-                offload_folder="./temp",  # Offload some layers to disk if needed
-                device_map={"": 0}  # Force single GPU mapping
+                offload_folder="./temp"  # Offload some layers to disk if needed
             )
             
             # Create pipeline
