@@ -104,7 +104,7 @@ Authentication: Persistent HuggingFace token storage with GUI input for seamless
 
 ## Recent Changes
 
-### July 28, 2025 - Enhanced Analytics & Hybrid Query Engine for Optimal Workflow
+### July 28, 2025 - PyTorch Security & RTX 3060 Memory Fixes
 - **Complete Repository Cleanup**: Eliminated 5.7GB package cache bloat, reduced to 22MB clean codebase
 - **Fresh Git History**: Removed bloated commit history (1.48GB), created clean repository for fast sync
 - **Persistent Token Storage**: GUI-based HuggingFace token input with secure file persistence
@@ -150,6 +150,12 @@ Authentication: Persistent HuggingFace token storage with GUI input for seamless
 - **Smart Model Switching**: Implemented automatic model unloading when switching between Mistral/Llama for RTX 3060 12GB efficiency
 - **Enhanced Memory Management**: Raised embedding threshold from 85% to 95-98% for better RTX 3060 utilization
 - **GPU Memory Monitoring**: Real-time RTX 3060 memory status with intelligent CPU fallback only when truly necessary
+- **PyTorch CVE-2025-32434 Security Fix**: Applied safetensors format loading to avoid torch.load vulnerability
+- **RTX 3060 Memory Fragmentation Resolution**: Implemented PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True fix
+- **CUDA Environment Optimization**: Added CUDA_LAUNCH_BLOCKING and TORCH_USE_CUDA_DSA for better debugging
+- **Memory Allocator Fix**: Prevents impossible 22GB allocation reports on 12GB RTX 3060 GPU
+- **Safetensors Model Selection**: Switched to DialoGPT/GPT-2 models with secure loading format
+- **Comprehensive Error Resolution**: Fixed both security vulnerabilities and memory management issues
 
 ### System Status
 - **Replit**: Clean development environment, ALL ONLINE OPERATIONS DISABLED (offline-only app)

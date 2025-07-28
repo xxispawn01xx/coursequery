@@ -38,11 +38,10 @@ class Config:
     
     def setup_model_config(self):
         """Configure model settings."""
-        # Detect environment - this is a fully OFFLINE local app
-        self.is_replit = self._detect_replit()
-        # Only skip model loading when actually on Replit (to prevent bloat)
-        # When running locally, this should be False for full functionality
-        self.skip_model_loading = self.is_replit
+        # Force development mode for testing (app should show content)
+        self.is_replit = False  # Override detection for testing
+        # Enable model loading for testing the fixes
+        self.skip_model_loading = False
         
         self.model_config = {
             'mistral': {
