@@ -2449,6 +2449,15 @@ class RealEstateAIApp:
                 if st.button("🔄 Generate Vector Embeddings from ALL Course Materials", type="primary"):
                     with st.spinner("Processing documents, transcriptions, and indexed materials..."):
                         try:
+                            # Check if embedding model is loaded properly
+                            from local_models import LocalModelManager
+                            model_mgr = LocalModelManager()
+                            if hasattr(model_mgr, 'embedding_model') and model_mgr.embedding_model:
+                                # Check if using CPU fallback
+                                device = getattr(model_mgr.embedding_model, 'device', 'unknown')
+                                if 'cpu' in str(device).lower():
+                                    st.error("⚠️ **PERFORMANCE WARNING**: Using CPU for embeddings - this will be 5-10x slower than GPU!")
+                                    st.info("💡 Consider restarting the application to retry GPU initialization")
 
                             
                             # Process ALL course content

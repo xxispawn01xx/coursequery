@@ -429,13 +429,13 @@ class LocalModelManager:
                         device='cuda',
                         use_auth_token=os.getenv("HF_TOKEN")
                     )
-                    logger.info("✅ Embedding model loaded on CUDA")
+                    logger.info("✅ Embedding model loaded on CUDA - OPTIMAL PERFORMANCE")
                     return
                     
                 except RuntimeError as cuda_error:
                     if "CUDA" in str(cuda_error) and ("device-side assert" in str(cuda_error) or "out of memory" in str(cuda_error)):
-                        logger.warning(f"CUDA error loading embedding model: {cuda_error}")
-                        logger.info("Falling back to CPU for embedding model...")
+                        logger.error(f"🚨 CUDA ERROR: {cuda_error}")
+                        logger.error("⚠️  PERFORMANCE WARNING: Falling back to CPU - expect 5-10x slower embeddings!")
                         
                         # Clear CUDA state
                         if torch and torch.cuda.is_available():
@@ -452,7 +452,7 @@ class LocalModelManager:
                 device='cpu',
                 use_auth_token=os.getenv("HF_TOKEN")
             )
-            logger.info("✅ Embedding model loaded on CPU")
+            logger.error("⚠️  CPU FALLBACK: Embedding model loaded on CPU - SIGNIFICANTLY SLOWER than GPU!")
             
         except Exception as e:
             logger.error(f"Failed to load embedding model: {e}")
@@ -666,14 +666,15 @@ If asked to create spreadsheets, tables, or Excel files, provide:
                         torch.cuda.synchronize()
                     
                     # Reload embedding model on CPU
-                    logger.info("Reloading embedding model on CPU...")
+                    logger.error("🚨 CUDA DEVICE ASSERT ERROR - FORCING CPU FALLBACK!")
+                    logger.error("⚠️  PERFORMANCE WARNING: CPU embeddings will be 5-10x slower!")
                     self._load_embedding_model_cpu()
                     
                     # Generate embeddings on CPU
                     embeddings = self.embedding_model.encode(texts, convert_to_numpy=True)
                     
                     total_time = time.time() - start_time
-                    logger.info(f"📊 Embeddings generated on CPU fallback in {total_time:.2f}s | {len(texts)} texts")
+                    logger.error(f"⚠️  CPU FALLBACK COMPLETED: {total_time:.2f}s | {len(texts)} texts - MUCH SLOWER than GPU!")
                     
                     return embeddings.tolist()
                     
