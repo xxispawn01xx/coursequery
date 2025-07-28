@@ -2,7 +2,7 @@ modules = ["python-3.11", "python3"]
 
 [nix]
 channel = "stable-25_05"
-packages = ["ffmpeg-full", "glibcLocales", "libxcrypt", "pkg-config", "xsimd"]
+packages = ["cargo", "ffmpeg-full", "glibcLocales", "libiconv", "libjpeg_turbo", "libpng", "libxcrypt", "pkg-config", "rustc", "which", "xsimd"]
 
 [deployment]
 deploymentTarget = "autoscale"
