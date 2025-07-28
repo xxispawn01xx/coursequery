@@ -58,6 +58,13 @@ except ImportError:
     LocalQueryEngine = None
     QUERY_ENGINE_AVAILABLE = False
 
+try:
+    from hybrid_query_engine import HybridQueryEngine
+    HYBRID_QUERY_ENGINE_AVAILABLE = True
+except ImportError:
+    HybridQueryEngine = None
+    HYBRID_QUERY_ENGINE_AVAILABLE = False
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -81,7 +88,11 @@ class RealEstateAIApp:
         if 'query_engine' in st.session_state:
             self.query_engine = st.session_state.query_engine
         else:
-            self.query_engine = None
+            # Initialize hybrid query engine for better reliability
+            if HYBRID_QUERY_ENGINE_AVAILABLE:
+                self.query_engine = HybridQueryEngine()
+            else:
+                self.query_engine = None
             
         self.course_indexer = CourseIndexer() if COURSE_INDEXER_AVAILABLE else None
         
@@ -1018,28 +1029,41 @@ class RealEstateAIApp:
         """Process a user query with comprehensive metrics tracking."""
         # Check if query engine is available
         if not self.query_engine:
-            # Check if models are loaded but query engine is missing
-            if st.session_state.models_loaded:
-                # Get model manager from session state or use current instance
-                model_manager = st.session_state.get('model_manager', self.model_manager)
-                if model_manager:
-                    try:
-                        # Try to recreate query engine
-                        self.query_engine = LocalQueryEngine(model_manager)
-                        st.session_state.query_engine = self.query_engine
-                        logger.info("Query engine recreated successfully")
-                    except Exception as e:
-                        st.error(f"❌ Failed to initialize query engine: {e}")
-                        logger.error(f"Query engine recreation failed: {e}")
+            # Try to initialize hybrid query engine first (more reliable)
+            if HYBRID_QUERY_ENGINE_AVAILABLE:
+                try:
+                    self.query_engine = HybridQueryEngine()
+                    st.session_state.query_engine = self.query_engine
+                    logger.info("Hybrid query engine initialized successfully")
+                except Exception as e:
+                    logger.error(f"Hybrid query engine failed: {e}")
+                    # Fall back to local query engine
+                    pass
+            
+            # If hybrid didn't work, try local query engine
+            if not self.query_engine:
+                # Check if models are loaded but query engine is missing
+                if st.session_state.models_loaded:
+                    # Get model manager from session state or use current instance
+                    model_manager = st.session_state.get('model_manager', self.model_manager)
+                    if model_manager:
+                        try:
+                            # Try to recreate query engine
+                            self.query_engine = LocalQueryEngine(model_manager)
+                            st.session_state.query_engine = self.query_engine
+                            logger.info("Local query engine recreated successfully")
+                        except Exception as e:
+                            st.error(f"❌ Failed to initialize query engine: {e}")
+                            logger.error(f"Query engine recreation failed: {e}")
+                            return
+                    else:
+                        st.error("❌ Model manager not available in session state")
                         return
                 else:
-                    st.error("❌ Model manager not available in session state")
-                    return
-            else:
-                # Models not loaded, try to load them
-                if not self.load_models():
-                    st.error("❌ Cannot load models. Q&A functionality unavailable.")
-                    return
+                    # Models not loaded, try to load them
+                    if not self.load_models():
+                        st.error("❌ Cannot load models. Q&A functionality unavailable.")
+                        return
         
         # Double check query engine is now available
         if not self.query_engine:
@@ -1050,6 +1074,10 @@ class RealEstateAIApp:
             2. Verify model files are accessible
             3. Check logs for specific error messages
             4. Try restarting the application
+            
+            **Alternative Options:**
+            - Configure OpenAI API key for cloud-based responses
+            - Configure Perplexity API key for research-enhanced responses
             """)
             return
         
@@ -1074,14 +1102,31 @@ class RealEstateAIApp:
                     logger.error("Query engine is None in final check")
                     return
                 
-                result = self.query_engine.query(
-                    query=query,
-                    course_name=st.session_state.selected_course,
-                    max_results=max_results,
-                    include_sources=include_sources
-                )
-                
-                answer = result['answer']
+                # Check if we're using hybrid query engine
+                if isinstance(self.query_engine, HybridQueryEngine):
+                    result = self.query_engine.query(
+                        query=query,
+                        course_name=st.session_state.selected_course
+                    )
+                    answer = result.get('response', result.get('answer', 'No response generated'))
+                    
+                    # Convert hybrid result format to expected format
+                    result = {
+                        'answer': answer,
+                        'sources': [],  # Hybrid engine handles sources differently
+                        'method': result.get('method', 'unknown'),
+                        'cached': result.get('cached', False),
+                        'response_time': result.get('response_time', 0)
+                    }
+                else:
+                    # Local query engine
+                    result = self.query_engine.query(
+                        query=query,
+                        course_name=st.session_state.selected_course,
+                        max_results=max_results,
+                        include_sources=include_sources
+                    )
+                    answer = result['answer']
                 
                 # Record metrics for successful query
                 metrics = evaluator.end_query_timing(
@@ -1166,8 +1211,38 @@ class RealEstateAIApp:
                     error=error_occurred
                 )
                 
-                st.error(f"❌ Error processing query: {error_occurred}")
-                logger.error(f"Query processing error: {e}")
+                # Provide helpful fallback response for embedding errors
+                if "Embedding model not loaded" in error_occurred:
+                    st.warning("⚠️ Local AI models not fully loaded")
+                    
+                    # Import and use fallback response
+                    from simple_query_fix import create_fallback_response
+                    fallback_result = create_fallback_response(query, st.session_state.selected_course)
+                    
+                    st.subheader("💡 Recommended Solution")
+                    st.write(fallback_result['answer'])
+                    
+                    # Show quick setup options
+                    with st.expander("🚀 Quick Setup Options"):
+                        st.markdown("""
+                        **Option 1: Cloud APIs (Fastest)**
+                        1. Get OpenAI API key from https://platform.openai.com/api-keys
+                        2. Add to Secrets: `OPENAI_API_KEY = your_key_here`
+                        3. Reload page and try your question again
+                        
+                        **Option 2: ChatGPT Plus Upload**
+                        1. Upload your course materials to Google Drive
+                        2. Use ChatGPT Plus ($20/month) to query your files
+                        3. Get superior responses with current market data
+                        
+                        **Option 3: Local RTX 3060 (Best for Transcription)**
+                        1. Use GPU primarily for Whisper transcription
+                        2. Upload transcribed text to cloud services
+                        3. Query via ChatGPT/Perplexity for best responses
+                        """)
+                else:
+                    st.error(f"❌ Error processing query: {error_occurred}")
+                    logger.error(f"Query processing error: {e}")
                 
                 # Still save failed attempt for learning
                 self.save_conversation_for_learning(
