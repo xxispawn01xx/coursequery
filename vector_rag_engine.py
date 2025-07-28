@@ -674,6 +674,12 @@ Please provide a comprehensive answer based on the context provided. If the cont
                 if excel_file:
                     content += f"\n\n📊 **Excel file generated**: {excel_file}\n*Download available in the file explorer*"
             
+            # Suggest Google Drive for creative financial tasks
+            from google_drive_integration import suggest_google_drive_approach
+            google_suggestion = suggest_google_drive_approach(prompt, content)
+            if google_suggestion:
+                content += google_suggestion
+            
             return content
             
         except Exception as e:
@@ -717,6 +723,12 @@ Please provide a comprehensive answer based on the context provided. If the cont
                     excel_file = self._convert_response_to_excel(content, "Perplexity_Analysis")
                     if excel_file:
                         content += f"\n\n📊 **Excel file generated**: {excel_file}\n*Download available in the file explorer*"
+                
+                # Suggest Google Drive for creative financial tasks
+                from google_drive_integration import suggest_google_drive_approach
+                google_suggestion = suggest_google_drive_approach(prompt, content)
+                if google_suggestion:
+                    content += google_suggestion
                 
                 return content
             else:
