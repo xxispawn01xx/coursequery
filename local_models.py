@@ -52,6 +52,13 @@ from config import Config
 
 logger = logging.getLogger(__name__)
 
+try:
+    from memory_optimizer import MemoryOptimizer
+    MEMORY_OPTIMIZER_AVAILABLE = True
+except ImportError:
+    MemoryOptimizer = None
+    MEMORY_OPTIMIZER_AVAILABLE = False
+
 class LocalModelManager:
     """Manages local AI models for text generation and embeddings."""
     
@@ -86,6 +93,18 @@ class LocalModelManager:
     def load_models(self, model_type: str = "mistral"):
         """Load all required models with caching optimization."""
         logger.info(f"Loading local models (type: {model_type})...")
+        
+        # Check memory status - RTX 3060 12GB should handle large models
+        if MEMORY_OPTIMIZER_AVAILABLE:
+            MemoryOptimizer.log_memory_status()
+            # With RTX 3060 12GB, GPU memory is abundant
+            if torch and torch.cuda.is_available():
+                gpu_memory = torch.cuda.get_device_properties(0).total_memory / (1024**3)
+                logger.info(f"GPU Memory: {gpu_memory:.1f}GB - RTX 3060 can handle 7B models")
+            else:
+                if not MemoryOptimizer.check_memory_available(4.0):
+                    suggested_model = MemoryOptimizer.suggest_optimal_model()
+                    logger.warning(f"System RAM may be insufficient. Consider using: {suggested_model}")
         
         # Check if models are already loaded in memory
         if self._models_already_loaded(model_type):
@@ -158,10 +177,11 @@ class LocalModelManager:
             # For now, show detected but continue with HuggingFace model
             logger.info("GGUF detected but using HuggingFace model for compatibility")
         
-        # Try models in order of preference - Llama first, then Mistral fallback
+        # Try models in order of preference - RTX 3060 12GB can handle full models
         model_attempts = [
-            ("meta-llama/Llama-2-7b-chat-hf", "Llama 2 7B Chat", "causal"),
-            ("mistralai/Mistral-7B-Instruct-v0.1", "Mistral 7B", "causal")
+            ("meta-llama/Llama-2-7b-chat-hf", "Llama 2 7B Chat", "causal"),  # Primary choice
+            ("mistralai/Mistral-7B-Instruct-v0.1", "Mistral 7B", "causal"),  # Fallback
+            ("microsoft/DialoGPT-medium", "DialoGPT Medium", "causal"),       # System RAM fallback
         ]
         
         for model_name, model_display_name, model_type in model_attempts:
@@ -169,15 +189,23 @@ class LocalModelManager:
                 cache_status = self._check_cache_status(model_name)
                 logger.info(f"Attempting to load {model_display_name}... {cache_status}")
                 
-                # Configure quantization only for larger models
+                # Configure quantization and memory optimization
                 quantization_config = None
-                if torch and torch.cuda.is_available() and "Mistral" in model_name and BitsAndBytesConfig:
-                    quantization_config = BitsAndBytesConfig(
-                        load_in_4bit=True,
-                        bnb_4bit_quant_type="nf4",
-                        bnb_4bit_compute_dtype=torch.float16,
-                        bnb_4bit_use_double_quant=True,
-                    )
+                low_cpu_mem_usage = True
+                
+                # Use 4-bit quantization for RTX 3060 efficiency
+                if torch and BitsAndBytesConfig and ("Mistral" in model_name or "Llama" in model_name):
+                    if torch.cuda.is_available():
+                        logger.info("Using 4-bit quantization for RTX 3060 12GB efficiency")
+                        quantization_config = BitsAndBytesConfig(
+                            load_in_4bit=True,
+                            bnb_4bit_quant_type="nf4",
+                            bnb_4bit_compute_dtype=torch.float16,
+                            bnb_4bit_use_double_quant=True,
+                        )
+                    else:
+                        # CPU fallback if GPU fails
+                        logger.info("GPU not available, using CPU mode")
                 
                 # Load tokenizer first (this will fail fast if authentication is wrong)
                 logger.info(f"Loading tokenizer from cache: {self.config.models_dir}")
@@ -192,14 +220,21 @@ class LocalModelManager:
                 if self.mistral_tokenizer.pad_token is None:
                     self.mistral_tokenizer.pad_token = self.mistral_tokenizer.eos_token
                 
-                # Load model with appropriate class
+                # Load model with memory optimization
                 model_kwargs = {
                     "cache_dir": str(self.config.models_dir),
                     "trust_remote_code": True,
+                    "low_cpu_mem_usage": low_cpu_mem_usage,
+                    "local_files_only": False,
                 }
                 
                 if torch:
-                    model_kwargs["torch_dtype"] = torch.float16 if torch.cuda.is_available() else torch.float32
+                    # Use smaller float precision to save memory
+                    if torch.cuda.is_available():
+                        model_kwargs["torch_dtype"] = torch.float16
+                    else:
+                        # For CPU, use float32 but with smaller batch sizes
+                        model_kwargs["torch_dtype"] = torch.float32
                 
                 # Add quantization and device mapping only if accelerate is available
                 try:
@@ -328,7 +363,8 @@ class LocalModelManager:
         try:
             model_config = self.config.model_config['embeddings']
             model_name = model_config['model_name']
-            device = model_config['device']
+            # Use CUDA for embeddings with RTX 3060
+            device = 'cuda' if torch and torch.cuda.is_available() else 'cpu'
             
             cache_status = self._check_cache_status(model_name)
             logger.info(f"Loading embedding model from cache: {self.config.models_dir} - {cache_status}")

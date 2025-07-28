@@ -39,21 +39,45 @@ class Config:
         
         self.model_config = {
             'mistral': {
-                'model_name': 'mistralai/Mistral-7B-Instruct-v0.1',  # Original Mistral model
+                'model_name': 'mistralai/Mistral-7B-Instruct-v0.1',  # Perfect for RTX 3060 12GB
                 'max_length': 4096,
                 'temperature': 0.7,
-                'device': 'auto',  # Will use GPU if available
-                'load_in_4bit': True,  # For RTX 3060 efficiency
+                'device': 'cuda',  # Use GPU with 12GB VRAM
+                'load_in_4bit': True,  # 4-bit quantization for efficiency
+            },
+            'llama': {
+                'model_name': 'meta-llama/Llama-2-7b-chat-hf',  # Alternative for 12GB GPU
+                'max_length': 4096,
+                'temperature': 0.7,
+                'device': 'cuda',
+                'load_in_4bit': True,
+            },
+            'small': {
+                'model_name': 'microsoft/DialoGPT-small',  # Fallback for system RAM issues
+                'max_length': 512,
+                'temperature': 0.7,
+                'device': 'cpu',
+                'load_in_4bit': False,
+            },
+            'medium': {
+                'model_name': 'microsoft/DialoGPT-medium', 
+                'max_length': 1024,
+                'temperature': 0.7,
+                'device': 'cuda',  # Can use GPU
+                'load_in_4bit': False,
             },
             'whisper': {
-                'model_size': 'medium',  # Good balance of speed and accuracy
-                'device': 'cuda' if self.has_gpu() else 'cpu',
+                'model_size': 'medium',  # Good balance, can use GPU
+                'device': 'cuda',  # RTX 3060 handles Whisper well
             },
             'embeddings': {
                 'model_name': 'sentence-transformers/all-MiniLM-L6-v2',
-                'device': 'cuda' if self.has_gpu() else 'cpu',
+                'device': 'cuda',  # Use GPU for faster embeddings
             }
         }
+        
+        # With RTX 3060 12GB, prefer the full models
+        self.preferred_model = 'mistral'  # RTX 3060 can handle this easily
     
     def has_gpu(self) -> bool:
         """Check if GPU is available."""

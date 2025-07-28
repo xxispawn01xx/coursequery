@@ -273,6 +273,18 @@ class RealEstateAIApp:
                         
                         **Alternative:** Set HF_TOKEN in Secrets tab
                         """)
+                    elif "paging file" in error_msg.lower() or "os error 1455" in error_msg.lower():
+                        st.error("❌ Memory Error: Paging file too small")
+                        st.markdown("""
+                        **Windows Memory Issue - Quick Fix:**
+                        1. Press Windows + R, type "sysdm.cpl", press Enter
+                        2. Advanced tab → Performance Settings → Advanced → Virtual Memory
+                        3. Click "Change" → Uncheck "Automatically manage"
+                        4. Custom size: Initial 4096 MB, Maximum 8192 MB
+                        5. Click Set → OK → Restart computer
+                        
+                        **Alternative:** Use smaller models by setting model preference to "small" in config.
+                        """)
                     else:
                         st.error(f"❌ Failed to load models: {error_msg}")
                     
