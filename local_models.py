@@ -460,6 +460,16 @@ class LocalModelManager:
                 raise RuntimeError(f"No model loaded (current: {self.current_model}). Models: mistral={self.mistral_model is not None}, llama={self.llama_model is not None}, pipelines: mistral_pipeline={self.mistral_pipeline is not None}, llama_pipeline={self.llama_pipeline is not None}")
         
         try:
+            # Clear CUDA cache and handle device-side assert errors
+            if TORCH_AVAILABLE and torch.cuda.is_available():
+                torch.cuda.empty_cache()
+                torch.cuda.synchronize()
+                # Reset CUDA context to prevent device-side assert errors
+                try:
+                    torch.cuda.reset_peak_memory_stats()
+                except:
+                    pass
+            
             # Generate response with timeout and optimized settings for RTX 3060
             import signal
             
@@ -506,14 +516,26 @@ class LocalModelManager:
                 torch.cuda.synchronize()
             return "I apologize, but the response generation took too long. Please try asking a shorter or more specific question."
         except Exception as e:
-            # Handle CUDA errors specifically
-            if "CUDA" in str(e):
+            # Handle CUDA errors specifically with recovery
+            if "CUDA" in str(e).upper() or "device-side assert" in str(e).lower():
                 logger.error(f"CUDA error during response generation: {e}")
-                logger.info("Attempting to clear CUDA cache and retry...")
+                logger.info("Attempting to clear CUDA cache and recover...")
                 if TORCH_AVAILABLE and torch.cuda.is_available():
-                    torch.cuda.empty_cache()
-                    torch.cuda.synchronize()
-                raise RuntimeError(f"CUDA error in text generation. Try restarting the app: {e}")
+                    try:
+                        torch.cuda.empty_cache()
+                        torch.cuda.synchronize()
+                        # Force garbage collection
+                        import gc
+                        gc.collect()
+                        logger.info("CUDA cache cleared, attempting recovery...")
+                        
+                        # Return a helpful fallback response instead of crashing
+                        return "I encountered a GPU memory issue while processing your request. Please try asking a shorter, more specific question, or restart the application if this persists."
+                    except Exception as cuda_error:
+                        logger.error(f"Failed to recover from CUDA error: {cuda_error}")
+                        raise RuntimeError(f"CUDA error in text generation. Please restart the app: {e}")
+                else:
+                    raise RuntimeError(f"CUDA error but no CUDA available: {e}")
             else:
                 logger.error(f"Error generating response: {e}")
                 raise

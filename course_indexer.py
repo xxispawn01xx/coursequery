@@ -289,6 +289,12 @@ class CourseIndexer:
             # Additional analytics calculations
             analytics = metadata.copy()
             
+            # Ensure required fields exist with defaults
+            analytics.setdefault('total_documents', 0)
+            analytics.setdefault('total_chunks', 0)
+            analytics.setdefault('syllabus_documents', 0)
+            analytics.setdefault('document_types', {})
+            
             # Load raw document data if available
             raw_docs_path = course_index_dir / "raw_documents.pkl"
             if raw_docs_path.exists():
@@ -296,7 +302,7 @@ class CourseIndexer:
                     raw_docs = pickle.load(f)
                 
                 # Calculate content length distribution
-                content_lengths = [doc['character_count'] for doc in raw_docs]
+                content_lengths = [doc['character_count'] for doc in raw_docs if 'character_count' in doc]
                 analytics['content_lengths'] = content_lengths
                 
                 # Calculate average document length
@@ -304,6 +310,21 @@ class CourseIndexer:
                     analytics['avg_content_length'] = sum(content_lengths) / len(content_lengths)
                     analytics['min_content_length'] = min(content_lengths)
                     analytics['max_content_length'] = max(content_lengths)
+                else:
+                    analytics['avg_content_length'] = 0
+                    analytics['min_content_length'] = 0
+                    analytics['max_content_length'] = 0
+            
+            # Calculate total chunks if we have an index
+            try:
+                index = self.get_course_index(course_name)
+                if index and hasattr(index, 'docstore') and hasattr(index.docstore, 'docs'):
+                    analytics['total_chunks'] = len(index.docstore.docs)
+                elif index and hasattr(index, '_vector_store') and hasattr(index._vector_store, '_data'):
+                    analytics['total_chunks'] = len(index._vector_store._data.embedding_dict)
+            except Exception as e:
+                logger.warning(f"Could not calculate chunks for {course_name}: {e}")
+                # Keep default value of 0
             
             return analytics
             
