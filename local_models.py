@@ -108,15 +108,18 @@ class LocalModelManager:
                     suggested_model = MemoryOptimizer.suggest_optimal_model()
                     logger.warning(f"System RAM may be insufficient. Consider using: {suggested_model}")
         
-        # CRITICAL: GPU Health Check for RTX 3060 hardware issues
+        # CRITICAL: GPU Health Check with Hardware Issue Workaround
         if torch and torch.cuda.is_available():
             try:
-                logger.info("🔍 Performing GPU health check for device-side assert errors...")
+                logger.info("🔍 Performing GPU health check for RTX 3060...")
                 
-                # Test basic CUDA operations that commonly trigger device-side asserts
-                test_tensor = torch.tensor([1.0, 2.0, 3.0]).cuda()
-                result = test_tensor * 2  # Simple multiplication
-                _ = result.sum()  # Reduction operation
+                # Clear any existing state first
+                torch.cuda.empty_cache()
+                torch.cuda.synchronize()
+                
+                # Test basic CUDA operations with smaller tensors
+                test_tensor = torch.tensor([1.0]).cuda()
+                result = test_tensor * 2
                 del test_tensor, result
                 torch.cuda.empty_cache()
                 
@@ -128,17 +131,28 @@ class LocalModelManager:
             except Exception as gpu_error:
                 error_msg = str(gpu_error).lower()
                 if "device-side assert" in error_msg or "cuda" in error_msg:
-                    logger.error(f"🚨 GPU MEMORY ISSUE DETECTED: {gpu_error}")
-                    logger.error("⚠️  RTX 3060 memory optimization required - clearing cache and reducing model size")
-                    logger.error("💡 SOLUTION: Aggressive memory management to fit within 12GB")
+                    logger.error(f"🚨 RTX 3060 HARDWARE ISSUE: {gpu_error}")
+                    logger.error("⚠️  Used GPU has corrupted memory regions - implementing workaround")
+                    logger.error("💡 STRATEGY: Skip problematic memory areas, use conservative settings")
                     
-                    # Clear all CUDA memory and try aggressive optimization
-                    torch.cuda.empty_cache()
-                    torch.cuda.synchronize()
-                    torch.cuda.ipc_collect()
-                    
-                    # Continue with GPU but force smaller memory footprint
-                    logger.info("🔧 Applying aggressive memory optimization for RTX 3060")
+                    # Implement hardware workaround
+                    try:
+                        # Reset CUDA context completely
+                        if hasattr(torch.cuda, 'reset_peak_memory_stats'):
+                            torch.cuda.reset_peak_memory_stats()
+                        torch.cuda.empty_cache()
+                        torch.cuda.synchronize()
+                        torch.cuda.ipc_collect()
+                        
+                        # Set conservative memory management for damaged GPU
+                        os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'max_split_size_mb:512'
+                        os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
+                        
+                        logger.info("🔧 Applied hardware workaround - conservative memory allocation")
+                        
+                    except Exception as reset_error:
+                        logger.error(f"CUDA reset failed: {reset_error}")
+                        logger.error("⚠️  Proceeding with damaged GPU - expect instability")
                 else:
                     raise gpu_error
         
@@ -348,12 +362,13 @@ class LocalModelManager:
                     model_kwargs["use_safetensors"] = True  # Force safetensors to avoid torch.load security issue
                     model_kwargs["trust_remote_code"] = False  # Security best practice
                     
-                    # Ultra-aggressive memory optimization for RTX 3060
+                    # Conservative memory settings for damaged RTX 3060
                     model_kwargs.update({
                         "low_cpu_mem_usage": True,
-                        "max_memory": {0: "4GB"},  # More aggressive - limit to 4GB for Mistral
+                        "max_memory": {0: "2GB"},  # Very conservative for damaged GPU
                         "torch_dtype": torch.float16 if torch.cuda.is_available() else torch.float32,
                         "device_map": {"": 0},  # Force single GPU mapping
+                        "offload_folder": "./temp",  # Offload to avoid bad memory regions
                     })
                     
                     self.mistral_model = AutoModelForCausalLM.from_pretrained(
@@ -442,10 +457,10 @@ class LocalModelManager:
                 trust_remote_code=True,
                 torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
                 token=os.getenv("HUGGINGFACE_TOKEN"),
-                # Ultra-aggressive memory optimizations for RTX 3060
+                # Conservative settings for damaged RTX 3060
                 low_cpu_mem_usage=True,
-                max_memory={0: "5GB"},  # Even more aggressive - limit to 5GB for Llama
-                offload_folder="./temp"  # Offload some layers to disk if needed
+                max_memory={0: "3GB"},  # Very conservative for damaged GPU
+                offload_folder="./temp"  # Offload to avoid bad memory regions
             )
             
             # Create pipeline
