@@ -103,6 +103,11 @@ class LocalModelManager:
                 
             self._load_embedding_model()
             self.current_model = model_type
+            
+            # Verify embedding model loaded successfully
+            if self.embedding_model is None:
+                logger.warning("Embedding model failed to load - Q&A functionality will be limited")
+            
             logger.info(f"All models loaded successfully ({model_type})")
         except Exception as e:
             logger.error(f"Failed to load models: {e}")
@@ -315,12 +320,19 @@ class LocalModelManager:
         """Load sentence transformer model for embeddings."""
         logger.info("Loading embedding model...")
         
+        # Check if sentence-transformers is available
+        if not SENTENCE_TRANSFORMERS_AVAILABLE:
+            logger.error("sentence-transformers not available. Please install it: pip install sentence-transformers")
+            raise ImportError("sentence-transformers package required for embeddings")
+        
         try:
             model_config = self.config.model_config['embeddings']
             model_name = model_config['model_name']
             device = model_config['device']
             
-            logger.info(f"Loading embedding model from cache: {self.config.models_dir}")
+            cache_status = self._check_cache_status(model_name)
+            logger.info(f"Loading embedding model from cache: {self.config.models_dir} - {cache_status}")
+            
             self.embedding_model = SentenceTransformer(
                 model_name,
                 cache_folder=str(self.config.models_dir),
@@ -332,7 +344,9 @@ class LocalModelManager:
             
         except Exception as e:
             logger.error(f"Failed to load embedding model: {e}")
-            raise
+            # Set to None but don't raise - allow app to continue with limited functionality
+            self.embedding_model = None
+            logger.warning("Continuing without embedding model - Q&A will be limited")
     
     def generate_response(self, prompt: str, max_new_tokens: int = 512) -> str:
         """
@@ -425,7 +439,13 @@ If asked to create spreadsheets, tables, or Excel files, provide:
             List of embedding vectors
         """
         if self.embedding_model is None:
-            raise RuntimeError("Embedding model not loaded")
+            logger.error("Embedding model not loaded - trying to reload...")
+            try:
+                self._load_embedding_model()
+                if self.embedding_model is None:
+                    raise RuntimeError("Embedding model not loaded and reload failed")
+            except Exception as e:
+                raise RuntimeError(f"Embedding model not loaded: {e}")
         
         try:
             embeddings = self.embedding_model.encode(texts, convert_to_numpy=True)
