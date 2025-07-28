@@ -648,9 +648,22 @@ If asked to create spreadsheets, tables, or Excel files, provide:
                 raise RuntimeError(f"Embedding model not loaded: {e}")
         
         try:
-            # Clear CUDA cache before encoding to prevent memory issues
+            # Clear CUDA cache and check memory before encoding
             if TORCH_AVAILABLE and torch.cuda.is_available():
                 torch.cuda.empty_cache()
+                allocated = torch.cuda.memory_allocated(0) / (1024**2)
+                total = torch.cuda.get_device_properties(0).total_memory / (1024**2)
+                free_memory = total - allocated
+                
+                logger.info(f"GPU Memory: {allocated:.0f}MB used, {free_memory:.0f}MB free of {total:.0f}MB total")
+                
+                # Estimate memory needed (rough calculation)
+                estimated_memory_mb = len(texts) * 2  # Rough estimate: 2MB per text chunk
+                
+                if free_memory < estimated_memory_mb * 1.5:  # Need 1.5x buffer
+                    logger.error(f"🚨 Insufficient GPU memory! Need ~{estimated_memory_mb}MB, only {free_memory:.0f}MB available")
+                    logger.error("⚠️  Your GPU is 96% full - forcing CPU processing")
+                    raise RuntimeError(f"Insufficient GPU memory: need {estimated_memory_mb}MB, have {free_memory:.0f}MB")
             
             embeddings = self.embedding_model.encode(texts, convert_to_numpy=True)
             

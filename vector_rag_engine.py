@@ -283,6 +283,23 @@ class VectorRAGEngine:
         # Generate embeddings for all content
         logger.info(f"Generating embeddings for {len(all_chunks)} chunks from {len(processed_sources)} sources...")
         
+        # Clear CUDA cache before large embedding generation
+        try:
+            import torch
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+                allocated = torch.cuda.memory_allocated(0) / (1024**2)
+                total = torch.cuda.get_device_properties(0).total_memory / (1024**2)
+                logger.info(f"GPU Memory before embeddings: {allocated:.0f}MB used / {total:.0f}MB total")
+                
+                # If GPU memory usage is above 90%, force CPU fallback
+                if allocated > total * 0.9:
+                    logger.error(f"🚨 GPU memory critically low: {allocated/total*100:.1f}% used!")
+                    logger.error("⚠️  Forcing CPU fallback to prevent CUDA errors")
+                    raise RuntimeError("GPU memory critically low - forcing CPU fallback")
+        except ImportError:
+            pass
+        
         try:
             embeddings = self.embeddings_engine.generate_embeddings(all_chunks)
         except RuntimeError as e:
