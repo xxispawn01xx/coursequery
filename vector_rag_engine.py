@@ -674,11 +674,11 @@ Please provide a comprehensive answer based on the context provided. If the cont
                 if excel_file:
                     content += f"\n\n📊 **Excel file generated**: {excel_file}\n*Download available in the file explorer*"
             
-            # Suggest Google Drive for creative financial tasks
-            from google_drive_integration import suggest_google_drive_approach
-            google_suggestion = suggest_google_drive_approach(prompt, content)
-            if google_suggestion:
-                content += google_suggestion
+            # Auto-create Google Sheets for financial models
+            from google_sheets_creator import detect_and_create_financial_sheet
+            sheets_result = detect_and_create_financial_sheet(prompt, content)
+            if sheets_result:
+                content += f"\n\n{sheets_result}"
             
             return content
             
@@ -724,11 +724,11 @@ Please provide a comprehensive answer based on the context provided. If the cont
                     if excel_file:
                         content += f"\n\n📊 **Excel file generated**: {excel_file}\n*Download available in the file explorer*"
                 
-                # Suggest Google Drive for creative financial tasks
-                from google_drive_integration import suggest_google_drive_approach
-                google_suggestion = suggest_google_drive_approach(prompt, content)
-                if google_suggestion:
-                    content += google_suggestion
+                # Auto-create Google Sheets for financial models
+                from google_sheets_creator import detect_and_create_financial_sheet
+                sheets_result = detect_and_create_financial_sheet(prompt, content)
+                if sheets_result:
+                    content += f"\n\n{sheets_result}"
                 
                 return content
             else:
