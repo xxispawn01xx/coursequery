@@ -33,9 +33,9 @@ class Config:
     
     def setup_model_config(self):
         """Configure model settings."""
-        # This is a fully local app - never skip model loading
-        self.is_replit = False
-        self.skip_model_loading = False
+        # STRICT REQUIREMENT: Never download models on Replit - this is development only
+        self.is_replit = True  # Always treat as Replit to prevent downloads
+        self.skip_model_loading = True  # ALWAYS skip model loading on Replit
         
         self.model_config = {
             'mistral': {

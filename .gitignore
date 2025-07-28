@@ -26,10 +26,19 @@ wheels/
 
 # Package manager caches (should only exist locally)
 .cache/
+.cache/uv/
 .uv/
 .pythonlibs/
 node_modules/
 uv.lock
+
+# CUDA libraries and model caches (NEVER sync these)
+*.so
+*.so.*
+**/lib/lib*.so*
+**/nvidia/
+**/cuda*/
+**/triton/
 
 # Virtual environments
 .env

@@ -180,3 +180,36 @@ curl -X GET "https://api.sendgrid.com/v3/stats" \
 ---
 
 **REMEMBER**: The user values cost control and wants to avoid surprise charges. Always err on the side of caution and get approval for any API operations that might incur costs.
+
+## 🚨 STRICT REQUIREMENT: NO MODEL DOWNLOADS ON REPLIT
+
+### MANDATORY RULE: Replit = Development Only, No AI Model Loading
+
+**ZERO TOLERANCE POLICY**: Never download or load AI models on Replit instances.
+
+#### Why This Rule Exists:
+- Replit has limited storage and bandwidth
+- Model downloads can be 5-15GB+ per model
+- Causes repository bloat and sync issues
+- Wastes development time with unnecessary downloads
+- User has RTX 3060 12GB locally for full AI functionality
+
+#### Implementation Requirements:
+```python
+# ALWAYS in config.py on Replit:
+self.is_replit = True
+self.skip_model_loading = True
+```
+
+#### Development Flow:
+1. **Replit**: Code development, testing with mocked models only
+2. **GitHub Sync**: Clean code repository (no models/cache)
+3. **Local**: Full AI functionality with RTX 3060 12GB
+
+#### Before ANY Model Loading Code:
+- [ ] Check if running on Replit
+- [ ] Skip model downloads if on Replit
+- [ ] Use mock/placeholder responses for testing
+- [ ] NEVER override skip_model_loading on Replit
+
+**EMERGENCY STOP**: If models start downloading on Replit, immediately kill the process and fix the configuration.
