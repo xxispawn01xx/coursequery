@@ -7,8 +7,33 @@ import logging
 from typing import Dict, Any, List, Optional
 import re
 
-from llama_index.core.retrievers import VectorIndexRetriever
-from llama_index.core.postprocessor import SimilarityPostprocessor
+try:
+    from llama_index.core.retrievers import VectorIndexRetriever
+    from llama_index.core.postprocessor import SimilarityPostprocessor
+except ImportError:
+    # Fallback for older LlamaIndex versions
+    try:
+        from llama_index.retrievers import VectorIndexRetriever
+        from llama_index.postprocessor import SimilarityPostprocessor
+    except ImportError:
+        # Mock classes for development environment
+        class VectorIndexRetriever:
+            def __init__(self, **kwargs):
+                self.index = kwargs.get('index')
+                self.similarity_top_k = kwargs.get('similarity_top_k', 5)
+            
+            def retrieve(self, query):
+                if self.index is None:
+                    return []
+                # Use index's retrieval method if available
+                if hasattr(self.index, 'as_retriever'):
+                    retriever = self.index.as_retriever(similarity_top_k=self.similarity_top_k)
+                    return retriever.retrieve(query)
+                return []
+        
+        class SimilarityPostprocessor:
+            def __init__(self, **kwargs):
+                self.similarity_cutoff = kwargs.get('similarity_cutoff', 0.7)
 
 from config import Config
 from local_models import LocalModelManager

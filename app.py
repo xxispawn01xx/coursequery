@@ -8,6 +8,7 @@ import os
 import logging
 from pathlib import Path
 from typing import List, Optional, Dict, Any
+from datetime import datetime
 # Optional visualization imports
 try:
     import plotly.express as px
@@ -1027,6 +1028,11 @@ class RealEstateAIApp:
             result = None
             
             try:
+                # Final check to ensure query_engine is available
+                if self.query_engine is None:
+                    st.error("❌ Query engine not initialized. Please reload the page and try again.")
+                    return
+                
                 result = self.query_engine.query(
                     query=query,
                     course_name=st.session_state.selected_course,
