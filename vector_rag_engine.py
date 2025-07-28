@@ -158,7 +158,7 @@ class LocalEmbeddingsEngine:
         
         # Generate embeddings for uncached texts
         new_embeddings = None
-        if uncached_texts:
+        if uncached_texts and self.model is not None:
             new_embeddings = self.model.encode(uncached_texts, convert_to_numpy=True)
             
             # Cache new embeddings
@@ -168,11 +168,15 @@ class LocalEmbeddingsEngine:
         
         # Get embedding dimension
         embedding_dim = 384  # Default for all-MiniLM-L6-v2
-        if hasattr(self.model, 'get_sentence_embedding_dimension'):
+        if self.model is not None and hasattr(self.model, 'get_sentence_embedding_dimension'):
             embedding_dim = self.model.get_sentence_embedding_dimension()
         
+        # Ensure embedding_dim is not None
+        if embedding_dim is None:
+            embedding_dim = 384
+        
         # Combine cached and new embeddings in correct order
-        all_embeddings = np.zeros((len(texts), embedding_dim))
+        all_embeddings = np.zeros((len(texts), int(embedding_dim)), dtype=np.float32)
         
         # Add cached embeddings
         for original_idx, embedding in cached_embeddings:
@@ -192,6 +196,8 @@ class LocalEmbeddingsEngine:
             self.load_model()
         
         # Generate query embedding
+        if self.model is None:
+            raise RuntimeError("Embedding model not loaded")
         query_embedding = self.model.encode([query_text], convert_to_numpy=True)[0]
         
         # Calculate similarity scores using numpy (avoid sklearn dependency)
@@ -382,7 +388,8 @@ Please provide a comprehensive answer based on the context provided. If the cont
                 temperature=0.7
             )
             
-            return response.choices[0].message.content
+            content = response.choices[0].message.content
+            return content if content is not None else "No response from OpenAI"
             
         except Exception as e:
             logger.error(f"OpenAI API error: {e}")
