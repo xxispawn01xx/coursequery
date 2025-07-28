@@ -2171,7 +2171,7 @@ class RealEstateAIApp:
         st.subheader("🔧 Step 1: Convert Transcripts to Vector Embeddings")
         
         # Course selection
-        available_courses = list(self.config.courses_dir.glob("*/"))
+        available_courses = list(self.config.indexed_courses_dir.glob("*/"))
         course_names = [course.name for course in available_courses if course.is_dir()]
         
         if not course_names:
