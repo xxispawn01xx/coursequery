@@ -33,9 +33,11 @@ class Config:
     
     def setup_model_config(self):
         """Configure model settings."""
-        # STRICT REQUIREMENT: Never download models on Replit - this is development only
-        self.is_replit = True  # Always treat as Replit to prevent downloads
-        self.skip_model_loading = True  # ALWAYS skip model loading on Replit
+        # Detect environment - this is a fully OFFLINE local app
+        self.is_replit = self._detect_replit()
+        # Only skip model loading when actually on Replit (to prevent bloat)
+        # When running locally, this should be False for full functionality
+        self.skip_model_loading = self.is_replit
         
         self.model_config = {
             'mistral': {
@@ -78,6 +80,26 @@ class Config:
         
         # With RTX 3060 12GB, prefer the full models
         self.preferred_model = 'mistral'  # RTX 3060 can handle this easily
+    
+    def _detect_replit(self) -> bool:
+        """Detect if running on Replit environment."""
+        # Check for Replit-specific environment variables
+        replit_indicators = [
+            'REPL_ID',
+            'REPL_SLUG', 
+            'REPLIT_DB_URL',
+            'REPL_OWNER'
+        ]
+        
+        for indicator in replit_indicators:
+            if os.getenv(indicator):
+                return True
+        
+        # Check if running in /home/runner (Replit path)
+        if str(self.base_dir).startswith('/home/runner'):
+            return True
+            
+        return False
     
     def has_gpu(self) -> bool:
         """Check if GPU is available."""

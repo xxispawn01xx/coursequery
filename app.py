@@ -207,21 +207,25 @@ class RealEstateAIApp:
 
     def load_models(self):
         """Load local models if not already loaded."""
-        # Check if model loading should be skipped (Replit development mode)
+        # Check if model loading should be skipped (only on Replit to prevent bloat)
         if hasattr(self.config, 'skip_model_loading') and self.config.skip_model_loading:
-            st.info("🔧 Development mode - AI models disabled on Replit")
-            st.markdown("""
-            **This is the development environment.** 
-            
-            ✅ Code development and testing
-            ❌ AI model functionality disabled
-            
-            **For full AI functionality:**
-            1. Clone repository locally  
-            2. Run on your RTX 3060 12GB system
-            3. Models will download and run locally
-            """)
-            return True  # Return success but skip loading
+            if self.config.is_replit:
+                st.info("🔧 Development mode - AI models disabled on Replit")
+                st.markdown("""
+                **This is the development environment.** 
+                
+                ✅ Code development and testing
+                ❌ AI model functionality disabled
+                
+                **For full AI functionality:**
+                1. Clone repository locally  
+                2. Run on your RTX 3060 12GB system
+                3. Models will download and run locally
+                """)
+                return True  # Return success but skip loading
+            else:
+                # Local environment but models disabled - this shouldn't happen
+                st.error("❌ Models disabled but running locally - check configuration")
         
         # Check authentication first for local usage
         if not st.session_state.get('hf_token_set', False):

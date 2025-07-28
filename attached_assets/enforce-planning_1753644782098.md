@@ -234,3 +234,40 @@ self.skip_model_loading = True
 4. **If bloated**: Follow emergency cleanup in REPOSITORY_MANAGEMENT.md
 
 **ENFORCEMENT**: Any agent work must comply with repository management guidelines to prevent the 5.7GB bloat that occurred previously.
+
+## 🚨 STRICT REQUIREMENT: OFFLINE-ONLY APPLICATION
+
+### MANDATORY RULE: No Online Operations During Development/Preview
+
+**ZERO TOLERANCE POLICY**: This is a 100% offline-only application. No online operations allowed.
+
+#### Prohibited Online Operations:
+- **Model Downloads**: No downloading AI models from HuggingFace, OpenAI, etc.
+- **API Calls**: No external API requests to any cloud services
+- **Package Downloads**: No runtime package installations during preview
+- **Authentication Requests**: No online token validation during development
+- **External Data Fetching**: No web scraping, RSS feeds, or external data sources
+
+#### Why This Rule Exists:
+- Application designed for complete privacy and offline operation
+- Replit preview should only show UI/UX, not trigger downloads
+- Prevents repository bloat from cached downloads
+- Maintains clean development environment
+- User expects zero external dependencies
+
+#### Implementation Requirements:
+```python
+# Always check environment before any online operation
+if self.is_replit:
+    # Skip ALL online operations
+    return mock_response_or_disable_feature()
+```
+
+#### Enforcement Checklist:
+- [ ] No model.download() calls
+- [ ] No API authentication during preview
+- [ ] No external HTTP requests
+- [ ] No package installation triggers
+- [ ] All external operations disabled on Replit
+
+**EMERGENCY PROCEDURE**: If any online operation starts during Replit preview, immediately kill the process and disable the feature.

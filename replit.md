@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a comprehensive, privacy-focused real estate course analysis application that runs 100% locally using Mistral 7B and Whisper models. The application processes various document formats (PDFs, DOCX, PPTX, EPUB, videos/audio) and provides an AI-powered Q&A interface for course materials without any external API calls.
+This is a comprehensive, privacy-focused real estate course analysis application that runs 100% offline using local AI models. The application processes various document formats (PDFs, DOCX, PPTX, EPUB, videos/audio) and provides an AI-powered Q&A interface for course materials without any external API calls, model downloads, or online dependencies.
 
 ## User Preferences
 
@@ -117,11 +117,12 @@ Authentication: Persistent HuggingFace token storage with GUI input for seamless
 - **Query Engine Enhancement**: Added robust initialization with proper error handling and fallback logic
 
 ### System Status
-- **Replit**: Clean development environment, AI models DISABLED to prevent bloat
-- **Local**: Full AI functionality with RTX 3060 12GB, persistent authentication and model downloads
+- **Replit**: Clean development environment, ALL ONLINE OPERATIONS DISABLED (offline-only app)
+- **Local**: Full AI functionality with RTX 3060 12GB, offline model loading and processing
 - **Repository**: Successfully cleaned from 5.7GB to 22MB, optimized for fast GitHub sync
 - **Query Engine**: Fixed MockLLM issue, now properly uses local Mistral/Llama models
-- **Configuration**: Development mode enforced on Replit, full functionality only local
+- **Configuration**: Offline-only mode enforced on Replit, full functionality only local
 - **Repository Management**: Integrated enforce-planning.md with @REPOSITORY_MANAGEMENT.md requirements
+- **Offline Compliance**: Added strict offline-only requirements to enforce-planning.md
 
 The architecture prioritizes privacy, local operation, and user control while maintaining enterprise-grade functionality for real estate education analysis.
