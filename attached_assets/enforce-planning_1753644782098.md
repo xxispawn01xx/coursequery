@@ -213,3 +213,24 @@ self.skip_model_loading = True
 - [ ] NEVER override skip_model_loading on Replit
 
 **EMERGENCY STOP**: If models start downloading on Replit, immediately kill the process and fix the configuration.
+
+## 🚨 MANDATORY REFERENCE: @REPOSITORY_MANAGEMENT.md
+
+### STRICT REQUIREMENT: Always Check Repository Management Guide
+
+**BEFORE ANY CHANGES**: Must reference and follow REPOSITORY_MANAGEMENT.md procedures.
+
+#### Key Requirements from REPOSITORY_MANAGEMENT.md:
+- Repository must stay under 25MB (source code only)
+- Never commit package caches (.cache/uv, .pythonlibs)
+- Regular size monitoring: `du -sh . --exclude=.git`
+- Clean .gitignore to prevent bloat
+- Emergency cleanup procedures if size grows
+
+#### Integration with Development:
+1. **Before commits**: Check repository size
+2. **After package installs**: Verify .gitignore exclusions
+3. **Weekly**: Run size health checks
+4. **If bloated**: Follow emergency cleanup in REPOSITORY_MANAGEMENT.md
+
+**ENFORCEMENT**: Any agent work must comply with repository management guidelines to prevent the 5.7GB bloat that occurred previously.

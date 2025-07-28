@@ -207,7 +207,21 @@ class RealEstateAIApp:
 
     def load_models(self):
         """Load local models if not already loaded."""
-        # This is a fully local app - always try to load models
+        # Check if model loading should be skipped (Replit development mode)
+        if hasattr(self.config, 'skip_model_loading') and self.config.skip_model_loading:
+            st.info("🔧 Development mode - AI models disabled on Replit")
+            st.markdown("""
+            **This is the development environment.** 
+            
+            ✅ Code development and testing
+            ❌ AI model functionality disabled
+            
+            **For full AI functionality:**
+            1. Clone repository locally  
+            2. Run on your RTX 3060 12GB system
+            3. Models will download and run locally
+            """)
+            return True  # Return success but skip loading
         
         # Check authentication first for local usage
         if not st.session_state.get('hf_token_set', False):
@@ -232,6 +246,11 @@ class RealEstateAIApp:
                     return False
             
         if not st.session_state.models_loaded:
+            # Skip model loading if configured to do so
+            if hasattr(self.config, 'skip_model_loading') and self.config.skip_model_loading:
+                st.session_state.models_loaded = True  # Mark as "loaded" (development mode)
+                return True
+                
             # Check if AI dependencies are available
             if not LOCAL_MODELS_AVAILABLE or not QUERY_ENGINE_AVAILABLE:
                 st.warning("⚠️ AI dependencies are not installed. Please check the System Status tab for installation instructions.")
