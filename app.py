@@ -2389,18 +2389,33 @@ class RealEstateAIApp:
             # Get content from multiple sources
             transcriptions = tm.get_all_transcriptions(selected_course)
             
-            # Check for documents
+            # Check for documents from multiple sources
             raw_docs_dir = self.config.raw_docs_dir / selected_course
             indexed_docs_dir = self.config.indexed_courses_dir / selected_course
             
             doc_count = 0
+            
+            # Count raw documents
             if raw_docs_dir.exists():
                 doc_files = list(raw_docs_dir.rglob("*"))
                 doc_count += len([f for f in doc_files if f.is_file() and f.suffix.lower() in ['.pdf', '.docx', '.pptx', '.epub', '.txt', '.md']])
             
+            # Count indexed documents
             if indexed_docs_dir.exists():
                 indexed_files = list(indexed_docs_dir.rglob("*"))
                 doc_count += len([f for f in indexed_files if f.is_file()])
+            
+            # If doc_count is still low, check analytics for true document count
+            if doc_count < 10:  # Likely undercount
+                try:
+                    analytics = self._get_comprehensive_analytics(selected_course)
+                    if analytics and analytics.get('total_documents', 0) > doc_count:
+                        true_doc_count = analytics.get('total_documents', 0)
+                        if true_doc_count > 0:
+                            doc_count = true_doc_count
+                            st.info(f"📊 Analytics detected {true_doc_count} documents (using comprehensive count)")
+                except Exception:
+                    pass
             
             col1, col2, col3, col4 = st.columns(4)
             with col1:
@@ -2416,8 +2431,19 @@ class RealEstateAIApp:
                 vector_status = "✅ Ready" if vectors_file.exists() else "❌ Not Created"
                 st.metric("Vector Status", vector_status)
             
-            # Process button - available if any content exists
+            # Process button - available if any content exists (documents OR transcriptions)
             has_content = doc_count > 0 or len(transcriptions) > 0
+            
+            # Override: If we detect any course in analytics, allow processing
+            if not has_content and selected_course:
+                # Check if course exists in system (like vcpe with 29 docs)
+                try:
+                    analytics = self._get_comprehensive_analytics(selected_course)
+                    if analytics and analytics.get('total_documents', 0) > 0:
+                        has_content = True
+                        st.info(f"✅ Detected {analytics['total_documents']} documents in course analytics - enabling vector processing")
+                except Exception:
+                    pass
             
             if has_content:
                 if st.button("🔄 Generate Vector Embeddings from ALL Course Materials", type="primary"):

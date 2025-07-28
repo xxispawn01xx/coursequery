@@ -254,7 +254,10 @@ class VectorRAGEngine:
         
         # 1.5. Extract content from LlamaIndex storage (for existing courses like vcpe)
         logger.info(f"Attempting to extract content from LlamaIndex for {course_name}")
-        self._process_llama_index_content(course_name, all_chunks, chunk_metadata, processed_sources, chunking_method)
+        try:
+            self._process_llama_index_content(course_name, all_chunks, chunk_metadata, processed_sources, chunking_method)
+        except Exception as e:
+            logger.warning(f"LlamaIndex extraction failed for {course_name}: {e}")
         
         # 2. Process raw documents (PDFs, DOCX, PPTX, etc.)
         raw_course_dir = self.config.raw_docs_dir / course_name
@@ -395,11 +398,8 @@ class VectorRAGEngine:
             
             # Check if course has indexed content  
             course_index_dir = self.config.indexed_courses_dir / course_name
-            if not course_index_dir.exists():
-                logger.info(f"No indexed course directory for {course_name}")
-                return
-                
-            # Get the course index
+            
+            # Get the course index directly without requiring directory
             index = course_indexer.get_course_index(course_name)
             if not index:
                 logger.warning(f"No LlamaIndex found for course {course_name}")
@@ -412,7 +412,16 @@ class VectorRAGEngine:
             logger.info(f"Found {len(documents)} documents in LlamaIndex for {course_name}")
             
             for i, doc in enumerate(documents):
-                content = doc.text if hasattr(doc, 'text') else str(doc)
+                # Try multiple ways to get text content
+                content = ""
+                if hasattr(doc, 'text'):
+                    content = doc.text
+                elif hasattr(doc, 'get_content'):
+                    content = doc.get_content()
+                elif hasattr(doc, 'content'):
+                    content = doc.content
+                else:
+                    content = str(doc)
                 
                 if content.strip():
                     # Get source info from metadata
