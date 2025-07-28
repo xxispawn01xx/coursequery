@@ -126,6 +126,9 @@ Authentication: Persistent HuggingFace token storage with GUI input for seamless
 - **Hybrid Query Engine**: Graceful fallback from local models to cloud APIs for optimal user experience
 - **Enhanced Analytics**: Real content analysis replacing placeholder visualizations with meaningful insights
 - **Smart Workflow Guidance**: Clear direction to RTX 3060 transcription + ChatGPT Plus querying approach
+- **Vector RAG System**: Complete implementation for $400+/year savings with local embeddings + cloud API optimization
+- **Bulk Transcription Interface**: Dedicated tab for folder structure preservation and RTX 3060 optimization
+- **Cost-Efficient Querying**: Vector similarity search with pay-per-token vs flat-rate subscription savings
 
 ### System Status
 - **Replit**: Clean development environment, ALL ONLINE OPERATIONS DISABLED (offline-only app)

@@ -1685,7 +1685,7 @@ class RealEstateAIApp:
         self.sidebar_course_management()
         
         # Main content tabs
-        tab1, tab2, tab3, tab4, tab5 = st.tabs(["📁 Upload Documents", "🎥 Bulk Transcription", "💬 Ask Questions", "📊 Analytics", "⚙️ System Status"])
+        tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["📁 Upload Documents", "🎥 Bulk Transcription", "🔍 Vector RAG", "💬 Ask Questions", "📊 Analytics", "⚙️ System Status"])
         
         with tab1:
             self.file_upload_section()
@@ -1694,12 +1694,15 @@ class RealEstateAIApp:
             self.bulk_transcription_section()
         
         with tab3:
-            self.query_interface()
+            self.vector_rag_section()
         
         with tab4:
-            self.analytics_section()
+            self.query_interface()
         
         with tab5:
+            self.analytics_section()
+        
+        with tab6:
             self.system_status_section()
         
         # Add new analytics and learning tabs
@@ -1836,7 +1839,7 @@ class RealEstateAIApp:
             if st.button("📁 Open Transcriptions Folder"):
                 st.info(f"Transcriptions stored in: `{stats['storage_location']}`")
     
-    def preview_media_files(self, directory: str, file_types: list, tm: TranscriptionManager, 
+    def preview_media_files(self, directory: str, file_types: list, tm, 
                            course_name: str, skip_existing: bool):
         """Preview media files that would be processed."""
         try:
@@ -1911,7 +1914,7 @@ class RealEstateAIApp:
             st.error(f"Error previewing files: {e}")
     
     def start_bulk_transcription(self, directory: str, course_name: str, file_types: list, 
-                               tm: TranscriptionManager, method: str, preserve_structure: bool,
+                               tm, method: str, preserve_structure: bool,
                                skip_existing: bool, batch_size: int, show_progress: bool):
         """Start the bulk transcription process."""
         try:
@@ -2027,7 +2030,7 @@ class RealEstateAIApp:
         except Exception as e:
             st.error(f"Error during bulk transcription: {e}")
     
-    def transcribe_file_local(self, media_file: Path, course_name: str, tm: TranscriptionManager) -> bool:
+    def transcribe_file_local(self, media_file, course_name: str, tm) -> bool:
         """Transcribe a single file using local Whisper."""
         try:
             import whisper
@@ -2046,7 +2049,7 @@ class RealEstateAIApp:
             logger.error(f"Local transcription failed for {media_file}: {e}")
             return False
     
-    def transcribe_file_cloud(self, media_file: Path, course_name: str, tm: TranscriptionManager) -> bool:
+    def transcribe_file_cloud(self, media_file, course_name: str, tm) -> bool:
         """Transcribe a single file using OpenAI API."""
         try:
             import os
@@ -2075,7 +2078,7 @@ class RealEstateAIApp:
             logger.error(f"Cloud transcription failed for {media_file}: {e}")
             return False
     
-    def show_all_transcriptions(self, tm: TranscriptionManager):
+    def show_all_transcriptions(self, tm):
         """Display all transcriptions with management options."""
         st.subheader("📋 All Transcriptions")
         
@@ -2128,6 +2131,236 @@ class RealEstateAIApp:
                                 tm._save_metadata()
                             st.success("Transcription deleted!")
                             st.rerun()
+    
+    def vector_rag_section(self):
+        """Vector RAG system for cost-efficient querying with embeddings."""
+        st.header("🔍 Vector RAG - Cost-Efficient AI Querying")
+        st.info("**Save $400+/year**: Use local embeddings + cloud APIs for precise, cost-effective responses")
+        
+        # Cost comparison
+        with st.expander("💰 Cost Savings Analysis"):
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown("**Current Approach (Flat Rate)**")
+                st.write("• ChatGPT Plus: $20/month")
+                st.write("• Perplexity Pro: $20/month")
+                st.write("• **Total: $480/year**")
+            with col2:
+                st.markdown("**Vector RAG Approach**")
+                st.write("• One-time setup: $20")
+                st.write("• Monthly usage: $0.50-5")
+                st.write("• **Total: $26-80/year**")
+                st.success("**Savings: $400-450/year (83-92% less)**")
+        
+        # Initialize Vector RAG Engine
+        try:
+            from vector_rag_engine import VectorRAGEngine
+            from transcription_manager import TranscriptionManager
+            
+            if 'vector_rag_engine' not in st.session_state:
+                st.session_state.vector_rag_engine = VectorRAGEngine()
+            
+            rag_engine = st.session_state.vector_rag_engine
+            tm = TranscriptionManager()
+            
+        except Exception as e:
+            st.error(f"Vector RAG engine not available: {e}")
+            return
+        
+        # Step 1: Process Transcripts into Vectors
+        st.subheader("🔧 Step 1: Convert Transcripts to Vector Embeddings")
+        
+        # Course selection
+        available_courses = list(self.config.courses_dir.glob("*/"))
+        course_names = [course.name for course in available_courses if course.is_dir()]
+        
+        if not course_names:
+            st.warning("No courses found. Upload documents first or use bulk transcription.")
+            return
+        
+        selected_course = st.selectbox(
+            "Select course to process:",
+            course_names,
+            help="Choose a course with transcriptions to convert to vectors"
+        )
+        
+        # Chunking method selection
+        chunking_method = st.radio(
+            "Chunking Strategy:",
+            ["paragraphs", "sliding_window", "topics"],
+            help="How to break transcripts into searchable chunks"
+        )
+        
+        # Show transcription status
+        if selected_course:
+            transcriptions = tm.get_all_transcriptions(selected_course)
+            
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.metric("Transcriptions Available", len(transcriptions))
+            with col2:
+                total_chars = sum(t.get('character_count', 0) for t in transcriptions)
+                st.metric("Total Characters", f"{total_chars:,}")
+            with col3:
+                # Check if vectors exist
+                vectors_file = rag_engine.vectors_dir / f"{selected_course}_vectors.json"
+                vector_status = "✅ Ready" if vectors_file.exists() else "❌ Not Created"
+                st.metric("Vector Status", vector_status)
+            
+            # Process button
+            if transcriptions:
+                if st.button("🔄 Generate Vector Embeddings", type="primary"):
+                    with st.spinner("Generating embeddings with your RTX 3060..."):
+                        try:
+                            # Process transcriptions
+                            vector_data = rag_engine.process_transcripts(
+                                selected_course, transcriptions, chunking_method
+                            )
+                            
+                            st.success(f"✅ Created {vector_data['total_chunks']} vector embeddings!")
+                            
+                            # Show processing results
+                            col1, col2 = st.columns(2)
+                            with col1:
+                                st.write(f"**Chunks Created**: {vector_data['total_chunks']}")
+                                st.write(f"**Method**: {vector_data['chunking_method']}")
+                            with col2:
+                                st.write(f"**Source Files**: {vector_data['total_transcripts']}")
+                                st.write(f"**Created**: {vector_data['created'][:19]}")
+                            
+                            st.rerun()
+                            
+                        except Exception as e:
+                            st.error(f"Error generating embeddings: {e}")
+            else:
+                st.info("No transcriptions found for this course. Use the Bulk Transcription tab first.")
+        
+        # Step 2: Query with Vector Search
+        st.subheader("🔍 Step 2: Query with Vector Search")
+        
+        if selected_course:
+            vectors_file = rag_engine.vectors_dir / f"{selected_course}_vectors.json"
+            
+            if vectors_file.exists():
+                # Query interface
+                query = st.text_input(
+                    "Enter your question:",
+                    placeholder="What are the key principles of real estate valuation?",
+                    help="Ask questions about your course content"
+                )
+                
+                # API provider selection
+                api_provider = st.radio(
+                    "Choose AI provider:",
+                    ["openai", "perplexity"],
+                    format_func=lambda x: {"openai": "OpenAI GPT-4", "perplexity": "Perplexity Sonar"}[x],
+                    help="Select which API to use for generating responses"
+                )
+                
+                # Advanced options
+                with st.expander("⚙️ Advanced Options"):
+                    top_k = st.slider("Number of relevant chunks", 1, 10, 5)
+                    show_sources = st.checkbox("Show source chunks", value=True)
+                    estimate_cost = st.checkbox("Show cost estimate", value=True)
+                
+                # Process query
+                if query:
+                    if st.button("🚀 Search & Generate Response"):
+                        with st.spinner("Searching relevant content and generating response..."):
+                            try:
+                                # Step 1: Vector search
+                                search_results = rag_engine.search_course(selected_course, query, top_k)
+                                
+                                if not search_results:
+                                    st.warning("No relevant content found for your query.")
+                                    return
+                                
+                                # Step 2: Cost estimation
+                                if estimate_cost:
+                                    cost_data = rag_engine.get_cost_estimate(query, len(search_results))
+                                    
+                                    col1, col2, col3 = st.columns(3)
+                                    with col1:
+                                        st.metric("Input Tokens", f"{cost_data['input_tokens']:.0f}")
+                                    with col2:
+                                        st.metric("Estimated Cost", f"${cost_data['total_estimated_cost']:.4f}")
+                                    with col3:
+                                        savings = cost_data['traditional_flat_rate_cost'] - cost_data['total_estimated_cost']
+                                        st.metric("Savings vs Flat Rate", f"${savings:.4f}")
+                                
+                                # Step 3: Generate response
+                                response = rag_engine.generate_response_with_context(
+                                    query, search_results, api_provider
+                                )
+                                
+                                # Display response
+                                st.subheader("🤖 AI Response")
+                                st.write(response)
+                                
+                                # Show sources if requested
+                                if show_sources:
+                                    st.subheader("📚 Source Chunks")
+                                    for i, result in enumerate(search_results):
+                                        with st.expander(f"Source {i+1}: {result['source_file']} (Similarity: {result['similarity']:.3f})"):
+                                            st.write(result['content'])
+                                            st.caption(f"Words: {result['word_count']} | Type: {result['chunk_type']}")
+                                
+                            except Exception as e:
+                                st.error(f"Error processing query: {e}")
+                
+                # Search across all courses
+                st.subheader("🌐 Search All Courses")
+                if st.button("🔍 Search Across All Courses"):
+                    if query:
+                        with st.spinner("Searching all courses..."):
+                            try:
+                                all_results = rag_engine.search_all_courses(query, 15)
+                                
+                                if all_results:
+                                    for course, results in all_results.items():
+                                        with st.expander(f"📚 {course} ({len(results)} results)"):
+                                            for result in results[:3]:  # Show top 3 per course
+                                                st.write(f"**Score: {result['similarity']:.3f}** - {result['content'][:200]}...")
+                                else:
+                                    st.info("No results found across courses.")
+                            except Exception as e:
+                                st.error(f"Error searching all courses: {e}")
+                    else:
+                        st.warning("Please enter a query first.")
+            else:
+                st.warning("No vector embeddings found. Please generate embeddings first.")
+        
+        # Management tools
+        st.subheader("📊 Vector Database Management")
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            if st.button("📋 View All Vector Databases"):
+                vector_files = list(rag_engine.vectors_dir.glob("*_vectors.json"))
+                if vector_files:
+                    for vector_file in vector_files:
+                        course_name = vector_file.stem.replace("_vectors", "")
+                        try:
+                            with open(vector_file, 'r') as f:
+                                data = json.load(f)
+                            st.write(f"**{course_name}**: {data['total_chunks']} chunks ({data['chunking_method']})")
+                        except Exception as e:
+                            st.write(f"**{course_name}**: Error reading data")
+                else:
+                    st.info("No vector databases found.")
+        
+        with col2:
+            if st.button("🧹 Clear Vector Cache"):
+                try:
+                    # Clear memory cache
+                    rag_engine.course_vectors.clear()
+                    st.success("Vector cache cleared!")
+                except Exception as e:
+                    st.error(f"Error clearing cache: {e}")
+        
+        with col3:
+            if st.button("📁 Open Vectors Folder"):
+                st.info(f"Vector files stored in: `{rag_engine.vectors_dir}`")
 
         # Footer
         st.markdown("---")

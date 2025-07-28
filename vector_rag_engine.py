@@ -157,6 +157,7 @@ class LocalEmbeddingsEngine:
                 uncached_indices.append(i)
         
         # Generate embeddings for uncached texts
+        new_embeddings = None
         if uncached_texts:
             new_embeddings = self.model.encode(uncached_texts, convert_to_numpy=True)
             
@@ -165,15 +166,20 @@ class LocalEmbeddingsEngine:
                 text_hash = hashlib.md5(text.encode()).hexdigest()
                 self.embeddings_cache[text_hash] = embedding
         
+        # Get embedding dimension
+        embedding_dim = 384  # Default for all-MiniLM-L6-v2
+        if hasattr(self.model, 'get_sentence_embedding_dimension'):
+            embedding_dim = self.model.get_sentence_embedding_dimension()
+        
         # Combine cached and new embeddings in correct order
-        all_embeddings = np.zeros((len(texts), self.model.get_sentence_embedding_dimension()))
+        all_embeddings = np.zeros((len(texts), embedding_dim))
         
         # Add cached embeddings
         for original_idx, embedding in cached_embeddings:
             all_embeddings[original_idx] = embedding
         
         # Add new embeddings
-        if uncached_texts:
+        if uncached_texts and new_embeddings is not None:
             for i, original_idx in enumerate(uncached_indices):
                 all_embeddings[original_idx] = new_embeddings[i]
         
@@ -188,9 +194,11 @@ class LocalEmbeddingsEngine:
         # Generate query embedding
         query_embedding = self.model.encode([query_text], convert_to_numpy=True)[0]
         
-        # Calculate similarity scores
-        from sklearn.metrics.pairwise import cosine_similarity
-        similarities = cosine_similarity([query_embedding], chunk_embeddings)[0]
+        # Calculate similarity scores using numpy (avoid sklearn dependency)
+        # Normalize vectors for cosine similarity
+        query_norm = query_embedding / np.linalg.norm(query_embedding)
+        chunk_norms = chunk_embeddings / np.linalg.norm(chunk_embeddings, axis=1, keepdims=True)
+        similarities = np.dot(chunk_norms, query_norm)
         
         # Get top K results
         top_indices = np.argsort(similarities)[-top_k:][::-1]
@@ -408,7 +416,8 @@ Please provide a comprehensive answer based on the context provided. If the cont
             )
             
             if response.status_code == 200:
-                return response.json()["choices"][0]["message"]["content"]
+                result = response.json()
+                return result["choices"][0]["message"]["content"]
             else:
                 return f"Perplexity API error: {response.status_code}"
                 
