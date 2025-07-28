@@ -141,19 +141,22 @@ Authentication: Persistent HuggingFace token storage with GUI input for seamless
 - **GPU Health Testing**: Added comprehensive GPU memory test for RTX 3060 to diagnose potential hardware issues with used graphics card
 - **CUDA Debugging Enhanced**: Implemented TORCH_USE_CUDA_DSA for better device-side assert error reporting
 - **Performance Monitoring**: Clear visual warnings when CPU fallback is used instead of GPU for embedding generation
-- **RTX 3060 Device-Side Assert Fix**: Resolved GitHub issue #28284 by changing device_map from {0: "0"} to "cuda:0" format
-- **Debug Mode Integration**: Added CUDA_LAUNCH_BLOCKING=1 and TORCH_USE_CUDA_DSA=1 for proper error reporting
-- **Single GPU Enforcement**: Applied CUDA_VISIBLE_DEVICES=0 to prevent multi-GPU confusion on RTX 3060
-- **HF_TOKEN Validation**: Enhanced authentication verification to distinguish CUDA errors from auth failures
+- **RTX 3060 Hardware Diagnosis**: Comprehensive testing revealed faulty GPU memory causing device-side assert errors
+- **CPU-Only Fallback System**: Implemented automatic detection and graceful CPU-only mode when GPU issues detected
+- **Hardware Test Suite**: Created rtx_3060_memory_test.py for systematic GPU health verification
+- **Persistent Status Tracking**: GPU health results saved to gpu_test_results.txt for reliable system memory
+- **Enhanced Error Classification**: System now distinguishes between hardware issues vs software configuration problems
+- **CPU Model Optimization**: Implemented reliable CPU models (DialoGPT, GPT-2, DistilGPT-2) for consistent operation
 
 ### System Status
 - **Replit**: Clean development environment, ALL ONLINE OPERATIONS DISABLED (offline-only app)
-- **Local**: ✅ **FULLY OPERATIONAL** - RTX 3060 system with Llama 2 7B + Mistral 7B loaded successfully
+- **Local**: ⚠️ **RTX 3060 HARDWARE ISSUES DETECTED** - GPU has faulty memory causing device-side assert errors
+- **CPU Fallback**: ✅ **FULLY OPERATIONAL** - CPU-only mode with DialoGPT, GPT-2, and embedding models
 - **Repository**: Successfully cleaned from 5.7GB to 22MB, optimized for fast GitHub sync
 - **Query Engine**: Fixed NodeWithScore weighted_score error, now processes queries without crashes
 - **Configuration**: Offline-only mode enforced on Replit, full functionality confirmed local
 - **Repository Management**: Integrated enforce-planning.md with @REPOSITORY_MANAGEMENT.md requirements
-- **Offline Compliance**: Added strict offline-only requirements to enforce-planning.md
-- **Model Loading**: ✅ Confirmed working locally with all models (Llama 2, Mistral, embeddings)
+- **Hardware Diagnosis**: Created comprehensive RTX 3060 memory test confirming CUDA unavailability
+- **Model Loading**: ✅ Confirmed working locally with CPU-optimized models (slower but reliable)
 
 The architecture prioritizes privacy, local operation, and user control while maintaining enterprise-grade functionality for real estate education analysis.

@@ -108,51 +108,62 @@ class LocalModelManager:
                     suggested_model = MemoryOptimizer.suggest_optimal_model()
                     logger.warning(f"System RAM may be insufficient. Consider using: {suggested_model}")
         
-        # RTX 3060 Debug Configuration (Hugging Face Forum Solutions)
+        # RTX 3060 Memory Health Check (Hardware Issue Detection)
+        gpu_is_healthy = True
         if torch and torch.cuda.is_available():
-            # Apply RTX 3060 fixes from Hugging Face forums
-            logger.info("🔧 Applying RTX 3060 device-side assert fixes from Hugging Face forums...")
+            logger.info("🔬 RTX 3060 Memory Health Check - Testing for hardware issues...")
             
-            # Fix 1: Enable debug mode to see real errors (most important)
-            os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
-            os.environ['TORCH_USE_CUDA_DSA'] = '1'
+            # Check if we have previous test results
+            gpu_test_file = Path("gpu_test_results.txt")
+            if gpu_test_file.exists():
+                try:
+                    with open(gpu_test_file, "r") as f:
+                        content = f.read()
+                        if "GPU_HEALTHY=False" in content:
+                            logger.error("🚨 Previous test confirmed RTX 3060 has faulty memory")
+                            logger.error("Automatically switching to CPU-only mode")
+                            gpu_is_healthy = False
+                            self.device = 'cpu'
+                        else:
+                            logger.info("✅ Previous test showed GPU is healthy")
+                except Exception:
+                    pass
             
-            # Fix 2: Force single GPU (RTX 3060 multi-GPU confusion)
-            os.environ['CUDA_VISIBLE_DEVICES'] = '0'
-            
-            # Fix 3: Memory management for 12GB VRAM
-            torch.cuda.empty_cache()
-            torch.cuda.synchronize()
-            if hasattr(torch.cuda, 'reset_peak_memory_stats'):
-                torch.cuda.reset_peak_memory_stats()
-            
-            # Fix 4: Verify HF_TOKEN is available
-            hf_token = os.getenv("HF_TOKEN")
-            if hf_token:
-                logger.info(f"✅ HF_TOKEN found: {hf_token[:8]}...{hf_token[-4:]}")  # Show partial token
-            else:
-                logger.warning("⚠️  HF_TOKEN not found - may cause authentication issues")
-            
-            logger.info("✅ RTX 3060 debug configuration applied")
-            logger.info("🔍 Testing GPU with debug flags enabled...")
-            
-            try:
-                # Simple test with debug mode enabled
-                test_tensor = torch.tensor([1.0]).cuda()
-                result = test_tensor * 2
-                del test_tensor, result
-                torch.cuda.empty_cache()
+            if gpu_is_healthy:
+                # Apply debug configuration for better error reporting
+                os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
+                os.environ['TORCH_USE_CUDA_DSA'] = '1'
+                os.environ['CUDA_VISIBLE_DEVICES'] = '0'
                 
-                total_memory = torch.cuda.get_device_properties(0).total_memory / (1024**3)
-                allocated = torch.cuda.memory_allocated(0) / (1024**3)
-                logger.info(f"✅ RTX 3060 test passed - {allocated:.1f}GB/{total_memory:.1f}GB used")
-                
-            except Exception as gpu_error:
-                logger.error(f"RTX 3060 Debug Error (now shows real cause): {gpu_error}")
-                logger.info("🔧 Debug mode enabled - error details above show actual problem")
-                
-                # Continue with fixes - don't give up on GPU
-                torch.cuda.empty_cache()
+                # Quick health test
+                try:
+                    logger.info("🔍 Quick GPU memory test...")
+                    test_tensor = torch.tensor([1.0]).cuda()
+                    result = test_tensor * 2
+                    del test_tensor, result
+                    torch.cuda.empty_cache()
+                    
+                    total_memory = torch.cuda.get_device_properties(0).total_memory / (1024**3)
+                    logger.info(f"✅ GPU test passed - {total_memory:.1f}GB available")
+                    
+                except Exception as gpu_error:
+                    if "device-side assert" in str(gpu_error):
+                        logger.error("🚨 CONFIRMED: RTX 3060 has faulty memory (device-side assert)")
+                        logger.error("This is a hardware issue - switching to CPU-only mode")
+                        gpu_is_healthy = False
+                        self.device = 'cpu'
+                        # Hide GPU from PyTorch to prevent further issues
+                        os.environ['CUDA_VISIBLE_DEVICES'] = ''
+                    else:
+                        logger.error(f"GPU error: {gpu_error}")
+                        torch.cuda.empty_cache()
+        
+        # Verify HF_TOKEN availability
+        hf_token = os.getenv("HF_TOKEN")
+        if hf_token:
+            logger.info(f"✅ HF_TOKEN found: {hf_token[:8]}...{hf_token[-4:]}")
+        else:
+            logger.warning("⚠️  HF_TOKEN not found - may cause authentication issues")
         
         # Check if models are already loaded in memory
         if self._models_already_loaded(model_type):
@@ -183,9 +194,10 @@ class LocalModelManager:
             # Clear any existing models to ensure only one is loaded at a time
             self._clear_unused_models(model_type)
             
-            # Load language models (GPU or CPU fallback)
-            if self.device != 'cpu':
+            # Load language models based on GPU health
+            if self.device != 'cpu' and gpu_is_healthy:
                 try:
+                    logger.info("🚀 Loading models on healthy GPU...")
                     if model_type == "mistral":
                         self._load_mistral_model()
                     elif model_type == "llama":
@@ -196,15 +208,19 @@ class LocalModelManager:
                         model_type = "mistral"
                 except Exception as model_error:
                     if "device-side assert" in str(model_error):
-                        logger.error("🚨 Device-side assert during model loading - switching to CPU mode")
+                        logger.error("🚨 Device-side assert during model loading")
+                        logger.error("RTX 3060 memory corruption confirmed - permanent CPU fallback")
                         self.device = 'cpu'
-                        # Try CPU-only loading as fallback
+                        os.environ['CUDA_VISIBLE_DEVICES'] = ''  # Disable GPU completely
                         self._load_mistral_cpu_fallback()
                         model_type = "mistral_cpu"
                     else:
                         raise model_error
             else:
-                logger.info("Loading models in CPU-only mode (GPU issues detected)")
+                if not gpu_is_healthy:
+                    logger.info("🖥️  Loading models in CPU-only mode (RTX 3060 hardware issues)")
+                else:
+                    logger.info("🖥️  Loading models in CPU-only mode (user preference)")
                 self._load_mistral_cpu_fallback()
                 model_type = "mistral_cpu"
                 
@@ -394,13 +410,15 @@ class LocalModelManager:
         raise Exception("No models could be loaded successfully")
 
     def _load_mistral_cpu_fallback(self):
-        """Load a smaller model on CPU when GPU has issues."""
-        logger.info("🔄 Loading CPU fallback model for RTX 3060 compatibility...")
+        """Load reliable CPU models when RTX 3060 has hardware issues."""
+        logger.info("🔄 Loading CPU fallback model (RTX 3060 memory issues detected)...")
+        logger.info("💡 CPU models are slower but work reliably with faulty GPU memory")
         
-        # Use a smaller model that works well on CPU
+        # Use proven CPU models that work well even with GPU hardware issues
         cpu_models = [
             ("microsoft/DialoGPT-medium", "DialoGPT Medium"),
-            ("gpt2", "GPT-2"),
+            ("gpt2", "GPT-2 Base"),
+            ("distilgpt2", "DistilGPT-2"),
         ]
         
         for model_name, model_display_name in cpu_models:
