@@ -148,20 +148,24 @@ class LocalQueryEngine:
         
         for node in nodes:
             # Get syllabus weight from metadata
-            syllabus_weight = node.metadata.get('syllabus_weight', 1.0)
+            metadata = getattr(node, 'metadata', {})
+            if hasattr(node, 'node') and hasattr(node.node, 'metadata'):
+                metadata = node.node.metadata
+            
+            syllabus_weight = metadata.get('syllabus_weight', 1.0)
             
             # Apply weight to the similarity score
             original_score = getattr(node, 'score', 0.0)
             weighted_score = original_score * syllabus_weight
             
-            # Store the weighted score
-            node.weighted_score = weighted_score
-            weighted_nodes.append(node)
+            # Create a tuple to store node and weighted score instead of modifying the object
+            weighted_nodes.append((node, weighted_score))
         
         # Sort by weighted score (descending)
-        weighted_nodes.sort(key=lambda x: getattr(x, 'weighted_score', 0.0), reverse=True)
+        weighted_nodes.sort(key=lambda x: x[1], reverse=True)
         
-        return weighted_nodes
+        # Return just the nodes in the new order
+        return [node for node, score in weighted_nodes]
     
     def _build_context(self, nodes: List[Any]) -> str:
         """
@@ -176,13 +180,23 @@ class LocalQueryEngine:
         context_parts = []
         
         for i, node in enumerate(nodes, 1):
-            file_name = node.metadata.get('file_name', 'Unknown')
-            is_syllabus = node.metadata.get('is_syllabus', False)
+            # Get node metadata
+            metadata = getattr(node, 'metadata', {})
+            if hasattr(node, 'node') and hasattr(node.node, 'metadata'):
+                metadata = node.node.metadata
+                
+            file_name = metadata.get('file_name', 'Unknown')
+            is_syllabus = metadata.get('is_syllabus', False)
+            
+            # Get node text
+            node_text = getattr(node, 'text', str(node))
+            if hasattr(node, 'node') and hasattr(node.node, 'text'):
+                node_text = node.node.text
             
             # Add priority indicator for syllabus content
             priority_indicator = " [SYLLABUS]" if is_syllabus else ""
             
-            context_part = f"[Source {i}: {file_name}{priority_indicator}]\n{node.text}\n"
+            context_part = f"[Source {i}: {file_name}{priority_indicator}]\n{node_text}\n"
             context_parts.append(context_part)
         
         return "\n".join(context_parts)
@@ -274,9 +288,14 @@ ANSWER:"""
         sources = []
         
         for node in nodes:
-            file_name = node.metadata.get('file_name', 'Unknown source')
-            file_type = node.metadata.get('file_type', '')
-            is_syllabus = node.metadata.get('is_syllabus', False)
+            # Get node metadata
+            metadata = getattr(node, 'metadata', {})
+            if hasattr(node, 'node') and hasattr(node.node, 'metadata'):
+                metadata = node.node.metadata
+                
+            file_name = metadata.get('file_name', 'Unknown source')
+            file_type = metadata.get('file_type', '')
+            is_syllabus = metadata.get('is_syllabus', False)
             
             # Build source string
             source_str = f"{file_name}"
@@ -288,9 +307,15 @@ ANSWER:"""
                 source_str += " [Syllabus]"
             
             # Add similarity score if available
-            if hasattr(node, 'weighted_score'):
-                score = getattr(node, 'weighted_score', 0.0)
-                source_str += f" (Relevance: {score:.2f})"
+            if hasattr(node, 'score'):
+                score = getattr(node, 'score', 0.0)
+                # Calculate weighted score for display
+                metadata = getattr(node, 'metadata', {})
+                if hasattr(node, 'node') and hasattr(node.node, 'metadata'):
+                    metadata = node.node.metadata
+                syllabus_weight = metadata.get('syllabus_weight', 1.0)
+                weighted_score = score * syllabus_weight
+                source_str += f" (Relevance: {weighted_score:.2f})"
             
             sources.append(source_str)
         
