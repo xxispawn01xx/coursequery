@@ -1,0 +1,30 @@
+# Ignore all model files to prevent them from being committed to GitHub
+# Models should only be downloaded locally, not on Replit
+
+# HuggingFace model cache directories
+models--*/
+snapshots/
+blobs/
+refs/
+
+# Model files
+*.bin
+*.safetensors
+*.gguf
+*.pt
+*.pth
+*.h5
+*.pkl
+*.pickle
+
+# Tokenizer files (large)
+*.json
+*.txt
+*.model
+
+# Keep this .gitignore file
+!.gitignore
+
+# Keep any small config files if needed
+!config.yaml
+!config.json

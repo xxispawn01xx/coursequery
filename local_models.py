@@ -1,0 +1,470 @@
+"""
+Local model management for Mistral 7B and embedding models.
+Handles model loading, caching, and inference without external API calls.
+"""
+
+import logging
+import os
+import json
+from datetime import datetime
+from typing import Optional, Dict, Any, List
+import gc
+
+# Optional AI/ML imports
+try:
+    import torch
+    TORCH_AVAILABLE = True
+except ImportError:
+    torch = None
+    TORCH_AVAILABLE = False
+
+try:
+    from transformers import AutoTokenizer, AutoModelForCausalLM
+    from transformers.pipelines import pipeline
+    try:
+        from transformers import BitsAndBytesConfig
+    except ImportError:
+        BitsAndBytesConfig = None
+    TRANSFORMERS_AVAILABLE = True
+except ImportError:
+    AutoTokenizer = None
+    AutoModelForCausalLM = None
+    BitsAndBytesConfig = None
+    pipeline = None
+    TRANSFORMERS_AVAILABLE = False
+
+try:
+    from vllm import LLM, SamplingParams
+    VLLM_AVAILABLE = True
+except ImportError:
+    LLM = None
+    SamplingParams = None
+    VLLM_AVAILABLE = False
+
+try:
+    from sentence_transformers import SentenceTransformer
+    SENTENCE_TRANSFORMERS_AVAILABLE = True
+except ImportError:
+    SentenceTransformer = None
+    SENTENCE_TRANSFORMERS_AVAILABLE = False
+
+from config import Config
+
+logger = logging.getLogger(__name__)
+
+class LocalModelManager:
+    """Manages local AI models for text generation and embeddings."""
+    
+    def __init__(self):
+        """Initialize the model manager."""
+        self.config = Config()
+        self.mistral_model = None
+        self.mistral_tokenizer = None
+        self.mistral_pipeline = None
+        self.llama_model = None
+        self.llama_tokenizer = None
+        self.llama_pipeline = None
+        self.vllm_model = None
+        self.embedding_model = None
+        self.device = self._get_device()
+        
+        # Model selection
+        self.current_model = "mistral"  # Default to Mistral
+        
+        # Simple conversation memory
+        self.conversations = []
+        
+        logger.info(f"Initialized LocalModelManager with device: {self.device}")
+    
+    def _get_device(self) -> str:
+        """Determine the best available device."""
+        if TORCH_AVAILABLE and torch.cuda.is_available():
+            return f"cuda:{torch.cuda.current_device()}"
+        else:
+            return "cpu"
+    
+    def load_models(self, model_type: str = "mistral"):
+        """Load all required models."""
+        logger.info(f"Loading local models (type: {model_type})...")
+        
+        try:
+            if model_type == "mistral":
+                self._load_mistral_model()
+            elif model_type == "llama":
+                self._load_llama_model()
+            else:
+                # Load default Mistral if unknown type
+                self._load_mistral_model()
+                
+            self._load_embedding_model()
+            self.current_model = model_type
+            logger.info(f"All models loaded successfully ({model_type})")
+        except Exception as e:
+            logger.error(f"Failed to load models: {e}")
+            raise
+    
+    def _check_gguf_models(self) -> Optional[str]:
+        """Check for available GGUF models in the models/gguf directory."""
+        gguf_dir = self.config.models_dir / "gguf"
+        if not gguf_dir.exists():
+            return None
+        
+        # Look for GGUF files
+        gguf_files = list(gguf_dir.glob("*.gguf"))
+        if gguf_files:
+            logger.info(f"Found GGUF model: {gguf_files[0].name}")
+            return str(gguf_files[0])
+        return None
+
+    def _load_mistral_model(self):
+        """Load Mistral 7B model with 4-bit quantization or GGUF if available."""
+        logger.info("Loading Mistral 7B model...")
+        
+        # Check for GGUF models first
+        gguf_path = self._check_gguf_models()
+        if gguf_path:
+            logger.info(f"Using GGUF model: {gguf_path}")
+            # GGUF loading would require llama-cpp-python or similar
+            # For now, show detected but continue with HuggingFace model
+            logger.info("GGUF detected but using HuggingFace model for compatibility")
+        
+        # Try models in order of preference - Llama first, then Mistral fallback
+        model_attempts = [
+            ("meta-llama/Llama-2-7b-chat-hf", "Llama 2 7B Chat", "causal"),
+            ("mistralai/Mistral-7B-Instruct-v0.1", "Mistral 7B", "causal")
+        ]
+        
+        for model_name, model_display_name, model_type in model_attempts:
+            try:
+                logger.info(f"Attempting to load {model_display_name}...")
+                
+                # Configure quantization only for larger models
+                quantization_config = None
+                if torch and torch.cuda.is_available() and "Mistral" in model_name and BitsAndBytesConfig:
+                    quantization_config = BitsAndBytesConfig(
+                        load_in_4bit=True,
+                        bnb_4bit_quant_type="nf4",
+                        bnb_4bit_compute_dtype=torch.float16,
+                        bnb_4bit_use_double_quant=True,
+                    )
+                
+                # Load tokenizer first (this will fail fast if authentication is wrong)
+                self.mistral_tokenizer = AutoTokenizer.from_pretrained(
+                    model_name,
+                    cache_dir=str(self.config.models_dir),
+                    trust_remote_code=True
+                )
+                
+                # Set pad token if not present
+                if self.mistral_tokenizer.pad_token is None:
+                    self.mistral_tokenizer.pad_token = self.mistral_tokenizer.eos_token
+                
+                # Load model with appropriate class
+                model_kwargs = {
+                    "cache_dir": str(self.config.models_dir),
+                    "trust_remote_code": True,
+                }
+                
+                if torch:
+                    model_kwargs["torch_dtype"] = torch.float16 if torch.cuda.is_available() else torch.float32
+                
+                # Add quantization and device mapping only if accelerate is available
+                try:
+                    import accelerate
+                    if quantization_config and BitsAndBytesConfig:
+                        model_kwargs["quantization_config"] = quantization_config
+                    if torch and torch.cuda.is_available():
+                        model_kwargs["device_map"] = "auto"
+                except ImportError:
+                    logger.info("Accelerate not available, using CPU-only mode")
+                
+                if model_type == "causal":
+                    self.mistral_model = AutoModelForCausalLM.from_pretrained(
+                        model_name,
+                        **model_kwargs
+                    )
+                else:  # seq2seq models like T5
+                    from transformers import AutoModelForSeq2SeqLM
+                    self.mistral_model = AutoModelForSeq2SeqLM.from_pretrained(
+                        model_name,
+                        **model_kwargs
+                    )
+                
+                logger.info(f"Successfully loaded {model_display_name}")
+                break  # Success! Exit the loop
+                
+            except Exception as e:
+                logger.warning(f"Failed to load {model_display_name}: {e}")
+                if model_name == model_attempts[-1][0]:  # Last attempt
+                    logger.error("Both Llama 2 and Mistral model loading failed. Please check authentication.")
+                    logger.info("To use these models, you need Hugging Face authentication:")
+                    logger.info("1. Get token from https://huggingface.co/settings/tokens")
+                    logger.info("2. Run: huggingface-cli login")
+                    logger.info("3. Or set HF_TOKEN environment variable")
+                    raise e
+                continue  # Try next model
+        
+        try:
+            
+            # Create pipeline with default configuration
+            self.mistral_pipeline = pipeline(
+                "text-generation",
+                model=self.mistral_model,
+                tokenizer=self.mistral_tokenizer,
+                max_length=512,
+                temperature=0.7,
+                do_sample=True,
+                pad_token_id=self.mistral_tokenizer.eos_token_id
+            )
+            
+            logger.info("Mistral 7B model loaded successfully")
+            
+        except Exception as e:
+            logger.error(f"Failed to load Mistral model: {e}")
+            raise
+    
+    def _load_llama_model(self):
+        """Load Llama 2 7B model with 4-bit quantization."""
+        logger.info("Loading Llama 2 7B model...")
+        
+        try:
+            model_name = "meta-llama/Llama-2-7b-chat-hf"
+            
+            # Configure 4-bit quantization for RTX 3060 efficiency
+            if torch.cuda.is_available():
+                quantization_config = BitsAndBytesConfig(
+                    load_in_4bit=True,
+                    bnb_4bit_quant_type="nf4",
+                    bnb_4bit_compute_dtype=torch.float16,
+                    bnb_4bit_use_double_quant=True,
+                )
+            else:
+                quantization_config = None
+            
+            # Load tokenizer
+            self.llama_tokenizer = AutoTokenizer.from_pretrained(
+                model_name,
+                cache_dir=str(self.config.models_dir),
+                trust_remote_code=True,
+                token=os.getenv("HUGGINGFACE_TOKEN")
+            )
+            
+            # Set pad token if not present
+            if self.llama_tokenizer.pad_token is None:
+                self.llama_tokenizer.pad_token = self.llama_tokenizer.eos_token
+            
+            # Load model
+            self.llama_model = AutoModelForCausalLM.from_pretrained(
+                model_name,
+                cache_dir=str(self.config.models_dir),
+                quantization_config=quantization_config,
+                device_map="auto",
+                trust_remote_code=True,
+                torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
+                token=os.getenv("HUGGINGFACE_TOKEN")
+            )
+            
+            # Create pipeline
+            self.llama_pipeline = pipeline(
+                "text-generation",
+                model=self.llama_model,
+                tokenizer=self.llama_tokenizer,
+                max_length=4096,
+                temperature=0.7,
+                do_sample=True,
+                pad_token_id=self.llama_tokenizer.eos_token_id
+            )
+            
+            logger.info("Llama 2 7B model loaded successfully")
+            
+        except Exception as e:
+            logger.error(f"Failed to load Llama model: {e}")
+            raise
+    
+    def _load_embedding_model(self):
+        """Load sentence transformer model for embeddings."""
+        logger.info("Loading embedding model...")
+        
+        try:
+            model_config = self.config.model_config['embeddings']
+            model_name = model_config['model_name']
+            device = model_config['device']
+            
+            self.embedding_model = SentenceTransformer(
+                model_name,
+                cache_folder=str(self.config.models_dir),
+                device=device
+            )
+            
+            logger.info(f"Embedding model loaded on {device}")
+            
+        except Exception as e:
+            logger.error(f"Failed to load embedding model: {e}")
+            raise
+    
+    def generate_response(self, prompt: str, max_new_tokens: int = 512) -> str:
+        """
+        Generate response using local Mistral model.
+        
+        Args:
+            prompt: Input prompt for generation
+            max_new_tokens: Maximum number of new tokens to generate
+            
+        Returns:
+            Generated response text
+        """
+        # Use appropriate model based on current selection
+        if self.current_model == "llama" and self.llama_pipeline is not None:
+            pipeline = self.llama_pipeline
+            formatted_prompt = self._format_llama_prompt(prompt)
+        elif self.mistral_pipeline is not None:
+            pipeline = self.mistral_pipeline
+            formatted_prompt = self._format_instruction_prompt(prompt)
+        else:
+            raise RuntimeError(f"No model loaded (current: {self.current_model})")
+        
+        try:
+            # Generate response
+            response = pipeline(
+                formatted_prompt,
+                max_new_tokens=max_new_tokens,
+                do_sample=True,
+                temperature=0.7,
+                top_p=0.9,
+                repetition_penalty=1.1,
+                return_full_text=False
+            )
+            
+            # Extract generated text
+            generated_text = response[0]['generated_text']
+            
+            # Clean up the response
+            cleaned_response = self._clean_response(generated_text)
+            
+            return cleaned_response
+            
+        except Exception as e:
+            logger.error(f"Error generating response: {e}")
+            raise
+    
+    def _format_instruction_prompt(self, user_query: str) -> str:
+        """Format prompt for instruction following."""
+        return f"""<s>[INST] You are a knowledgeable course assistant. Provide accurate, detailed answers based on the given context. Be specific and practical in your responses.
+
+If asked to create spreadsheets, tables, or Excel files, provide:
+1. Clear step-by-step instructions for creating them manually
+2. Detailed table structure with column headers and example data
+3. Relevant formulas or calculations needed
+
+User Question: {user_query} [/INST]"""
+    
+    def _format_llama_prompt(self, user_query: str) -> str:
+        """Format prompt for Llama 2 chat format."""
+        return f"""<s>[INST] <<SYS>>
+You are a knowledgeable course assistant. Provide accurate, detailed answers based on the given context. Be specific and practical in your responses.
+
+If asked to create spreadsheets, tables, or Excel files, provide:
+1. Clear step-by-step instructions for creating them manually
+2. Detailed table structure with column headers and example data
+3. Relevant formulas or calculations needed
+<</SYS>>
+
+{user_query} [/INST]"""
+    
+    def _clean_response(self, response: str) -> str:
+        """Clean and format the generated response."""
+        # Remove any potential instruction tags that might leak through
+        response = response.replace("[INST]", "").replace("[/INST]", "")
+        response = response.replace("<s>", "").replace("</s>", "")
+        
+        # Strip extra whitespace
+        response = response.strip()
+        
+        return response
+    
+    def generate_embeddings(self, texts: List[str]) -> List[List[float]]:
+        """
+        Generate embeddings for a list of texts.
+        
+        Args:
+            texts: List of text strings to embed
+            
+        Returns:
+            List of embedding vectors
+        """
+        if self.embedding_model is None:
+            raise RuntimeError("Embedding model not loaded")
+        
+        try:
+            embeddings = self.embedding_model.encode(texts, convert_to_numpy=True)
+            return embeddings.tolist()
+        except Exception as e:
+            logger.error(f"Error generating embeddings: {e}")
+            raise
+    
+    def get_model_info(self) -> Dict[str, Any]:
+        """Get information about loaded models."""
+        info = {
+            'device': self.device,
+            'cuda_available': torch.cuda.is_available(),
+            'models_loaded': {
+                'mistral': self.mistral_model is not None,
+                'embeddings': self.embedding_model is not None,
+            }
+        }
+        
+        if torch.cuda.is_available():
+            info['gpu_memory'] = {
+                'allocated': torch.cuda.memory_allocated() / 1024**3,  # GB
+                'cached': torch.cuda.memory_reserved() / 1024**3,      # GB
+            }
+        
+        return info
+    
+    def clear_cache(self):
+        """Clear GPU cache to free memory."""
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+            gc.collect()
+            logger.info("GPU cache cleared")
+    
+    def unload_models(self):
+        """Unload models to free memory."""
+        logger.info("Unloading models...")
+        
+        self.mistral_model = None
+        self.mistral_tokenizer = None
+        self.mistral_pipeline = None
+        self.embedding_model = None
+        
+        self.clear_cache()
+        logger.info("Models unloaded")
+    
+    def save_conversation(self, question: str, answer: str, course_name: str = "default"):
+        """Save conversation for future learning."""
+        import json
+        import os
+        from datetime import datetime
+        
+        conversation = {
+            "question": question,
+            "answer": answer,
+            "course": course_name,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+        # Save to memory
+        self.conversations.append(conversation)
+        
+        # Save to file for persistence
+        os.makedirs("./conversations", exist_ok=True)
+        filename = f"./conversations/{course_name}_conversations.jsonl"
+        
+        with open(filename, "a", encoding="utf-8") as f:
+            f.write(json.dumps(conversation) + "\n")
+        
+        logger.info(f"Saved conversation for course: {course_name}")
+        
+        # Simple learning trigger (every 10 conversations)
+        if len(self.conversations) % 10 == 0:
+            logger.info(f"Learning trigger: {len(self.conversations)} conversations saved")

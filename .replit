@@ -1,0 +1,16 @@
+modules = ["python-3.11", "python3"]
+
+[nix]
+channel = "stable-25_05"
+packages = ["ffmpeg-full", "glibcLocales", "libxcrypt", "pkg-config", "xsimd"]
+
+[deployment]
+deploymentTarget = "autoscale"
+run = ["streamlit", "run", "app.py", "--server.port", "5000"]
+
+[workflows]
+
+[[ports]]
+localPort = 5000
+externalPort = 80
+exposeLocalhost = true
