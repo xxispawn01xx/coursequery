@@ -281,6 +281,13 @@ class LocalModelManager:
                     model_kwargs["use_safetensors"] = True  # Force safetensors to avoid torch.load security issue
                     model_kwargs["trust_remote_code"] = False  # Security best practice
                     
+                    # Add memory optimization for Mistral model on RTX 3060
+                    model_kwargs.update({
+                        "low_cpu_mem_usage": True,
+                        "max_memory": {0: "6GB"},  # Limit Mistral to 6GB, leave room for embeddings
+                        "torch_dtype": torch.float16 if torch.cuda.is_available() else torch.float32,
+                    })
+                    
                     self.mistral_model = AutoModelForCausalLM.from_pretrained(
                         model_name,
                         **model_kwargs
@@ -332,13 +339,16 @@ class LocalModelManager:
         try:
             model_name = "meta-llama/Llama-2-7b-chat-hf"
             
-            # Configure 4-bit quantization for RTX 3060 efficiency
+            # Configure 4-bit quantization for RTX 3060 efficiency - more aggressive memory saving
             if torch.cuda.is_available():
                 quantization_config = BitsAndBytesConfig(
                     load_in_4bit=True,
                     bnb_4bit_quant_type="nf4",
                     bnb_4bit_compute_dtype=torch.float16,
                     bnb_4bit_use_double_quant=True,
+                    # Additional memory optimizations
+                    llm_int8_threshold=6.0,
+                    llm_int8_skip_modules=None,
                 )
             else:
                 quantization_config = None
@@ -355,7 +365,7 @@ class LocalModelManager:
             if self.llama_tokenizer.pad_token is None:
                 self.llama_tokenizer.pad_token = self.llama_tokenizer.eos_token
             
-            # Load model
+            # Load model with memory optimization for RTX 3060
             self.llama_model = AutoModelForCausalLM.from_pretrained(
                 model_name,
                 cache_dir=str(self.config.models_dir),
@@ -363,7 +373,11 @@ class LocalModelManager:
                 device_map="auto",
                 trust_remote_code=True,
                 torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
-                token=os.getenv("HUGGINGFACE_TOKEN")
+                token=os.getenv("HUGGINGFACE_TOKEN"),
+                # Additional memory optimizations
+                low_cpu_mem_usage=True,
+                max_memory={0: "8GB"},  # Limit to 8GB instead of using full 12GB
+                offload_folder="./temp"  # Offload some layers to disk if needed
             )
             
             # Create pipeline
@@ -430,12 +444,26 @@ class LocalModelManager:
                     # Set CUDA debug mode to get better error messages
                     os.environ['TORCH_USE_CUDA_DSA'] = '1'
                     
+                    # Optimize GPU memory usage for RTX 3060
+                    import torch
+                    torch.cuda.empty_cache()  # Clear before loading
+                    
+                    # Use half precision to reduce memory by ~50%
                     self.embedding_model = SentenceTransformer(
                         model_name,
                         cache_folder=str(self.config.models_dir),
                         device='cuda',
-                        token=os.getenv("HF_TOKEN")  # Updated from deprecated use_auth_token
+                        token=os.getenv("HF_TOKEN")
                     )
+                    
+                    # Convert to half precision after loading to save memory
+                    if hasattr(self.embedding_model._modules, 'values'):
+                        for module in self.embedding_model._modules.values():
+                            if hasattr(module, 'half'):
+                                module.half()
+                    
+                    # Set smaller batch size for encoding
+                    self.embedding_model.encode_kwargs = {'batch_size': 8}  # Reduced from default 32
                     logger.info("✅ Embedding model loaded on CUDA - OPTIMAL PERFORMANCE")
                     return
                     
@@ -665,7 +693,14 @@ If asked to create spreadsheets, tables, or Excel files, provide:
                     logger.error("⚠️  Your GPU is 96% full - forcing CPU processing")
                     raise RuntimeError(f"Insufficient GPU memory: need {estimated_memory_mb}MB, have {free_memory:.0f}MB")
             
-            embeddings = self.embedding_model.encode(texts, convert_to_numpy=True)
+            # Use optimized batch processing for RTX 3060
+            embeddings = self.embedding_model.encode(
+                texts, 
+                convert_to_numpy=True,
+                batch_size=8,  # Smaller batches to prevent memory overflow
+                show_progress_bar=len(texts) > 50,  # Only show progress for large batches
+                device='cuda' if torch.cuda.is_available() else 'cpu'
+            )
             
             # Log embedding performance
             total_time = time.time() - start_time
@@ -690,8 +725,14 @@ If asked to create spreadsheets, tables, or Excel files, provide:
                     logger.error("⚠️  PERFORMANCE WARNING: CPU embeddings will be 5-10x slower!")
                     self._load_embedding_model_cpu()
                     
-                    # Generate embeddings on CPU
-                    embeddings = self.embedding_model.encode(texts, convert_to_numpy=True)
+                    # Generate embeddings on CPU with optimized batch processing
+                    embeddings = self.embedding_model.encode(
+                        texts, 
+                        convert_to_numpy=True,
+                        batch_size=16,  # Larger batches OK on CPU
+                        show_progress_bar=len(texts) > 50,
+                        device='cpu'
+                    )
                     
                     total_time = time.time() - start_time
                     logger.error(f"⚠️  CPU FALLBACK COMPLETED: {total_time:.2f}s | {len(texts)} texts - MUCH SLOWER than GPU!")
