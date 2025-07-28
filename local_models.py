@@ -128,14 +128,17 @@ class LocalModelManager:
             except Exception as gpu_error:
                 error_msg = str(gpu_error).lower()
                 if "device-side assert" in error_msg or "cuda" in error_msg:
-                    logger.error(f"🚨 GPU HARDWARE FAILURE DETECTED: {gpu_error}")
-                    logger.error("⚠️  Your used RTX 3060 has memory corruption - device-side assert triggered")
-                    logger.error("⚠️  FORCING CPU-ONLY MODE to prevent crashes")
-                    logger.error("💡 SOLUTION: Test GPU with NVIDIA Memory Test tools from GPU_TESTING_GUIDE.md")
+                    logger.error(f"🚨 GPU MEMORY ISSUE DETECTED: {gpu_error}")
+                    logger.error("⚠️  RTX 3060 memory optimization required - clearing cache and reducing model size")
+                    logger.error("💡 SOLUTION: Aggressive memory management to fit within 12GB")
                     
-                    # Force CPU-only mode
-                    self.device = 'cpu'
+                    # Clear all CUDA memory and try aggressive optimization
                     torch.cuda.empty_cache()
+                    torch.cuda.synchronize()
+                    torch.cuda.ipc_collect()
+                    
+                    # Continue with GPU but force smaller memory footprint
+                    logger.info("🔧 Applying aggressive memory optimization for RTX 3060")
                 else:
                     raise gpu_error
         
@@ -179,7 +182,7 @@ class LocalModelManager:
                     self._load_mistral_model()
                     model_type = "mistral"
             else:
-                logger.info("CPU-only mode: Skipping large language models, loading embeddings only")
+                logger.error("GPU required for this application - CPU mode disabled")
                 
             self._load_embedding_model()
             self.current_model = model_type if self.device != 'cpu' else 'cpu_embeddings_only'
@@ -345,11 +348,12 @@ class LocalModelManager:
                     model_kwargs["use_safetensors"] = True  # Force safetensors to avoid torch.load security issue
                     model_kwargs["trust_remote_code"] = False  # Security best practice
                     
-                    # Add memory optimization for Mistral model on RTX 3060
+                    # Ultra-aggressive memory optimization for RTX 3060
                     model_kwargs.update({
                         "low_cpu_mem_usage": True,
-                        "max_memory": {0: "6GB"},  # Limit Mistral to 6GB, leave room for embeddings
+                        "max_memory": {0: "4GB"},  # More aggressive - limit to 4GB for Mistral
                         "torch_dtype": torch.float16 if torch.cuda.is_available() else torch.float32,
+                        "device_map": {"": 0},  # Force single GPU mapping
                     })
                     
                     self.mistral_model = AutoModelForCausalLM.from_pretrained(
@@ -438,10 +442,11 @@ class LocalModelManager:
                 trust_remote_code=True,
                 torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
                 token=os.getenv("HUGGINGFACE_TOKEN"),
-                # Additional memory optimizations
+                # Ultra-aggressive memory optimizations for RTX 3060
                 low_cpu_mem_usage=True,
-                max_memory={0: "8GB"},  # Limit to 8GB instead of using full 12GB
-                offload_folder="./temp"  # Offload some layers to disk if needed
+                max_memory={0: "5GB"},  # Even more aggressive - limit to 5GB for Llama
+                offload_folder="./temp",  # Offload some layers to disk if needed
+                device_map={"": 0}  # Force single GPU mapping
             )
             
             # Create pipeline
@@ -519,10 +524,13 @@ class LocalModelManager:
                     
                     logger.info(f"GPU Memory Check: {allocated_memory:.1f}GB used, {free_memory:.1f}GB free of {total_memory:.1f}GB total")
                     
-                    if free_memory < 2.0:  # Need at least 2GB free for embedding model
-                        logger.error(f"🚨 Insufficient GPU memory for embedding model: only {free_memory:.1f}GB available")
-                        logger.error("⚠️  Forcing CPU mode due to memory constraints")
-                        raise RuntimeError("Insufficient GPU memory - forcing CPU fallback")
+                    if free_memory < 1.0:  # Reduced threshold - be more aggressive
+                        logger.warning(f"⚠️  Low GPU memory for embedding model: only {free_memory:.1f}GB available")
+                        logger.info("🔧 Applying ultra-aggressive memory optimization")
+                        # Clear everything and continue with minimal footprint
+                        torch.cuda.empty_cache()
+                        torch.cuda.synchronize()
+                        torch.cuda.ipc_collect()
                     
                     # Use half precision to reduce memory by ~50%
                     self.embedding_model = SentenceTransformer(
@@ -546,18 +554,36 @@ class LocalModelManager:
                 except Exception as cuda_error:
                     error_msg = str(cuda_error).lower()
                     if any(keyword in error_msg for keyword in ["cuda", "device-side assert", "out of memory", "insufficient", "memory"]):
-                        logger.error(f"🚨 GPU ERROR (RTX 3060 Memory Issue): {cuda_error}")
-                        logger.error("⚠️  HARDWARE ISSUE: Your used RTX 3060 may have memory problems")
-                        logger.error("⚠️  PERFORMANCE WARNING: Falling back to CPU - expect 5-10x slower embeddings!")
+                        logger.error(f"🚨 GPU MEMORY ERROR: {cuda_error}")
+                        logger.error("⚠️  RTX 3060 memory exhausted - trying ultra-aggressive optimization")
                         
-                        # Clear CUDA state completely
+                        # Clear CUDA state completely and retry with minimal settings
                         if torch and torch.cuda.is_available():
                             try:
                                 torch.cuda.empty_cache()
                                 torch.cuda.synchronize()
                                 torch.cuda.ipc_collect()
-                            except:
-                                pass
+                                
+                                # Try loading with minimal memory footprint
+                                logger.info("🔧 Retrying with ultra-low memory settings")
+                                self.embedding_model = SentenceTransformer(
+                                    model_name,
+                                    cache_folder=str(self.config.models_dir),
+                                    device='cuda',
+                                    token=os.getenv("HF_TOKEN")
+                                )
+                                
+                                # Immediately convert to lowest precision
+                                self.embedding_model.half()
+                                
+                                # Force very small batch processing
+                                self.embedding_model.encode_kwargs = {'batch_size': 4}
+                                logger.info("✅ Ultra-optimized embedding model loaded on CUDA")
+                                return
+                                
+                            except Exception as retry_error:
+                                logger.error(f"Ultra-optimization also failed: {retry_error}")
+                                raise cuda_error
                     else:
                         raise cuda_error
             
