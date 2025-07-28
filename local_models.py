@@ -108,6 +108,37 @@ class LocalModelManager:
                     suggested_model = MemoryOptimizer.suggest_optimal_model()
                     logger.warning(f"System RAM may be insufficient. Consider using: {suggested_model}")
         
+        # CRITICAL: GPU Health Check for RTX 3060 hardware issues
+        if torch and torch.cuda.is_available():
+            try:
+                logger.info("🔍 Performing GPU health check for device-side assert errors...")
+                
+                # Test basic CUDA operations that commonly trigger device-side asserts
+                test_tensor = torch.tensor([1.0, 2.0, 3.0]).cuda()
+                result = test_tensor * 2  # Simple multiplication
+                _ = result.sum()  # Reduction operation
+                del test_tensor, result
+                torch.cuda.empty_cache()
+                
+                # Check memory availability
+                total_memory = torch.cuda.get_device_properties(0).total_memory / (1024**3)
+                allocated = torch.cuda.memory_allocated(0) / (1024**3)
+                logger.info(f"✅ GPU health check passed - {allocated:.1f}GB/{total_memory:.1f}GB used")
+                
+            except Exception as gpu_error:
+                error_msg = str(gpu_error).lower()
+                if "device-side assert" in error_msg or "cuda" in error_msg:
+                    logger.error(f"🚨 GPU HARDWARE FAILURE DETECTED: {gpu_error}")
+                    logger.error("⚠️  Your used RTX 3060 has memory corruption - device-side assert triggered")
+                    logger.error("⚠️  FORCING CPU-ONLY MODE to prevent crashes")
+                    logger.error("💡 SOLUTION: Test GPU with NVIDIA Memory Test tools from GPU_TESTING_GUIDE.md")
+                    
+                    # Force CPU-only mode
+                    self.device = 'cpu'
+                    torch.cuda.empty_cache()
+                else:
+                    raise gpu_error
+        
         # Check if models are already loaded in memory
         if self._models_already_loaded(model_type):
             logger.info("Models and pipelines already loaded in memory, skipping reload")
@@ -134,16 +165,24 @@ class LocalModelManager:
                 # Continue with full reload
         
         try:
-            if model_type == "mistral":
-                self._load_mistral_model()
-            elif model_type == "llama":
-                self._load_llama_model()
+            # Clear any existing models to ensure only one is loaded at a time
+            self._clear_unused_models(model_type)
+            
+            # Only load language models if GPU is healthy or using CPU
+            if self.device != 'cpu':
+                if model_type == "mistral":
+                    self._load_mistral_model()
+                elif model_type == "llama":
+                    self._load_llama_model()
+                else:
+                    # Load default Mistral if unknown type
+                    self._load_mistral_model()
+                    model_type = "mistral"
             else:
-                # Load default Mistral if unknown type
-                self._load_mistral_model()
+                logger.info("CPU-only mode: Skipping large language models, loading embeddings only")
                 
             self._load_embedding_model()
-            self.current_model = model_type
+            self.current_model = model_type if self.device != 'cpu' else 'cpu_embeddings_only'
             
             # Verify embedding model loaded successfully
             if self.embedding_model is None:
@@ -156,21 +195,25 @@ class LocalModelManager:
             raise
 
     def _models_already_loaded(self, model_type: str) -> bool:
-        """Check if models are already loaded in memory."""
+        """Check if the requested model is already loaded in memory."""
         if model_type == "mistral":
             models_loaded = (self.mistral_model is not None and 
                            self.mistral_tokenizer is not None and 
                            self.embedding_model is not None)
             pipeline_loaded = self.mistral_pipeline is not None
-            logger.info(f"Mistral check - Models: {models_loaded}, Pipeline: {pipeline_loaded}")
-            return models_loaded and pipeline_loaded
+            # Ensure no other models are loaded (memory efficiency)
+            other_models_clear = (self.llama_model is None and self.llama_tokenizer is None and self.llama_pipeline is None)
+            logger.info(f"Mistral check - Models: {models_loaded}, Pipeline: {pipeline_loaded}, Other models clear: {other_models_clear}")
+            return models_loaded and pipeline_loaded and other_models_clear
         elif model_type == "llama":
             models_loaded = (self.llama_model is not None and 
                            self.llama_tokenizer is not None and 
                            self.embedding_model is not None)
             pipeline_loaded = self.llama_pipeline is not None
-            logger.info(f"Llama check - Models: {models_loaded}, Pipeline: {pipeline_loaded}")
-            return models_loaded and pipeline_loaded
+            # Ensure no other models are loaded (memory efficiency)
+            other_models_clear = (self.mistral_model is None and self.mistral_tokenizer is None and self.mistral_pipeline is None)
+            logger.info(f"Llama check - Models: {models_loaded}, Pipeline: {pipeline_loaded}, Other models clear: {other_models_clear}")
+            return models_loaded and pipeline_loaded and other_models_clear
         return False
 
     def _check_cache_status(self, model_name: str) -> str:
@@ -193,6 +236,27 @@ class LocalModelManager:
             logger.info(f"Found GGUF model: {gguf_files[0].name}")
             return str(gguf_files[0])
         return None
+    
+    def _clear_unused_models(self, target_model: str):
+        """Clear models that aren't the target to save memory - only one model at a time."""
+        if target_model == "mistral":
+            # Clear Llama models
+            if self.llama_model is not None or self.llama_tokenizer is not None or self.llama_pipeline is not None:
+                logger.info("🧹 Clearing Llama models to load Mistral (memory optimization)")
+                self.llama_model = None
+                self.llama_tokenizer = None
+                self.llama_pipeline = None
+                if torch and torch.cuda.is_available():
+                    torch.cuda.empty_cache()
+        elif target_model == "llama":
+            # Clear Mistral models
+            if self.mistral_model is not None or self.mistral_tokenizer is not None or self.mistral_pipeline is not None:
+                logger.info("🧹 Clearing Mistral models to load Llama (memory optimization)")
+                self.mistral_model = None
+                self.mistral_tokenizer = None
+                self.mistral_pipeline = None
+                if torch and torch.cuda.is_available():
+                    torch.cuda.empty_cache()
 
     def _load_mistral_model(self):
         """Load Mistral 7B model with 4-bit quantization or GGUF if available."""
@@ -448,6 +512,18 @@ class LocalModelManager:
                     import torch
                     torch.cuda.empty_cache()  # Clear before loading
                     
+                    # Check available memory before loading
+                    total_memory = torch.cuda.get_device_properties(0).total_memory / (1024**3)
+                    allocated_memory = torch.cuda.memory_allocated(0) / (1024**3)
+                    free_memory = total_memory - allocated_memory
+                    
+                    logger.info(f"GPU Memory Check: {allocated_memory:.1f}GB used, {free_memory:.1f}GB free of {total_memory:.1f}GB total")
+                    
+                    if free_memory < 2.0:  # Need at least 2GB free for embedding model
+                        logger.error(f"🚨 Insufficient GPU memory for embedding model: only {free_memory:.1f}GB available")
+                        logger.error("⚠️  Forcing CPU mode due to memory constraints")
+                        raise RuntimeError("Insufficient GPU memory - forcing CPU fallback")
+                    
                     # Use half precision to reduce memory by ~50%
                     self.embedding_model = SentenceTransformer(
                         model_name,
@@ -467,15 +543,21 @@ class LocalModelManager:
                     logger.info("✅ Embedding model loaded on CUDA - OPTIMAL PERFORMANCE")
                     return
                     
-                except RuntimeError as cuda_error:
-                    if "CUDA" in str(cuda_error) and ("device-side assert" in str(cuda_error) or "out of memory" in str(cuda_error)):
-                        logger.error(f"🚨 CUDA ERROR: {cuda_error}")
+                except Exception as cuda_error:
+                    error_msg = str(cuda_error).lower()
+                    if any(keyword in error_msg for keyword in ["cuda", "device-side assert", "out of memory", "insufficient", "memory"]):
+                        logger.error(f"🚨 GPU ERROR (RTX 3060 Memory Issue): {cuda_error}")
+                        logger.error("⚠️  HARDWARE ISSUE: Your used RTX 3060 may have memory problems")
                         logger.error("⚠️  PERFORMANCE WARNING: Falling back to CPU - expect 5-10x slower embeddings!")
                         
-                        # Clear CUDA state
+                        # Clear CUDA state completely
                         if torch and torch.cuda.is_available():
-                            torch.cuda.empty_cache()
-                            torch.cuda.synchronize()
+                            try:
+                                torch.cuda.empty_cache()
+                                torch.cuda.synchronize()
+                                torch.cuda.ipc_collect()
+                            except:
+                                pass
                     else:
                         raise cuda_error
             
