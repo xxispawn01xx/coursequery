@@ -151,7 +151,9 @@ Authentication: Persistent HuggingFace token storage with GUI input for seamless
 - **Enhanced Memory Management**: Raised embedding threshold from 85% to 95-98% for better RTX 3060 utilization
 - **GPU Memory Monitoring**: Real-time RTX 3060 memory status with intelligent CPU fallback only when truly necessary
 - **PyTorch CVE-2025-32434 Security Fix**: Applied safetensors format loading to avoid torch.load vulnerability
-- **RTX 3060 Memory Fragmentation Resolution**: Implemented PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True fix
+- **RTX 3060 Memory Fragmentation Fix Applied**: Implemented PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True fix (requires system restart)
+- **Memory Allocator Configuration**: Applied expandable_segments fix in config.py before any imports for maximum effectiveness  
+- **Conservative Model Strategy**: Switched to smaller models (DistilGPT-2, GPT-2) to work within fragmented memory constraints
 - **CUDA Environment Optimization**: Added CUDA_LAUNCH_BLOCKING and TORCH_USE_CUDA_DSA for better debugging
 - **Memory Allocator Fix**: Prevents impossible 22GB allocation reports on 12GB RTX 3060 GPU
 - **Safetensors Model Selection**: Switched to DialoGPT/GPT-2 models with secure loading format
@@ -159,7 +161,7 @@ Authentication: Persistent HuggingFace token storage with GUI input for seamless
 
 ### System Status
 - **Replit**: Clean development environment, ALL ONLINE OPERATIONS DISABLED (offline-only app)
-- **Local**: ✅ **RTX 3060 SOFTWARE ISSUE RESOLVED** - Hardware healthy (memtest passed), forum fixes applied
+- **Local**: 🔄 **RTX 3060 MEMORY FRAGMENTATION FIXES APPLIED** - Requires full system restart to take effect, not just Streamlit restart
 - **GPU Status**: ✅ **FULLY OPERATIONAL** - HuggingFace forum solutions working for RTX 3060
 - **Repository**: Successfully cleaned from 5.7GB to 22MB, optimized for fast GitHub sync
 - **Query Engine**: Fixed NodeWithScore weighted_score error, now processes queries without crashes

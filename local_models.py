@@ -93,9 +93,12 @@ class LocalModelManager:
         """Apply proven RTX 3060 memory fragmentation fixes."""
         import os
         
-        # Apply CUDA memory allocator fixes
+        # Critical: Apply memory fragmentation fix BEFORE any GPU operations
+        os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
+        logger.info("🔧 RTX 3060 CRITICAL: Applied expandable_segments:True before GPU access")
+        
+        # Additional CUDA fixes
         cuda_fixes = {
-            "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True",
             "CUDA_LAUNCH_BLOCKING": "1", 
             "TORCH_USE_CUDA_DSA": "1",
             "CUDA_VISIBLE_DEVICES": "0"
@@ -106,19 +109,28 @@ class LocalModelManager:
                 os.environ[key] = value
                 logger.info(f"🔧 RTX 3060 Fix: Set {key}={value}")
         
-        # Additional memory management
+        # Apply GPU memory management if available
         if TORCH_AVAILABLE and torch:
             try:
                 if torch.cuda.is_available():
-                    # Clear any existing fragmentation
+                    # Force GPU context reset to apply new allocator settings
                     torch.cuda.empty_cache()
+                    torch.cuda.ipc_collect()
                     torch.cuda.synchronize()
-                    logger.info("🧹 RTX 3060: Cleared GPU memory fragmentation")
                     
-                    # Apply memory fraction limit
+                    # Reset memory allocator with new settings
+                    if hasattr(torch.cuda, 'reset_accumulated_memory_stats'):
+                        torch.cuda.reset_accumulated_memory_stats()
+                    if hasattr(torch.cuda, 'reset_max_memory_allocated'):
+                        torch.cuda.reset_max_memory_allocated()
+                        
+                    logger.info("🧹 RTX 3060: Applied aggressive memory cleanup and allocator reset")
+                    
+                    # Set conservative memory fraction
                     if hasattr(torch.cuda, 'set_memory_fraction'):
-                        torch.cuda.set_memory_fraction(0.95)
-                        logger.info("✅ RTX 3060: Set memory fraction to 95%")
+                        torch.cuda.set_memory_fraction(0.90)
+                        logger.info("✅ RTX 3060: Set memory fraction to 90% (conservative)")
+                        
             except Exception as e:
                 logger.warning(f"RTX 3060 memory fixes partially applied: {e}")
 
@@ -394,12 +406,13 @@ class LocalModelManager:
         """Load Mistral 7B model with RTX 3060 CPU-first debugging approach."""
         logger.info("Loading Mistral 7B model with RTX 3060 compatibility fixes...")
         
-        # Use models with safetensors support to avoid PyTorch CVE-2025-32434
-        logger.warning("🔒 Using safetensors-compatible models due to PyTorch CVE-2025-32434 vulnerability")
+        # Use smaller models due to RTX 3060 memory fragmentation issue
+        logger.warning("🔒 Using smaller models due to RTX 3060 memory fragmentation and PyTorch CVE-2025-32434")
+        logger.info("💡 RTX 3060 Strategy: Load smaller models first to test memory allocator fixes")
         model_attempts = [
-            ("microsoft/DialoGPT-medium", "DialoGPT Medium (Safetensors)"),
-            ("gpt2", "GPT-2 Base (Safetensors)"),
-            ("distilgpt2", "DistilGPT-2 (Safetensors)"),
+            ("distilgpt2", "DistilGPT-2 (Small, Safe for RTX 3060)"),
+            ("gpt2", "GPT-2 Base (Medium, RTX 3060 Test)"),
+            ("microsoft/DialoGPT-small", "DialoGPT Small (Conservative)"),
         ]
         
         for model_name, model_display_name in model_attempts:

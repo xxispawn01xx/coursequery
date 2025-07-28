@@ -6,10 +6,12 @@ import os
 from pathlib import Path
 from typing import Dict, Any
 
-# Set CUDA environment variables for RTX 3060 12GB stability
+# RTX 3060 Memory Fragmentation Fix - Apply BEFORE any imports
+os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'
+# Additional RTX 3060 stability fixes
 os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
-os.environ['TORCH_USE_CUDA_DSA'] = '1'  # Enable device-side assertions for debugging
-os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'max_split_size_mb:512,garbage_collection_threshold:0.6'
+os.environ['TORCH_USE_CUDA_DSA'] = '1'
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 class Config:
     """Application configuration."""
