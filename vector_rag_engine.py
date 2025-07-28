@@ -689,7 +689,7 @@ Please provide a comprehensive answer based on the context provided. If the cont
                     "Content-Type": "application/json"
                 },
                 json={
-                    "model": "llama-3.1-sonar-small-128k-online",
+                    "model": "sonar",
                     "messages": [
                         {"role": "system", "content": "You are a helpful assistant analyzing real estate course materials."},
                         {"role": "user", "content": prompt}
@@ -703,7 +703,13 @@ Please provide a comprehensive answer based on the context provided. If the cont
                 result = response.json()
                 return result["choices"][0]["message"]["content"]
             else:
-                return f"Perplexity API error: {response.status_code}"
+                error_details = ""
+                try:
+                    error_info = response.json()
+                    error_details = f" - {error_info.get('error', {}).get('message', 'Unknown error')}"
+                except:
+                    pass
+                return f"Perplexity API error {response.status_code}{error_details}"
                 
         except Exception as e:
             logger.error(f"Perplexity API error: {e}")
