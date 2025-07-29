@@ -13,6 +13,13 @@ Workflow: Replit → GitHub sync → GitHub Desktop → local development with b
 Deployment strategy: Replit for development (models disabled), local RTX 3060 for Whisper transcription, cloud APIs for querying.
 Authentication: Persistent HuggingFace token storage with GUI input for seamless local usage.
 
+## Primary Use Cases
+
+**eBook Library Management**: User has large collection of eBooks in single directory, needs focused processing by theme/topic rather than bulk processing all books together.
+**Udemy Course Processing**: Complete course analysis including video transcription (RTX 3060), code files, and PDFs applied to specific problem sets.
+**Multi-Page Strategic Planning**: Generate comprehensive business plans, implementation roadmaps, and strategic frameworks from book content using EPUB processing.
+**Bulk Audio/Video Processing**: Process podcast series, lecture collections, and video courses with folder structure preservation for RTX 3060 transcription.
+
 ## System Architecture
 
 ### Frontend Architecture
@@ -104,6 +111,13 @@ Authentication: Persistent HuggingFace token storage with GUI input for seamless
 - **Resource Monitoring**: GPU/CPU usage tracking and optimization
 
 ## Recent Changes
+
+### July 29, 2025 - Workflow Documentation & Whisper Detection Fix
+- **Comprehensive Workflow Guide**: Created WORKFLOW_GUIDE.md with specific procedures for eBook library management, Udemy course processing, and strategic plan generation
+- **eBook Directory Management**: Documented themed course creation approach for focused learning from large book collections
+- **Whisper Detection Fix**: Corrected hybrid model detection to properly check for Whisper availability independent of transformers/CUDA
+- **Multi-Page Response Workflows**: Detailed procedures for generating comprehensive strategic plans and implementation roadmaps from EPUB books
+- **Cost Optimization Documentation**: Clear guidance on local RTX 3060 transcription + cloud API querying for maximum efficiency
 
 ### July 28, 2025 - PyTorch Security & RTX 3060 Memory Fixes
 - **Complete Repository Cleanup**: Eliminated 5.7GB package cache bloat, reduced to 22MB clean codebase
