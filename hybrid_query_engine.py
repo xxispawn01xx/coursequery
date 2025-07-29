@@ -45,14 +45,22 @@ class HybridQueryEngine:
         except ImportError:
             logger.info("Local embeddings not available - will use cloud APIs")
         
+        # Check for local LLM capability
         try:
             import torch
             from transformers import AutoTokenizer
             if torch.cuda.is_available():
                 available["local_llm"] = True
-                available["whisper"] = True
         except ImportError:
-            logger.info("Local LLM/Whisper not available - transcription will use cloud")
+            logger.info("Local LLM not available - will use cloud APIs")
+        
+        # Check for Whisper specifically
+        try:
+            import whisper
+            available["whisper"] = True
+            logger.info("Whisper available for local transcription")
+        except ImportError:
+            logger.info("Whisper not available - transcription will use cloud APIs")
         
         logger.info(f"Available models: {available}")
         return available
