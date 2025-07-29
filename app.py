@@ -410,21 +410,46 @@ class RealEstateAIApp:
         courses = st.session_state.available_courses
         if courses:
             st.sidebar.subheader("Available Courses")
-            for course in courses:
-                course_name = course['name']
-                doc_count = course['document_count']
-                last_indexed = course['last_indexed']
-                
-                with st.sidebar.expander(f"📖 {course_name}"):
-                    st.write(f"Documents: {doc_count}")
-                    st.write(f"Last indexed: {last_indexed}")
+            
+            # Group courses by status
+            indexed_courses = [c for c in courses if c.get('status') == 'indexed']
+            unprocessed_courses = [c for c in courses if c.get('status') == 'unprocessed']
+            
+            # Show indexed courses first
+            if indexed_courses:
+                st.sidebar.markdown("**✅ Indexed Courses**")
+                for course in indexed_courses:
+                    course_name = course['name']
+                    doc_count = course['document_count']
+                    last_indexed = course['last_indexed']
                     
-                    if st.button(f"Select {course_name}", key=f"select_{course_name}"):
-                        st.session_state.selected_course = course_name
-                        st.rerun()
+                    with st.sidebar.expander(f"📖 {course_name}"):
+                        st.write(f"Documents: {doc_count}")
+                        st.write(f"Last indexed: {last_indexed}")
+                        
+                        if st.button(f"Select {course_name}", key=f"select_{course_name}"):
+                            st.session_state.selected_course = course_name
+                            st.rerun()
+                        
+                        if st.button(f"Re-index {course_name}", key=f"reindex_{course_name}"):
+                            self.reindex_course(course_name)
+            
+            # Show unprocessed courses
+            if unprocessed_courses:
+                st.sidebar.markdown("**⏳ Unprocessed Courses**")
+                for course in unprocessed_courses:
+                    course_name = course['name']
+                    doc_count = course['document_count']
                     
-                    if st.button(f"Re-index {course_name}", key=f"reindex_{course_name}"):
-                        self.reindex_course(course_name)
+                    with st.sidebar.expander(f"📁 {course_name}"):
+                        st.write(f"Files found: {doc_count}")
+                        st.write(f"Status: Not processed")
+                        
+                        if st.button(f"Process {course_name}", key=f"process_{course_name}"):
+                            self.process_raw_course(course_name)
+                        
+                        if st.button(f"Select anyway", key=f"select_raw_{course_name}"):
+                            st.warning("⚠️ This course isn't processed yet. Process it first to enable querying.")
         else:
             st.sidebar.info("No courses found. Upload documents to get started.")
 
@@ -638,6 +663,17 @@ class RealEstateAIApp:
         finally:
             progress_bar.empty()
             status_text.empty()
+    
+    def process_raw_course(self, course_name: str):
+        """Process a course that exists in raw_docs but hasn't been indexed yet."""
+        course_dir = self.config.raw_docs_dir / course_name
+        
+        if not course_dir.exists():
+            st.error(f"❌ Course directory not found: {course_name}")
+            return
+        
+        st.info(f"🔄 Processing course: {course_name}")
+        self.process_directory(str(course_dir), course_name)
     
     def export_chat_history(self):
         """Export chat history to a downloadable file."""

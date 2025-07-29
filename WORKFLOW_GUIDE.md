@@ -10,14 +10,26 @@ This guide covers the specific workflows for processing different types of conte
 
 **Your Current Setup:**
 ```
-/home/user/ebooks/
-├── strategic_planning.epub
-├── airflow_guide.epub  
-├── leadership_fundamentals.epub
-├── python_mastery.epub
-├── financial_modeling.epub
-└── 50+ other books...
+/course_parent_directory/
+├── business_strategy/          ← Each directory = one course
+│   ├── strategic_planning.epub
+│   ├── leadership_book.epub
+│   └── syllabus.pdf
+├── technical_skills/           ← Another course
+│   ├── airflow_guide.epub
+│   ├── python_mastery.epub  
+│   └── code_examples.zip
+├── financial_modeling/         ← Another course
+│   ├── dcf_valuation.epub
+│   ├── lecture_videos.mp4
+│   └── course_outline.pdf
+└── 20+ other course directories...
 ```
+
+**System Detection:**
+Your app automatically detects all course directories and shows them in the sidebar:
+- ✅ **Indexed Courses**: Fully processed and ready for querying
+- ⏳ **Unprocessed Courses**: Found in raw_docs but not yet processed
 
 ### Option A: Themed Course Creation (Recommended)
 

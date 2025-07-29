@@ -223,43 +223,83 @@ class CourseIndexer:
     
     def get_available_courses(self) -> List[Dict[str, Any]]:
         """
-        Get list of available courses with metadata.
+        Get list of available courses with metadata, including both indexed and unprocessed courses.
         
         Returns:
             List of course information dictionaries
         """
         courses = []
+        course_names = set()
         
         try:
-            for course_dir in self.config.indexed_courses_dir.iterdir():
-                if course_dir.is_dir():
-                    metadata_path = course_dir / "metadata.json"
-                    
-                    if metadata_path.exists():
-                        with open(metadata_path, 'r') as f:
-                            metadata = json.load(f)
+            # First, get indexed courses from indexed_courses_dir
+            if self.config.indexed_courses_dir.exists():
+                for course_dir in self.config.indexed_courses_dir.iterdir():
+                    if course_dir.is_dir():
+                        metadata_path = course_dir / "metadata.json"
                         
-                        course_info = {
-                            'name': metadata.get('course_name', course_dir.name),
-                            'document_count': metadata.get('document_count', 0),
-                            'syllabus_documents': metadata.get('syllabus_documents', 0),
-                            'last_indexed': metadata.get('last_indexed', 'Unknown'),
-                            'total_content_length': metadata.get('total_content_length', 0),
-                        }
-                        courses.append(course_info)
-                    else:
-                        # Course directory exists but no metadata
-                        course_info = {
-                            'name': course_dir.name,
-                            'document_count': 0,
-                            'syllabus_documents': 0,
-                            'last_indexed': 'Unknown',
-                            'total_content_length': 0,
-                        }
-                        courses.append(course_info)
+                        if metadata_path.exists():
+                            with open(metadata_path, 'r') as f:
+                                metadata = json.load(f)
+                            
+                            course_info = {
+                                'name': metadata.get('course_name', course_dir.name),
+                                'document_count': metadata.get('document_count', 0),
+                                'syllabus_documents': metadata.get('syllabus_documents', 0),
+                                'last_indexed': metadata.get('last_indexed', 'Unknown'),
+                                'total_content_length': metadata.get('total_content_length', 0),
+                                'status': 'indexed',
+                                'has_index': True
+                            }
+                            courses.append(course_info)
+                            course_names.add(course_info['name'])
+                        else:
+                            # Course directory exists but no metadata
+                            course_info = {
+                                'name': course_dir.name,
+                                'document_count': 0,
+                                'syllabus_documents': 0,
+                                'last_indexed': 'Unknown',
+                                'total_content_length': 0,
+                                'status': 'indexed',
+                                'has_index': True
+                            }
+                            courses.append(course_info)
+                            course_names.add(course_info['name'])
             
-            # Sort by last indexed date
-            courses.sort(key=lambda x: x['last_indexed'], reverse=True)
+            # Then, check for unprocessed courses in raw_docs_dir
+            if self.config.raw_docs_dir.exists():
+                for course_dir in self.config.raw_docs_dir.iterdir():
+                    if course_dir.is_dir() and course_dir.name not in course_names:
+                        # Count files in the directory
+                        supported_files = []
+                        for file_path in course_dir.rglob('*'):
+                            if file_path.is_file():
+                                # Check if it's a supported format
+                                supported_extensions = ['.pdf', '.docx', '.pptx', '.epub', '.mp4', '.avi', '.mov', '.mp3', '.wav']
+                                if file_path.suffix.lower() in supported_extensions:
+                                    supported_files.append(file_path)
+                        
+                        if supported_files:  # Only show directories with supported files
+                            course_info = {
+                                'name': course_dir.name,
+                                'document_count': len(supported_files),
+                                'syllabus_documents': 0,
+                                'last_indexed': 'Not processed',
+                                'total_content_length': 0,
+                                'status': 'unprocessed',
+                                'has_index': False
+                            }
+                            courses.append(course_info)
+            
+            # Sort: indexed courses first (by last indexed date), then unprocessed courses
+            def sort_key(course):
+                if course['status'] == 'indexed':
+                    return (0, course['last_indexed'])
+                else:
+                    return (1, course['name'])  # Unprocessed courses sorted by name
+            
+            courses.sort(key=sort_key, reverse=False)
             
         except Exception as e:
             logger.error(f"Error getting available courses: {e}")

@@ -112,12 +112,14 @@ Authentication: Persistent HuggingFace token storage with GUI input for seamless
 
 ## Recent Changes
 
-### July 29, 2025 - Workflow Documentation & Whisper Detection Fix
-- **Comprehensive Workflow Guide**: Created WORKFLOW_GUIDE.md with specific procedures for eBook library management, Udemy course processing, and strategic plan generation
-- **eBook Directory Management**: Documented themed course creation approach for focused learning from large book collections
+### July 29, 2025 - Multi-Course Detection & Replit Integration
+- **Enhanced Course Detection**: System now detects both indexed courses and unprocessed course directories automatically
+- **Multi-Course Sidebar**: Displays processed courses (ready for querying) and unprocessed courses (ready for processing) separately
+- **One-Click Processing**: Added "Process Course" buttons for unprocessed courses found in raw_docs directories
+- **Replit + VSCode Integration**: Created comprehensive guide for course-to-deployment pipeline with automatic project generation
+- **Complete Project Generation**: Enhanced course queries to generate full production-ready applications instead of code snippets
+- **Workflow Documentation**: Created WORKFLOW_GUIDE.md and PROJECT_GENERATION_GUIDE.md with specific procedures
 - **Whisper Detection Fix**: Corrected hybrid model detection to properly check for Whisper availability independent of transformers/CUDA
-- **Multi-Page Response Workflows**: Detailed procedures for generating comprehensive strategic plans and implementation roadmaps from EPUB books
-- **Cost Optimization Documentation**: Clear guidance on local RTX 3060 transcription + cloud API querying for maximum efficiency
 
 ### July 28, 2025 - PyTorch Security & RTX 3060 Memory Fixes
 - **Complete Repository Cleanup**: Eliminated 5.7GB package cache bloat, reduced to 22MB clean codebase
