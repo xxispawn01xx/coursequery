@@ -42,10 +42,10 @@ class Config:
         if user_course_dir:
             self.raw_docs_dir = user_course_dir
         else:
-            # Use local raw_docs directory
-            self.raw_docs_dir = self.base_dir / "raw_docs"
+            # Use local archived_courses directory
+            self.raw_docs_dir = self.base_dir / "archived_courses"
             print(f"📁 Using local course directory: {self.raw_docs_dir}")
-            print("💡 Copy your courses to raw_docs/ or update path in config.py")
+            print("💡 Copy your courses to archived_courses/ or update path in config.py")
         
         # Always use local directories for processed data
         self.indexed_courses_dir = self.base_dir / "indexed_courses"
@@ -56,7 +56,7 @@ class Config:
         for directory in [self.indexed_courses_dir, self.models_dir, self.temp_dir]:
             directory.mkdir(exist_ok=True)
         
-        # Create raw_docs if using local fallback
+        # Create archived_courses if using local fallback
         if not user_course_dir:
             self.raw_docs_dir.mkdir(exist_ok=True)
         

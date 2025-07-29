@@ -7,11 +7,11 @@ You're running the application in a Linux environment but your courses are on Wi
 
 ```bash
 # Create symbolic link or copy your courses
-mkdir -p raw_docs
-cp -r "/path/to/your/courses/"* raw_docs/
+mkdir -p archived_courses
+cp -r "/path/to/your/courses/"* archived_courses/
 
 # Or if you have access to H drive through WSL/mount:
-cp -r "/mnt/h/Archive Classes/"* raw_docs/
+cp -r "/mnt/h/Archive Classes/"* archived_courses/
 ```
 
 ## Solution 2: Update Path in Config
@@ -39,11 +39,11 @@ The app now has a file uploader in the sidebar:
 ✅ **Pure Offline Mode**: No Replit dependencies
 ✅ **AI Models Enabled**: RTX 3060 optimization active
 ✅ **Course Detection**: Enhanced debugging and validation
-✅ **Fallback Directory**: Using `raw_docs` for local courses
+✅ **Fallback Directory**: Using `archived_courses` for local courses
 
 ## Next Steps
 
-1. Copy your course folders to `raw_docs/` directory
+1. Copy your course folders to `archived_courses/` directory
 2. Each course should be its own subdirectory
 3. Click "🔄 Refresh Course List" to detect them
 4. Select and process your courses

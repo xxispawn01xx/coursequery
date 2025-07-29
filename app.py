@@ -376,7 +376,7 @@ class RealEstateAIApp:
         raw_docs_exists = self.config.raw_docs_dir.exists()
         indexed_exists = self.config.indexed_courses_dir.exists()
         
-        print(f"📁 Directories - raw_docs: {raw_docs_exists}, indexed: {indexed_exists}")
+        print(f"📁 Directories - archived_courses: {raw_docs_exists}, indexed: {indexed_exists}")
         
         # Get already indexed courses
         indexed_courses = set()
@@ -391,9 +391,9 @@ class RealEstateAIApp:
                     })
                     print(f"📚 Found indexed course: {item.name}")
         
-        # Get raw courses (ready for processing)
+        # Get archived courses (ready for processing)
         if raw_docs_exists:
-            print(f"📂 Scanning raw_docs...")
+            print(f"📂 Scanning archived_courses...")
             for item in self.config.raw_docs_dir.iterdir():
                 if item.is_dir() and item.name not in indexed_courses:
                     # Count supported files
@@ -409,7 +409,7 @@ class RealEstateAIApp:
                         'status': 'raw',
                         'document_count': file_count
                     })
-                    print(f"📁 Found raw course: {item.name} ({file_count} files)")
+                    print(f"📁 Found archived course: {item.name} ({file_count} files)")
         
         print(f"✅ Total courses found: {len(courses)}")
         st.session_state.available_courses = courses
@@ -431,7 +431,7 @@ class RealEstateAIApp:
                 1. Update the path in `config.py`
                 2. Or use the file uploader below
                 
-                **Current Status:** Using local raw_docs for courses
+                **Current Status:** Using local archived_courses for courses
                 """)
         else:
             st.sidebar.success(f"✅ Connected to: {course_path}")
@@ -732,7 +732,7 @@ class RealEstateAIApp:
             status_text.empty()
     
     def save_uploaded_course(self, uploaded_files, course_name: str):
-        """Save uploaded course files to the raw_docs directory."""
+        """Save uploaded course files to the archived_courses directory."""
         course_dir = self.config.raw_docs_dir / course_name
         course_dir.mkdir(exist_ok=True)
         
@@ -765,7 +765,7 @@ class RealEstateAIApp:
         self.refresh_available_courses()
     
     def process_raw_course(self, course_name: str):
-        """Process a course that exists in raw_docs but hasn't been indexed yet."""
+        """Process a course that exists in archived_courses but hasn't been indexed yet."""
         course_dir = self.config.raw_docs_dir / course_name
         
         if not course_dir.exists():
