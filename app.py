@@ -366,46 +366,54 @@ class RealEstateAIApp:
         return True
 
     def refresh_available_courses(self):
-        """Refresh the list of available courses with detailed logging."""
-        logger.info("🔄 Starting course refresh...")
+        """Refresh the list of available courses with direct folder detection."""
+        print("🔄 Starting course refresh...")
         
-        if self.course_indexer is None:
-            logger.warning("❌ Course indexer not available")
-            st.session_state.available_courses = []
-            return []
+        # Direct folder detection (bypass course_indexer issues)
+        courses = []
         
-        # Debug: Check directories exist
+        # Check directories exist
         raw_docs_exists = self.config.raw_docs_dir.exists()
-        indexed_courses_exists = self.config.indexed_courses_dir.exists()
-        logger.info(f"📁 Directories - raw_docs: {raw_docs_exists}, indexed_courses: {indexed_courses_exists}")
+        indexed_exists = self.config.indexed_courses_dir.exists()
         
-        # Debug: List what's in raw_docs
+        print(f"📁 Directories - raw_docs: {raw_docs_exists}, indexed: {indexed_exists}")
+        
+        # Get already indexed courses
+        indexed_courses = set()
+        if indexed_exists:
+            for item in self.config.indexed_courses_dir.iterdir():
+                if item.is_dir():
+                    indexed_courses.add(item.name)
+                    courses.append({
+                        'name': item.name,
+                        'status': 'indexed',
+                        'document_count': len(list(item.rglob('*.pdf'))) + len(list(item.rglob('*.docx')))
+                    })
+                    print(f"📚 Found indexed course: {item.name}")
+        
+        # Get raw courses (ready for processing)
         if raw_docs_exists:
-            raw_dirs = [d.name for d in self.config.raw_docs_dir.iterdir() if d.is_dir()]
-            logger.info(f"📂 Raw courses found: {raw_dirs}")
-        else:
-            logger.info("📂 No raw_docs directory found")
+            print(f"📂 Scanning raw_docs...")
+            for item in self.config.raw_docs_dir.iterdir():
+                if item.is_dir() and item.name not in indexed_courses:
+                    # Count supported files
+                    file_count = 0
+                    for file_path in item.rglob('*'):
+                        if file_path.is_file():
+                            ext = file_path.suffix.lower()
+                            if ext in ['.pdf', '.docx', '.pptx', '.epub', '.mp4', '.avi', '.mov', '.mp3', '.wav']:
+                                file_count += 1
+                    
+                    courses.append({
+                        'name': item.name,
+                        'status': 'raw',
+                        'document_count': file_count
+                    })
+                    print(f"📁 Found raw course: {item.name} ({file_count} files)")
         
-        # Debug: List what's in indexed_courses  
-        if indexed_courses_exists:
-            indexed_dirs = [d.name for d in self.config.indexed_courses_dir.iterdir() if d.is_dir()]
-            logger.info(f"📊 Indexed courses found: {indexed_dirs}")
-        else:
-            logger.info("📊 No indexed_courses directory found")
-        
-        try:
-            courses = self.course_indexer.get_available_courses()
-            logger.info(f"✅ Course detection returned {len(courses)} courses:")
-            for course in courses:
-                logger.info(f"  - {course['name']}: {course['status']} ({course['document_count']} docs)")
-            
-            st.session_state.available_courses = courses
-            return courses
-            
-        except Exception as e:
-            logger.error(f"❌ Error refreshing courses: {e}")
-            st.session_state.available_courses = []
-            return []
+        print(f"✅ Total courses found: {len(courses)}")
+        st.session_state.available_courses = courses
+        return courses
 
     def sidebar_course_management(self):
         """Handle course management in the sidebar."""
