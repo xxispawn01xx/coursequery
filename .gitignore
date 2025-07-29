@@ -66,3 +66,12 @@ Thumbs.db
 temp/
 *.tmp
 *.log
+
+# Course data and indexes (user's private content - never sync)
+archived_courses/
+raw_docs/
+indexed_courses/
+cache/
+vectors/
+transcriptions/
+models/
