@@ -75,3 +75,14 @@ cache/
 vectors/
 transcriptions/
 models/
+
+# Model files and caches (NEVER store on Replit - local only)
+*.bin
+*.safetensors
+*.pt
+*.pth
+**/models/**
+**/cache/**
+**/vectors/**
+**/.cache/**
+.pythonlibs/

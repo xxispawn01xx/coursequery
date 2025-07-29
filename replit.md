@@ -6,7 +6,7 @@ This is a comprehensive, privacy-focused real estate course analysis application
 
 ## User Preferences
 
-**CRITICAL**: Pure offline operation - never build for Replit, always offline-first architecture.
+**CRITICAL**: Pure offline operation - never build for Replit, always offline-first architecture. NEVER store model files on Replit - models exist only locally.
 Preferred communication style: Simple, everyday language.
 Model preference: Local RTX 3060 models with hybrid cloud API fallback for enhanced responses.
 Creative tasks preference: Local Excel generation with Google Drive integration as optional enhancement.
