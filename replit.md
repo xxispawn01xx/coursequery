@@ -6,12 +6,13 @@ This is a comprehensive, privacy-focused real estate course analysis application
 
 ## User Preferences
 
+**CRITICAL**: Pure offline operation - never build for Replit, always offline-first architecture.
 Preferred communication style: Simple, everyday language.
-Model preference: ChatGPT/Perplexity cloud APIs preferred for better response quality and internet access over local models.
-Creative tasks preference: Google Drive integration preferred for financial modeling tasks requiring live formulas, linked cells, and dynamic worksheets over static Excel files.
-Workflow: Replit → GitHub sync → GitHub Desktop → local development with browser refresh.
-Deployment strategy: Replit for development (models disabled), local RTX 3060 for Whisper transcription, cloud APIs for querying.
-Authentication: Persistent HuggingFace token storage with GUI input for seamless local usage.
+Model preference: Local RTX 3060 models with hybrid cloud API fallback for enhanced responses.
+Creative tasks preference: Local Excel generation with Google Drive integration as optional enhancement.
+Workflow: Pure offline development → RTX 3060 local processing → optional cloud API enhancement.
+Deployment strategy: 100% offline capable, RTX 3060 for all AI processing, local file system for courses.
+Authentication: Local HuggingFace token storage, no external dependencies required.
 
 ## Primary Use Cases
 
@@ -178,13 +179,13 @@ Authentication: Persistent HuggingFace token storage with GUI input for seamless
 - **Persistent API Key Storage**: Added secure local storage for OpenAI/Perplexity keys with auto-save functionality
 
 ### System Status
-- **Replit**: Development environment for testing and sync - **AI MODELS NOW ENABLED**
+- **Architecture**: ✅ **PURE OFFLINE** - No Replit dependencies, 100% local operation
 - **Local**: ✅ **FULLY OPERATIONAL** - RTX 3060 running all AI models successfully on CUDA
 - **GPU Status**: ✅ **RTX 3060 PERFECT** - All models loading on cuda:0, memory fragmentation fix successful
 - **Local Models**: ✅ **ALL WORKING** - local_embeddings, local_llm, whisper all operational
-- **Repository**: Successfully cleaned from 5.7GB to 22MB, optimized for fast GitHub sync
+- **Course Directory**: Configured for H:\Archive Classes with local fallback
 - **Query Engine**: Complete offline AI system with RTX 3060 acceleration
-- **Configuration**: Fixed development mode detection - AI models enabled based on actual environment
+- **Configuration**: Pure offline mode - no cloud dependencies required
 - **Course Processing**: Enhanced multi-course detection with comprehensive debugging and testing
 
 The architecture prioritizes privacy, local operation, and user control while maintaining enterprise-grade functionality for real estate education analysis.

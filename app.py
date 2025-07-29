@@ -260,21 +260,7 @@ class RealEstateAIApp:
 
     def load_models(self):
         """Load local models with RTX 3060 optimization - only one model at a time."""
-        # Only show development mode if actually running on Replit AND skip_model_loading is enabled
-        if self.config.is_replit and hasattr(self.config, 'skip_model_loading') and self.config.skip_model_loading:
-            st.info("🔧 Development mode - AI models disabled on Replit")
-            st.markdown("""
-            **This is the development environment.** 
-            
-            ✅ Code development and testing
-            ❌ AI model functionality disabled
-            
-            **For full AI functionality:**
-            1. Clone repository locally  
-            2. Run on your RTX 3060 12GB system
-            3. Models will download and run locally
-            """)
-            return True  # Return success but skip loading
+        # Pure offline mode - always load models
         
         # Check authentication first for local usage
         if not st.session_state.get('hf_token_set', False):
@@ -306,11 +292,7 @@ class RealEstateAIApp:
                                st.session_state.get('selected_model') != selected_model)
         
         if model_needs_loading:
-            # Skip model loading only if on Replit and configured to do so
-            if self.config.is_replit and hasattr(self.config, 'skip_model_loading') and self.config.skip_model_loading:
-                st.session_state.models_loaded = True  # Mark as "loaded" (development mode)
-                st.session_state.selected_model = selected_model
-                return True
+            # Offline mode - always attempt to load models
                 
             # Check if AI dependencies are available
             if not LOCAL_MODELS_AVAILABLE or not QUERY_ENGINE_AVAILABLE:
@@ -430,19 +412,21 @@ class RealEstateAIApp:
         st.sidebar.header("📚 Course Management")
         
         # Show course directory configuration
-        if not Path("H:/Archive Classes").exists():
-            st.sidebar.warning("⚠️ Course directory not accessible")
+        course_path = Path(r"H:\Archive Classes")
+        if not course_path.exists():
+            st.sidebar.warning(f"⚠️ Course directory not found: {course_path}")
             with st.sidebar.expander("🔧 Setup Your Courses"):
                 st.markdown("""
-                **Your courses are at:** `H:\\Archive Classes`
+                **Expected path:** `H:\\Archive Classes`
                 
-                **To access them:**
-                1. **Upload Method**: Use the file uploader below
-                2. **Local Development**: Run this locally where your courses exist
-                3. **Sync Method**: Copy course folders to this project
+                **If your courses are elsewhere:**
+                1. Update the path in `config.py`
+                2. Or use the file uploader below
                 
-                **Current Status:** Using test courses for demonstration
+                **Current Status:** Using local raw_docs for courses
                 """)
+        else:
+            st.sidebar.success(f"✅ Connected to: {course_path}")
         
         # File uploader for courses
         st.sidebar.subheader("📁 Upload Course Directory")
@@ -1133,21 +1117,7 @@ class RealEstateAIApp:
             st.info("👆 Please select a course from the sidebar to start asking questions.")
             return
         
-        # Show development mode notice only if on Replit and models are disabled
-        if self.config.is_replit and self.config.skip_model_loading:
-            st.header(f"📚 Course: {st.session_state.selected_course}")
-            st.info("🏠 **Development Mode**: AI Q&A features work locally. Use Replit for course management and development.")
-            st.markdown("""
-            **Available on Replit:**
-            - Document upload and processing
-            - Course organization and management
-            - Code development and GitHub sync
-            
-            **For AI Q&A (Local Only):**
-            1. Sync to GitHub → Pull locally → Run `streamlit run app.py --server.port 5000`
-            2. Full Llama 2 + Mistral functionality with conversation learning
-            """)
-            return
+        # Pure offline mode - no development mode restrictions
         
         st.header(f"💬 Ask Questions about: {st.session_state.selected_course}")
         
@@ -1165,22 +1135,7 @@ class RealEstateAIApp:
             include_sources = st.checkbox("Include source references", value=True)
         
         if query and st.button("🔍 Ask Question"):
-            # Check if we're in development mode (Replit only)
-            if self.config.is_replit and self.config.skip_model_loading:
-                st.info("🏠 **Development Mode**: Q&A features are disabled on Replit to save resources.")
-                st.markdown("""
-                **To use AI Q&A features:**
-                1. Sync this project to GitHub (automatic in Replit)
-                2. Pull to local machine using GitHub Desktop
-                3. Run locally: `streamlit run app.py --server.port 5000`
-                4. Models will load automatically with your HF_TOKEN
-                
-                **Your workflow preserves all data:**
-                - Course files and indexes sync through GitHub
-                - Run AI features locally for best performance
-                - Develop and manage courses on Replit
-                """)
-                return
+            # Pure offline mode - no restrictions
             
             # Check if models are loaded before attempting query
             if not st.session_state.models_loaded:

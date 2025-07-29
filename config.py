@@ -23,30 +23,41 @@ class Config:
         self.setup_model_config()
     
     def setup_directories(self):
-        """Create necessary directories."""
-        # Check for user's actual course directory first
-        user_course_dir = Path("H:/Archive Classes")
+        """Create necessary directories for offline usage."""
+        # Check multiple possible course directory locations
+        possible_paths = [
+            Path(r"H:\Archive Classes"),  # Windows direct
+            Path("/mnt/h/Archive Classes"),  # WSL mounted
+            Path.home() / "Archive Classes",  # User home
+            Path("Archive Classes"),  # Local relative
+        ]
         
-        if user_course_dir.exists():
-            # Use the actual course directory
+        user_course_dir = None
+        for path in possible_paths:
+            if path.exists():
+                user_course_dir = path
+                print(f"✅ Found course directory: {user_course_dir}")
+                break
+        
+        if user_course_dir:
             self.raw_docs_dir = user_course_dir
-            print(f"✅ Using your course directory: {self.raw_docs_dir}")
         else:
-            # Fallback to local directory structure
+            # Use local raw_docs directory
             self.raw_docs_dir = self.base_dir / "raw_docs"
-            print(f"📁 Using local directory: {self.raw_docs_dir}")
+            print(f"📁 Using local course directory: {self.raw_docs_dir}")
+            print("💡 Copy your courses to raw_docs/ or update path in config.py")
         
         # Always use local directories for processed data
         self.indexed_courses_dir = self.base_dir / "indexed_courses"
         self.models_dir = self.base_dir / "models"
         self.temp_dir = self.base_dir / "temp"
         
-        # Create processing directories (not the source directory)
+        # Create processing directories
         for directory in [self.indexed_courses_dir, self.models_dir, self.temp_dir]:
             directory.mkdir(exist_ok=True)
         
-        # Only create raw_docs if using local fallback
-        if not user_course_dir.exists():
+        # Create raw_docs if using local fallback
+        if not user_course_dir:
             self.raw_docs_dir.mkdir(exist_ok=True)
         
         # Create GGUF models subdirectory
@@ -54,11 +65,10 @@ class Config:
         gguf_dir.mkdir(exist_ok=True)
     
     def setup_model_config(self):
-        """Configure model settings."""
-        # Auto-detect environment - enable all models for local usage
-        self.is_replit = os.environ.get('REPL_ID') is not None
-        # Enable full AI functionality - user wants all models available
-        self.skip_model_loading = False
+        """Configure model settings for offline usage."""
+        # Pure offline configuration - never check for Replit
+        self.is_replit = False
+        self.skip_model_loading = False  # Always enable models offline
         
         self.model_config = {
             'mistral': {
