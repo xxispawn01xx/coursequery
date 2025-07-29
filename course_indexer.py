@@ -231,14 +231,22 @@ class CourseIndexer:
         courses = []
         course_names = set()
         
+        logger.info("🔍 Starting course detection...")
+        logger.info(f"📁 Raw docs directory: {self.config.raw_docs_dir}")
+        logger.info(f"📊 Indexed courses directory: {self.config.indexed_courses_dir}")
+        
         try:
             # First, get indexed courses from indexed_courses_dir
+            indexed_count = 0
             if self.config.indexed_courses_dir.exists():
+                logger.info("📊 Checking indexed courses directory...")
                 for course_dir in self.config.indexed_courses_dir.iterdir():
                     if course_dir.is_dir():
+                        logger.info(f"  Found indexed directory: {course_dir.name}")
                         metadata_path = course_dir / "metadata.json"
                         
                         if metadata_path.exists():
+                            logger.info(f"    ✅ Has metadata file")
                             with open(metadata_path, 'r') as f:
                                 metadata = json.load(f)
                             
@@ -253,7 +261,9 @@ class CourseIndexer:
                             }
                             courses.append(course_info)
                             course_names.add(course_info['name'])
+                            indexed_count += 1
                         else:
+                            logger.info(f"    ⚠️ Missing metadata file")
                             # Course directory exists but no metadata
                             course_info = {
                                 'name': course_dir.name,
@@ -266,19 +276,32 @@ class CourseIndexer:
                             }
                             courses.append(course_info)
                             course_names.add(course_info['name'])
+                            indexed_count += 1
+                logger.info(f"📊 Found {indexed_count} indexed courses")
+            else:
+                logger.info("📊 Indexed courses directory does not exist")
             
             # Then, check for unprocessed courses in raw_docs_dir
+            unprocessed_count = 0
             if self.config.raw_docs_dir.exists():
+                logger.info("📁 Checking raw docs directory...")
                 for course_dir in self.config.raw_docs_dir.iterdir():
                     if course_dir.is_dir() and course_dir.name not in course_names:
+                        logger.info(f"  Found raw directory: {course_dir.name}")
+                        
                         # Count files in the directory
                         supported_files = []
+                        all_files = []
                         for file_path in course_dir.rglob('*'):
                             if file_path.is_file():
+                                all_files.append(file_path.name)
                                 # Check if it's a supported format
                                 supported_extensions = ['.pdf', '.docx', '.pptx', '.epub', '.mp4', '.avi', '.mov', '.mp3', '.wav']
                                 if file_path.suffix.lower() in supported_extensions:
                                     supported_files.append(file_path)
+                        
+                        logger.info(f"    All files: {all_files}")
+                        logger.info(f"    Supported files: {[f.name for f in supported_files]}")
                         
                         if supported_files:  # Only show directories with supported files
                             course_info = {
@@ -291,6 +314,13 @@ class CourseIndexer:
                                 'has_index': False
                             }
                             courses.append(course_info)
+                            unprocessed_count += 1
+                            logger.info(f"    ✅ Added as unprocessed course ({len(supported_files)} files)")
+                        else:
+                            logger.info(f"    ❌ No supported files found")
+                logger.info(f"📁 Found {unprocessed_count} unprocessed courses")
+            else:
+                logger.info("📁 Raw docs directory does not exist")
             
             # Sort: indexed courses first (by last indexed date), then unprocessed courses
             def sort_key(course):
@@ -301,8 +331,14 @@ class CourseIndexer:
             
             courses.sort(key=sort_key, reverse=False)
             
+            logger.info(f"🎯 Final result: {len(courses)} total courses")
+            for course in courses:
+                logger.info(f"  - {course['name']}: {course['status']} ({course['document_count']} docs)")
+            
         except Exception as e:
-            logger.error(f"Error getting available courses: {e}")
+            logger.error(f"❌ Error getting available courses: {e}")
+            import traceback
+            logger.error(f"Full traceback: {traceback.format_exc()}")
         
         return courses
     

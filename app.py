@@ -388,22 +388,68 @@ class RealEstateAIApp:
         return True
 
     def refresh_available_courses(self):
-        """Refresh the list of available courses."""
+        """Refresh the list of available courses with detailed logging."""
+        logger.info("🔄 Starting course refresh...")
+        
         if self.course_indexer is None:
+            logger.warning("❌ Course indexer not available")
             st.session_state.available_courses = []
             return []
         
-        courses = self.course_indexer.get_available_courses()
-        st.session_state.available_courses = courses
-        return courses
+        # Debug: Check directories exist
+        raw_docs_exists = self.config.raw_docs_dir.exists()
+        indexed_courses_exists = self.config.indexed_courses_dir.exists()
+        logger.info(f"📁 Directories - raw_docs: {raw_docs_exists}, indexed_courses: {indexed_courses_exists}")
+        
+        # Debug: List what's in raw_docs
+        if raw_docs_exists:
+            raw_dirs = [d.name for d in self.config.raw_docs_dir.iterdir() if d.is_dir()]
+            logger.info(f"📂 Raw courses found: {raw_dirs}")
+        else:
+            logger.info("📂 No raw_docs directory found")
+        
+        # Debug: List what's in indexed_courses  
+        if indexed_courses_exists:
+            indexed_dirs = [d.name for d in self.config.indexed_courses_dir.iterdir() if d.is_dir()]
+            logger.info(f"📊 Indexed courses found: {indexed_dirs}")
+        else:
+            logger.info("📊 No indexed_courses directory found")
+        
+        try:
+            courses = self.course_indexer.get_available_courses()
+            logger.info(f"✅ Course detection returned {len(courses)} courses:")
+            for course in courses:
+                logger.info(f"  - {course['name']}: {course['status']} ({course['document_count']} docs)")
+            
+            st.session_state.available_courses = courses
+            return courses
+            
+        except Exception as e:
+            logger.error(f"❌ Error refreshing courses: {e}")
+            st.session_state.available_courses = []
+            return []
 
     def sidebar_course_management(self):
         """Handle course management in the sidebar."""
         st.sidebar.header("📚 Course Management")
         
-        # Refresh courses button
+        # Refresh courses button with debug info
         if st.sidebar.button("🔄 Refresh Course List"):
-            self.refresh_available_courses()
+            with st.sidebar:
+                with st.spinner("Refreshing courses..."):
+                    courses = self.refresh_available_courses()
+                    st.success(f"Found {len(courses)} courses")
+                    
+                    # Show debug info in sidebar
+                    with st.expander("🔍 Debug Info"):
+                        st.write(f"Raw docs dir: {self.config.raw_docs_dir}")
+                        st.write(f"Indexed dir: {self.config.indexed_courses_dir}")
+                        
+                        if courses:
+                            for course in courses:
+                                st.write(f"• {course['name']} ({course['status']})")
+                        else:
+                            st.write("No courses detected")
             st.rerun()
         
         # Available courses
