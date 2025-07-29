@@ -1,248 +1,169 @@
 """
-Transcription Management System
-Handles transcription storage, retrieval, and API model integration.
-Preserves original folder structure while avoiding re-processing media files.
+Local Whisper Transcription Manager
+Handles offline audio/video transcription using OpenAI Whisper
+Optimized for RTX 3060 GPU acceleration
 """
 
 import logging
-import json
-import hashlib
+import os
+import tempfile
 from pathlib import Path
-from typing import Dict, Any, Optional, List
-from datetime import datetime
+from typing import Optional, Dict, Any, List
+import torch
 
 logger = logging.getLogger(__name__)
 
-class TranscriptionManager:
-    """Manages transcription storage and retrieval to avoid re-processing media files."""
+class WhisperTranscriptionManager:
+    """Manages offline Whisper transcription with RTX 3060 optimization."""
     
-    def __init__(self, config=None):
-        """Initialize transcription manager."""
-        from config import Config
-        self.config = config or Config()
+    def __init__(self):
+        """Initialize Whisper transcription manager."""
+        self.whisper_model = None
+        self.model_name = "base"  # Start with base model for RTX 3060
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
         
-        # Create transcriptions directory structure
-        self.transcriptions_dir = Path("./transcriptions")
-        self.transcriptions_dir.mkdir(exist_ok=True)
+    def load_whisper_model(self, model_size: str = "base") -> bool:
+        """Load Whisper model for transcription.
         
-        # Metadata file for tracking transcriptions
-        self.metadata_file = self.transcriptions_dir / "transcription_metadata.json"
-        self.metadata = self._load_metadata()
-    
-    def _load_metadata(self) -> Dict[str, Any]:
-        """Load transcription metadata from file."""
-        try:
-            if self.metadata_file.exists():
-                with open(self.metadata_file, 'r', encoding='utf-8') as f:
-                    return json.load(f)
-        except Exception as e:
-            logger.warning(f"Could not load transcription metadata: {e}")
-        
-        return {
-            "version": "1.0",
-            "transcriptions": {},
-            "created": datetime.now().isoformat()
-        }
-    
-    def _save_metadata(self):
-        """Save transcription metadata to file."""
-        try:
-            self.metadata["last_updated"] = datetime.now().isoformat()
-            with open(self.metadata_file, 'w', encoding='utf-8') as f:
-                json.dump(self.metadata, f, indent=2, ensure_ascii=False)
-        except Exception as e:
-            logger.error(f"Failed to save transcription metadata: {e}")
-    
-    def _get_file_hash(self, file_path: Path) -> str:
-        """Generate hash for file to detect changes."""
-        try:
-            # Use file size + modification time for quick hash
-            stat = file_path.stat()
-            content = f"{file_path.name}_{stat.st_size}_{stat.st_mtime}"
-            return hashlib.md5(content.encode()).hexdigest()
-        except Exception as e:
-            logger.warning(f"Could not generate hash for {file_path}: {e}")
-            return str(file_path)
-    
-    def get_transcription_path(self, media_file: Path, course_name: str) -> Path:
-        """Get the path where transcription should be stored."""
-        # Preserve folder structure under transcriptions directory
-        relative_path = media_file.relative_to(media_file.parent.parent)
-        
-        # Create course-specific transcription directory
-        course_dir = self.transcriptions_dir / course_name
-        course_dir.mkdir(exist_ok=True)
-        
-        # Change extension to .txt
-        transcription_file = course_dir / f"{media_file.stem}.txt"
-        return transcription_file
-    
-    def has_transcription(self, media_file: Path, course_name: str) -> bool:
-        """Check if transcription already exists and is up to date."""
-        file_hash = self._get_file_hash(media_file)
-        file_key = str(media_file)
-        
-        # Check metadata
-        if file_key in self.metadata["transcriptions"]:
-            stored_info = self.metadata["transcriptions"][file_key]
+        Args:
+            model_size: Model size (tiny, base, small, medium, large)
             
-            # Check if file hasn't changed
-            if stored_info.get("file_hash") == file_hash:
-                transcription_path = Path(stored_info.get("transcription_path", ""))
+        Returns:
+            bool: True if model loaded successfully
+        """
+        try:
+            import whisper
+            
+            logger.info(f"Loading Whisper {model_size} model on {self.device}...")
+            
+            # RTX 3060 optimization - start with smaller models
+            if self.device == "cuda":
+                logger.info("🚀 RTX 3060 detected - optimizing Whisper for GPU")
                 
-                # Check if transcription file still exists
-                if transcription_path.exists():
-                    logger.info(f"Found existing transcription: {media_file.name}")
-                    return True
-        
-        return False
-    
-    def get_transcription(self, media_file: Path, course_name: str) -> Optional[str]:
-        """Get existing transcription content."""
-        file_key = str(media_file)
-        
-        if file_key in self.metadata["transcriptions"]:
-            stored_info = self.metadata["transcriptions"][file_key]
-            transcription_path = Path(stored_info.get("transcription_path", ""))
+                # Check GPU memory before loading
+                if torch.cuda.is_available():
+                    total_memory = torch.cuda.get_device_properties(0).total_memory / (1024**3)
+                    allocated = torch.cuda.memory_allocated(0) / (1024**3)
+                    available = total_memory - allocated
+                    
+                    logger.info(f"RTX 3060 VRAM: {available:.1f}GB available / {total_memory:.1f}GB total")
+                    
+                    # Adjust model size based on available memory
+                    if available < 2.0 and model_size in ["large", "medium"]:
+                        logger.warning(f"RTX 3060 low memory ({available:.1f}GB) - using 'base' model instead of '{model_size}'")
+                        model_size = "base"
+                    elif available < 1.0:
+                        logger.warning(f"RTX 3060 very low memory ({available:.1f}GB) - using 'tiny' model")
+                        model_size = "tiny"
             
-            try:
-                if transcription_path.exists():
-                    with open(transcription_path, 'r', encoding='utf-8') as f:
-                        content = f.read()
-                    logger.info(f"Loaded transcription: {media_file.name} ({len(content)} chars)")
-                    return content
-            except Exception as e:
-                logger.error(f"Failed to read transcription {transcription_path}: {e}")
-        
-        return None
-    
-    def save_transcription(self, media_file: Path, course_name: str, transcription: str, 
-                          method: str = "whisper") -> bool:
-        """Save transcription to file and update metadata."""
-        try:
-            transcription_path = self.get_transcription_path(media_file, course_name)
-            transcription_path.parent.mkdir(parents=True, exist_ok=True)
+            # Load the model
+            self.whisper_model = whisper.load_model(model_size, device=self.device)
+            self.model_name = model_size
             
-            # Save transcription content
-            with open(transcription_path, 'w', encoding='utf-8') as f:
-                # Add header with metadata
-                header = f"# Transcription: {media_file.name}\n"
-                header += f"# Course: {course_name}\n"
-                header += f"# Method: {method}\n"
-                header += f"# Generated: {datetime.now().isoformat()}\n"
-                header += f"# Original file: {media_file}\n\n"
-                
-                f.write(header + transcription)
-            
-            # Update metadata
-            file_key = str(media_file)
-            self.metadata["transcriptions"][file_key] = {
-                "file_hash": self._get_file_hash(media_file),
-                "transcription_path": str(transcription_path),
-                "course_name": course_name,
-                "method": method,
-                "created": datetime.now().isoformat(),
-                "character_count": len(transcription),
-                "original_file": str(media_file)
-            }
-            
-            self._save_metadata()
-            
-            logger.info(f"Saved transcription: {media_file.name} -> {transcription_path}")
+            logger.info(f"✅ Whisper {model_size} loaded successfully on {self.device}")
             return True
             
         except Exception as e:
-            logger.error(f"Failed to save transcription for {media_file}: {e}")
+            logger.error(f"Failed to load Whisper model: {e}")
             return False
     
-    def get_all_transcriptions(self, course_name: str) -> List[Dict[str, Any]]:
-        """Get all transcriptions for a specific course."""
-        transcriptions = []
+    def transcribe_audio(self, audio_path: str, language: Optional[str] = None) -> Dict[str, Any]:
+        """Transcribe audio file using local Whisper.
         
-        for file_key, info in self.metadata["transcriptions"].items():
-            if info.get("course_name") == course_name:
-                transcription_path = Path(info.get("transcription_path", ""))
+        Args:
+            audio_path: Path to audio/video file
+            language: Language code (optional, auto-detect if None)
+            
+        Returns:
+            Dict containing transcription results
+        """
+        if not self.whisper_model:
+            if not self.load_whisper_model():
+                raise RuntimeError("Whisper model not available")
+        
+        try:
+            logger.info(f"Transcribing {audio_path} with Whisper {self.model_name}...")
+            
+            # RTX 3060 memory optimization
+            if self.device == "cuda":
+                torch.cuda.empty_cache()
+            
+            # Transcribe with optimizations
+            result = self.whisper_model.transcribe(
+                audio_path,
+                language=language,
+                fp16=self.device == "cuda",  # Use FP16 on GPU for RTX 3060 efficiency
+                verbose=False
+            )
+            
+            logger.info(f"✅ Transcription completed - {len(result['text'])} characters")
+            
+            return {
+                "text": result["text"],
+                "language": result.get("language", "unknown"),
+                "segments": result.get("segments", []),
+                "model_used": self.model_name,
+                "device_used": self.device
+            }
+            
+        except Exception as e:
+            logger.error(f"Transcription failed for {audio_path}: {e}")
+            raise
+    
+    def transcribe_batch(self, audio_files: List[str], language: Optional[str] = None) -> Dict[str, Dict[str, Any]]:
+        """Transcribe multiple audio files in batch.
+        
+        Args:
+            audio_files: List of audio file paths
+            language: Language code (optional)
+            
+        Returns:
+            Dict mapping file paths to transcription results
+        """
+        results = {}
+        
+        for audio_file in audio_files:
+            try:
+                result = self.transcribe_audio(audio_file, language)
+                results[audio_file] = result
                 
-                if transcription_path.exists():
-                    try:
-                        with open(transcription_path, 'r', encoding='utf-8') as f:
-                            content = f.read()
-                        
-                        # Remove header metadata from content
-                        lines = content.split('\n')
-                        content_start = 0
-                        for i, line in enumerate(lines):
-                            if not line.startswith('#'):
-                                content_start = i
-                                break
-                        
-                        clean_content = '\n'.join(lines[content_start:]).strip()
-                        
-                        transcriptions.append({
-                            "original_file": info.get("original_file"),
-                            "transcription_path": str(transcription_path),
-                            "content": clean_content,
-                            "method": info.get("method"),
-                            "created": info.get("created"),
-                            "character_count": len(clean_content)
-                        })
-                        
-                    except Exception as e:
-                        logger.warning(f"Could not read transcription {transcription_path}: {e}")
+                # RTX 3060 memory management between files
+                if self.device == "cuda":
+                    torch.cuda.empty_cache()
+                    
+            except Exception as e:
+                logger.error(f"Failed to transcribe {audio_file}: {e}")
+                results[audio_file] = {"error": str(e)}
         
-        return transcriptions
+        return results
     
-    def should_skip_media_file(self, media_file: Path, course_name: str) -> bool:
-        """Determine if media file should be skipped (already transcribed)."""
-        return self.has_transcription(media_file, course_name)
+    def get_supported_formats(self) -> List[str]:
+        """Get list of supported audio/video formats."""
+        return [
+            ".mp3", ".wav", ".flac", ".m4a", ".ogg",
+            ".mp4", ".avi", ".mov", ".mkv", ".webm"
+        ]
     
-    def get_media_extensions(self) -> List[str]:
-        """Get list of media file extensions that can be transcribed."""
-        return ['.mp4', '.avi', '.mov', '.mkv', '.mp3', '.wav', '.flac', '.m4a']
+    def is_supported_format(self, file_path: str) -> bool:
+        """Check if file format is supported for transcription."""
+        return Path(file_path).suffix.lower() in self.get_supported_formats()
     
-    def is_media_file(self, file_path: Path) -> bool:
-        """Check if file is a media file that can be transcribed."""
-        return file_path.suffix.lower() in self.get_media_extensions()
-    
-    def cleanup_orphaned_transcriptions(self):
-        """Remove transcriptions for media files that no longer exist."""
-        orphaned_keys = []
-        
-        for file_key, info in self.metadata["transcriptions"].items():
-            original_file = Path(file_key)
-            if not original_file.exists():
-                orphaned_keys.append(file_key)
-                
-                # Remove transcription file
-                transcription_path = Path(info.get("transcription_path", ""))
-                if transcription_path.exists():
-                    try:
-                        transcription_path.unlink()
-                        logger.info(f"Removed orphaned transcription: {transcription_path}")
-                    except Exception as e:
-                        logger.warning(f"Could not remove {transcription_path}: {e}")
-        
-        # Remove from metadata
-        for key in orphaned_keys:
-            del self.metadata["transcriptions"][key]
-        
-        if orphaned_keys:
-            self._save_metadata()
-            logger.info(f"Cleaned up {len(orphaned_keys)} orphaned transcriptions")
-    
-    def get_stats(self) -> Dict[str, Any]:
-        """Get transcription statistics."""
-        total_transcriptions = len(self.metadata["transcriptions"])
-        total_chars = sum(info.get("character_count", 0) for info in self.metadata["transcriptions"].values())
-        
-        methods = {}
-        for info in self.metadata["transcriptions"].values():
-            method = info.get("method", "unknown")
-            methods[method] = methods.get(method, 0) + 1
-        
+    def get_model_info(self) -> Dict[str, Any]:
+        """Get information about loaded model."""
         return {
-            "total_transcriptions": total_transcriptions,
-            "total_characters": total_chars,
-            "methods_used": methods,
-            "storage_location": str(self.transcriptions_dir)
+            "model_loaded": self.whisper_model is not None,
+            "model_name": self.model_name,
+            "device": self.device,
+            "gpu_available": torch.cuda.is_available(),
+            "supported_formats": self.get_supported_formats()
         }
+
+# Global instance for reuse
+_whisper_manager = None
+
+def get_whisper_manager() -> WhisperTranscriptionManager:
+    """Get global Whisper transcription manager instance."""
+    global _whisper_manager
+    if _whisper_manager is None:
+        _whisper_manager = WhisperTranscriptionManager()
+    return _whisper_manager

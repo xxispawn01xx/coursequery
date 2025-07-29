@@ -54,13 +54,14 @@ class HybridQueryEngine:
         except ImportError:
             logger.info("Local LLM not available - will use cloud APIs")
         
-        # Check for Whisper specifically
+        # Check for Whisper specifically (local installation required)
         try:
             import whisper
             available["whisper"] = True
-            logger.info("Whisper available for local transcription")
+            logger.info("✅ Whisper available for local transcription")
         except ImportError:
-            logger.info("Whisper not available - transcription will use cloud APIs")
+            logger.info("📦 Whisper not installed - install locally with: pip install openai-whisper")
+            logger.info("💡 Once installed locally, Whisper will run on your RTX 3060 for offline transcription")
         
         logger.info(f"Available models: {available}")
         return available

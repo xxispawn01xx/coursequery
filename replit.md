@@ -52,7 +52,7 @@ Authentication: Local HuggingFace token storage, no external dependencies requir
 
 ### AI Models
 - **Mistral 7B Instruct**: Local text generation with 4-bit quantization for GPU efficiency
-- **Whisper Medium**: Local speech-to-text for media files
+- **Whisper (Offline)**: Local speech-to-text for media files (install locally: pip install openai-whisper)
 - **MiniLM Embeddings**: Sentence transformer for semantic search
 - **GPU Optimization**: RTX 3060 targeting with CPU fallback support
 
@@ -120,7 +120,9 @@ Authentication: Local HuggingFace token storage, no external dependencies requir
 - **Replit + VSCode Integration**: Created comprehensive guide for course-to-deployment pipeline with automatic project generation
 - **Complete Project Generation**: Enhanced course queries to generate full production-ready applications instead of code snippets
 - **Workflow Documentation**: Created WORKFLOW_GUIDE.md and PROJECT_GENERATION_GUIDE.md with specific procedures
-- **Whisper Detection Fix**: Corrected hybrid model detection to properly check for Whisper availability independent of transformers/CUDA
+- **Whisper Offline Ready**: Created complete offline Whisper transcription manager optimized for RTX 3060 (install locally: pip install openai-whisper)
+- **DialoGPT Completely Removed**: Eliminated DialoGPT from entire application for faster, cleaner operation per user requirements
+- **Pure Local Architecture**: All model files deleted from Replit project - models exist only locally on user's RTX 3060 system
 
 ### July 28, 2025 - PyTorch Security & RTX 3060 Memory Fixes
 - **Complete Repository Cleanup**: Eliminated 5.7GB package cache bloat, reduced to 22MB clean codebase
