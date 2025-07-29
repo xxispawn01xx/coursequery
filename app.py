@@ -260,25 +260,21 @@ class RealEstateAIApp:
 
     def load_models(self):
         """Load local models with RTX 3060 optimization - only one model at a time."""
-        # Check if model loading should be skipped (only on Replit to prevent bloat)
-        if hasattr(self.config, 'skip_model_loading') and self.config.skip_model_loading:
-            if self.config.is_replit:
-                st.info("🔧 Development mode - AI models disabled on Replit")
-                st.markdown("""
-                **This is the development environment.** 
-                
-                ✅ Code development and testing
-                ❌ AI model functionality disabled
-                
-                **For full AI functionality:**
-                1. Clone repository locally  
-                2. Run on your RTX 3060 12GB system
-                3. Models will download and run locally
-                """)
-                return True  # Return success but skip loading
-            else:
-                # Local environment but models disabled - this shouldn't happen
-                st.error("❌ Models disabled but running locally - check configuration")
+        # Only show development mode if actually running on Replit AND skip_model_loading is enabled
+        if self.config.is_replit and hasattr(self.config, 'skip_model_loading') and self.config.skip_model_loading:
+            st.info("🔧 Development mode - AI models disabled on Replit")
+            st.markdown("""
+            **This is the development environment.** 
+            
+            ✅ Code development and testing
+            ❌ AI model functionality disabled
+            
+            **For full AI functionality:**
+            1. Clone repository locally  
+            2. Run on your RTX 3060 12GB system
+            3. Models will download and run locally
+            """)
+            return True  # Return success but skip loading
         
         # Check authentication first for local usage
         if not st.session_state.get('hf_token_set', False):
@@ -310,8 +306,8 @@ class RealEstateAIApp:
                                st.session_state.get('selected_model') != selected_model)
         
         if model_needs_loading:
-            # Skip model loading if configured to do so
-            if hasattr(self.config, 'skip_model_loading') and self.config.skip_model_loading:
+            # Skip model loading only if on Replit and configured to do so
+            if self.config.is_replit and hasattr(self.config, 'skip_model_loading') and self.config.skip_model_loading:
                 st.session_state.models_loaded = True  # Mark as "loaded" (development mode)
                 st.session_state.selected_model = selected_model
                 return True
@@ -1071,8 +1067,8 @@ class RealEstateAIApp:
             st.info("👆 Please select a course from the sidebar to start asking questions.")
             return
         
-        # Show development mode notice if models are disabled
-        if self.config.skip_model_loading:
+        # Show development mode notice only if on Replit and models are disabled
+        if self.config.is_replit and self.config.skip_model_loading:
             st.header(f"📚 Course: {st.session_state.selected_course}")
             st.info("🏠 **Development Mode**: AI Q&A features work locally. Use Replit for course management and development.")
             st.markdown("""
@@ -1103,8 +1099,8 @@ class RealEstateAIApp:
             include_sources = st.checkbox("Include source references", value=True)
         
         if query and st.button("🔍 Ask Question"):
-            # Check if we're in development mode (Replit)
-            if self.config.skip_model_loading:
+            # Check if we're in development mode (Replit only)
+            if self.config.is_replit and self.config.skip_model_loading:
                 st.info("🏠 **Development Mode**: Q&A features are disabled on Replit to save resources.")
                 st.markdown("""
                 **To use AI Q&A features:**

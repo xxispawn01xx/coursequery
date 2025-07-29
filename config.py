@@ -40,10 +40,10 @@ class Config:
     
     def setup_model_config(self):
         """Configure model settings."""
-        # Disable local models since Vector RAG with cloud APIs is working
-        self.is_replit = True  # Keep local models disabled
-        # Skip problematic local model loading, focus on Vector RAG
-        self.skip_model_loading = True
+        # Auto-detect environment - enable all models for local usage
+        self.is_replit = os.environ.get('REPL_ID') is not None
+        # Enable full AI functionality - user wants all models available
+        self.skip_model_loading = False
         
         self.model_config = {
             'mistral': {
