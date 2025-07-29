@@ -429,6 +429,39 @@ class RealEstateAIApp:
         """Handle course management in the sidebar."""
         st.sidebar.header("📚 Course Management")
         
+        # Show course directory configuration
+        if not Path("H:/Archive Classes").exists():
+            st.sidebar.warning("⚠️ Course directory not accessible")
+            with st.sidebar.expander("🔧 Setup Your Courses"):
+                st.markdown("""
+                **Your courses are at:** `H:\\Archive Classes`
+                
+                **To access them:**
+                1. **Upload Method**: Use the file uploader below
+                2. **Local Development**: Run this locally where your courses exist
+                3. **Sync Method**: Copy course folders to this project
+                
+                **Current Status:** Using test courses for demonstration
+                """)
+        
+        # File uploader for courses
+        st.sidebar.subheader("📁 Upload Course Directory")
+        uploaded_files = st.sidebar.file_uploader(
+            "Upload course files (PDF, DOCX, EPUB, etc.)",
+            accept_multiple_files=True,
+            type=['pdf', 'docx', 'pptx', 'epub', 'mp4', 'avi', 'mov', 'mp3', 'wav'],
+            help="Select all files from one course folder at a time"
+        )
+        
+        if uploaded_files:
+            course_name = st.sidebar.text_input(
+                "Course name:",
+                placeholder="e.g., Python Programming, Real Estate Finance"
+            )
+            
+            if course_name and st.sidebar.button("💾 Save Course Files"):
+                self.save_uploaded_course(uploaded_files, course_name)
+        
         # Refresh courses button with debug info
         if st.sidebar.button("🔄 Refresh Course List"):
             with st.sidebar:
@@ -705,6 +738,39 @@ class RealEstateAIApp:
         finally:
             progress_bar.empty()
             status_text.empty()
+    
+    def save_uploaded_course(self, uploaded_files, course_name: str):
+        """Save uploaded course files to the raw_docs directory."""
+        course_dir = self.config.raw_docs_dir / course_name
+        course_dir.mkdir(exist_ok=True)
+        
+        saved_files = []
+        progress_bar = st.sidebar.progress(0)
+        
+        for i, uploaded_file in enumerate(uploaded_files):
+            try:
+                # Save the file
+                file_path = course_dir / uploaded_file.name
+                with open(file_path, "wb") as f:
+                    f.write(uploaded_file.getbuffer())
+                
+                saved_files.append(uploaded_file.name)
+                progress_bar.progress((i + 1) / len(uploaded_files))
+                
+            except Exception as e:
+                st.sidebar.error(f"Error saving {uploaded_file.name}: {str(e)}")
+        
+        progress_bar.empty()
+        
+        if saved_files:
+            st.sidebar.success(f"✅ Saved {len(saved_files)} files to course: {course_name}")
+            
+            # Auto-process the course
+            if st.sidebar.button(f"🚀 Process {course_name} Now"):
+                self.process_directory(str(course_dir), course_name)
+        
+        # Refresh course list
+        self.refresh_available_courses()
     
     def process_raw_course(self, course_name: str):
         """Process a course that exists in raw_docs but hasn't been indexed yet."""

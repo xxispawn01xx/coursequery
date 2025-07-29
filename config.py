@@ -24,15 +24,30 @@ class Config:
     
     def setup_directories(self):
         """Create necessary directories."""
-        self.raw_docs_dir = self.base_dir / "raw_docs"
+        # Check for user's actual course directory first
+        user_course_dir = Path("H:/Archive Classes")
+        
+        if user_course_dir.exists():
+            # Use the actual course directory
+            self.raw_docs_dir = user_course_dir
+            print(f"✅ Using your course directory: {self.raw_docs_dir}")
+        else:
+            # Fallback to local directory structure
+            self.raw_docs_dir = self.base_dir / "raw_docs"
+            print(f"📁 Using local directory: {self.raw_docs_dir}")
+        
+        # Always use local directories for processed data
         self.indexed_courses_dir = self.base_dir / "indexed_courses"
         self.models_dir = self.base_dir / "models"
         self.temp_dir = self.base_dir / "temp"
         
-        # Create directories
-        for directory in [self.raw_docs_dir, self.indexed_courses_dir, 
-                         self.models_dir, self.temp_dir]:
+        # Create processing directories (not the source directory)
+        for directory in [self.indexed_courses_dir, self.models_dir, self.temp_dir]:
             directory.mkdir(exist_ok=True)
+        
+        # Only create raw_docs if using local fallback
+        if not user_course_dir.exists():
+            self.raw_docs_dir.mkdir(exist_ok=True)
         
         # Create GGUF models subdirectory
         gguf_dir = self.models_dir / "gguf"
