@@ -103,9 +103,40 @@ cp -r /downloads/python_course/ raw_docs/python_mastery/
    - Processes code files
    - Creates unified vector embeddings
 
-### Step 3: Apply Learning to Problem Sets
+### Step 3: Generate Complete Projects
+Instead of just getting code snippets, generate entire project implementations:
+
+**Option A: Complete Project Generation**
 ```
-"Based on this Python course content, create a detailed implementation plan for solving [specific problem]. Include code structure, step-by-step approach, potential challenges, and testing strategies."
+"Based on this Python course content, build a complete [project type] project that demonstrates all the key concepts. Include:
+- Full project structure with proper organization
+- Complete implementation files
+- Configuration files and requirements
+- Documentation and README
+- Test files and examples
+- Deployment instructions"
+```
+
+**Option B: Custom Problem Implementation**
+```
+"Using the methodologies from this course, create a complete solution for [your specific business problem]. Generate:
+- Project architecture and file structure
+- All necessary code files with proper imports
+- Database schemas if needed
+- API endpoints and integrations
+- Error handling and logging
+- Production deployment guide"
+```
+
+**Option C: Learning-to-Production Pipeline**
+```
+"Transform the course exercises into a production-ready application for [your use case]. Include:
+- Scalable code architecture
+- Professional error handling
+- Security implementations
+- Performance optimizations
+- Documentation and testing
+- CI/CD pipeline setup"
 ```
 
 ## Workflow 3: Multi-Page Strategic Plan Generation
@@ -135,7 +166,57 @@ cp -r /downloads/python_course/ raw_docs/python_mastery/
 - **Google Sheets creation** for complex financial models
 - **Specific book references** and methodology citations
 
-## Workflow 4: Bulk Audio/Video Processing
+## Workflow 4: Complete Project Generation from Courses
+
+### Use Case: Transform course learning into production-ready projects
+
+**Enhanced Query Approach:**
+Instead of asking for code snippets, request complete project implementations that demonstrate mastery of course concepts applied to real-world problems.
+
+### Project Generation Templates:
+
+**Web Application Project:**
+```
+"Based on this web development course, create a complete [e-commerce/portfolio/dashboard] application including:
+- Frontend: Complete React/Vue components with routing
+- Backend: API server with authentication and database
+- Database: Schema design and migrations
+- Deployment: Docker configuration and cloud deployment
+- Documentation: Setup guide and API documentation
+- Testing: Unit tests and integration tests"
+```
+
+**Data Science Project:**
+```
+"Using the concepts from this data science course, build a complete machine learning pipeline for [your specific problem]:
+- Data ingestion and cleaning modules
+- Feature engineering pipeline
+- Model training and evaluation scripts
+- Prediction API with FastAPI/Flask
+- Monitoring and logging system
+- Jupyter notebooks with analysis
+- Production deployment configuration"
+```
+
+**DevOps/Infrastructure Project:**
+```
+"Based on this DevOps course, create a complete CI/CD pipeline for [your application type]:
+- Infrastructure as Code (Terraform/CloudFormation)
+- Kubernetes deployment manifests
+- GitHub Actions/Jenkins pipeline
+- Monitoring and alerting setup (Prometheus/Grafana)
+- Security scanning and compliance
+- Documentation and runbooks"
+```
+
+### Output Expectations:
+- **Multiple Files**: Complete project directory structure
+- **Production Ready**: Proper error handling, logging, security
+- **Documentation**: README, API docs, deployment guides
+- **Testing**: Unit tests, integration tests, test data
+- **Configuration**: Environment files, deployment configs
+
+## Workflow 5: Bulk Audio/Video Processing
 
 ### Scenario: Process multiple podcasts, lectures, or video series
 
