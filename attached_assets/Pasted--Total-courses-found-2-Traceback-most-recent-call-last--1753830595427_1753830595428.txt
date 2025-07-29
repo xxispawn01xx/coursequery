@@ -1,0 +1,98 @@
+ Total courses found: 2
+────────────────────────── Traceback (most recent call last) ───────────────────────────
+  C:\Program
+  Files\Python312\Lib\site-packages\streamlit\runtime\scriptrunner\exec_code.py:128 in
+  exec_func_with_error_handling
+
+  C:\Program
+  Files\Python312\Lib\site-packages\streamlit\runtime\scriptrunner\script_runner.py:66
+  9 in code_to_exec
+
+  H:\Archive Classes\coursequery\app.py:3311 in <module>
+
+
+  H:\Archive Classes\coursequery\app.py:3307 in main
+
+    3304
+
+  H:\Archive Classes\coursequery\app.py:2023 in run
+
+    2020 │   │   │   "🎥 Bulk Transcription (FREE)",
+    2021 │   │   │   "🔍 Vector RAG (💳 PAID)",
+    2022 │   │   │   "💬 Ask Questions (FREE)",
+  ❱ 2023 │   │   │   "📊 Analytics (FREE)",
+    2024 │   │   │   "⚙️ System Status (FREE)"
+    2025 │   │   ])
+    2026
+
+  H:\Archive Classes\coursequery\app.py:491 in sidebar_course_management
+
+     488 │   │   │   │   │   │
+     489 │   │   │   │   │   │   if st.button(f"Select {course_name}", key=f"select_{c
+     490 │   │   │   │   │   │   │   st.session_state.selected_course = course_name
+  ❱  491 │   │   │   │   │   │   │   st.rerun()
+     492 │   │   │   │   │   │
+     493 │   │   │   │   │   │   if st.button(f"Re-index {course_name}", key=f"reindex
+     494 │   │   │   │   │   │   │   self.reindex_course(course_name)
+────────────────────────────────────────────────────────────────────────────────────────
+KeyError: 'last_indexed'
+✅ Found course directory: H:\Archive Classes
+✅ Found course directory: H:\Archive Classes
+✅ Found course directory: H:\Archive Classes
+🔄 Starting course refresh...
+📁 Directories - archived_courses: True, indexed: True
+📚 Found indexed course: coursequery
+📂 Scanning archived_courses...
+📁 Found archived course: coursebackup (1056 files)
+✅ Total courses found: 2
+✅ Found course directory: H:\Archive Classes
+✅ Found course directory: H:\Archive Classes
+✅ Found course directory: H:\Archive Classes
+────────────────────────── Traceback (most recent call last) ───────────────────────────
+  C:\Program
+  Files\Python312\Lib\site-packages\streamlit\runtime\scriptrunner\exec_code.py:128 in
+  exec_func_with_error_handling
+
+  C:\Program
+  Files\Python312\Lib\site-packages\streamlit\runtime\scriptrunner\script_runner.py:66
+  9 in code_to_exec
+
+  H:\Archive Classes\coursequery\app.py:3311 in <module>
+
+    3308
+    3309
+    3310 if __name__ == "__main__":
+  ❱ 3311 │   main()
+    3312
+
+  H:\Archive Classes\coursequery\app.py:3307 in main
+
+    3304 def main():
+    3305 │   """Application entry point."""
+    3306 │   app = RealEstateAIApp()
+  ❱ 3307 │   app.run()
+    3308
+    3309
+    3310 if __name__ == "__main__":
+
+  H:\Archive Classes\coursequery\app.py:2023 in run
+
+    2020 │   │   │   self.refresh_available_courses()
+    2021 │   │
+    2022 │   │   # Sidebar
+  ❱ 2023 │   │   self.sidebar_course_management()
+    2024 │   │
+    2025 │   │   # Main content tabs with clear billing indicators
+    2026 │   │   tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+
+  H:\Archive Classes\coursequery\app.py:491 in sidebar_course_management
+
+     488 │   │   │   │   for course in indexed_courses:
+     489 │   │   │   │   │   course_name = course['name']
+     490 │   │   │   │   │   doc_count = course['document_count']
+  ❱  491 │   │   │   │   │   last_indexed = course['last_indexed']
+     492 │   │   │   │   │
+     493 │   │   │   │   │   with st.sidebar.expander(f"📖 {course_name}"):
+     494 │   │   │   │   │   │   st.write(f"Documents: {doc_count}")
+────────────────────────────────────────────────────────────────────────────────────────
+KeyError: 'last_indexed'

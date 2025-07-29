@@ -387,7 +387,8 @@ class RealEstateAIApp:
                     courses.append({
                         'name': item.name,
                         'status': 'indexed',
-                        'document_count': len(list(item.rglob('*.pdf'))) + len(list(item.rglob('*.docx')))
+                        'document_count': len(list(item.rglob('*.pdf'))) + len(list(item.rglob('*.docx'))),
+                        'last_indexed': 'Available'
                     })
                     print(f"📚 Found indexed course: {item.name}")
         
@@ -407,7 +408,8 @@ class RealEstateAIApp:
                     courses.append({
                         'name': item.name,
                         'status': 'raw',
-                        'document_count': file_count
+                        'document_count': file_count,
+                        'last_indexed': 'Not processed'
                     })
                     print(f"📁 Found archived course: {item.name} ({file_count} files)")
         
