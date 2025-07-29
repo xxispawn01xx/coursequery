@@ -174,7 +174,7 @@ Authentication: Local HuggingFace token storage, no external dependencies requir
 - **Conservative Model Strategy**: Switched to smaller models (DistilGPT-2, GPT-2) to work within fragmented memory constraints
 - **CUDA Environment Optimization**: Added CUDA_LAUNCH_BLOCKING and TORCH_USE_CUDA_DSA for better debugging
 - **Memory Allocator Fix**: Prevents impossible 22GB allocation reports on 12GB RTX 3060 GPU
-- **Safetensors Model Selection**: Switched to DialoGPT/GPT-2 models with secure loading format
+- **Safetensors Model Selection**: Switched to GPT-2 models with secure loading format
 - **Comprehensive Error Resolution**: Fixed both security vulnerabilities and memory management issues
 - **Persistent API Key Storage**: Added secure local storage for OpenAI/Perplexity keys with auto-save functionality
 

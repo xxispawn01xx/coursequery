@@ -412,7 +412,7 @@ class LocalModelManager:
         model_attempts = [
             ("distilgpt2", "DistilGPT-2 (Small, Safe for RTX 3060)"),
             ("gpt2", "GPT-2 Base (Medium, RTX 3060 Test)"),
-            ("microsoft/DialoGPT-small", "DialoGPT Small (Conservative)"),
+            ("gpt2-medium", "GPT-2 Medium (Conservative)"),
         ]
         
         for model_name, model_display_name in model_attempts:
@@ -559,7 +559,7 @@ class LocalModelManager:
         
         # Use proven CPU models that work well even with GPU hardware issues
         cpu_models = [
-            ("microsoft/DialoGPT-medium", "DialoGPT Medium"),
+            ("gpt2-large", "GPT-2 Large"),
             ("gpt2", "GPT-2 Base"),
             ("distilgpt2", "DistilGPT-2"),
         ]
