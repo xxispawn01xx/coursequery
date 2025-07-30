@@ -557,7 +557,7 @@ class RealEstateAIApp:
             
             # Group courses by status
             indexed_courses = [c for c in courses if c.get('status') == 'indexed']
-            unprocessed_courses = [c for c in courses if c.get('status') == 'unprocessed']
+            unprocessed_courses = [c for c in courses if c.get('status') == 'raw']
             
             # Show indexed courses first
             if indexed_courses:
@@ -585,15 +585,17 @@ class RealEstateAIApp:
                     course_name = course['name']
                     doc_count = course['document_count']
                     
-                    with st.sidebar.expander(f"📁 {course_name}"):
-                        st.write(f"Files found: {doc_count}")
-                        st.write(f"Status: Not processed")
-                        
-                        if st.button(f"Process {course_name}", key=f"process_{course_name}"):
-                            self.process_raw_course(course_name)
-                        
-                        if st.button(f"Select anyway", key=f"select_raw_{course_name}"):
-                            st.warning("⚠️ This course isn't processed yet. Process it first to enable querying.")
+                    # Only show courses with files
+                    if doc_count > 0:
+                        with st.sidebar.expander(f"📁 {course_name}"):
+                            st.write(f"Files found: {doc_count}")
+                            st.write(f"Status: Not processed")
+                            
+                            if st.button(f"Process {course_name}", key=f"process_{course_name}"):
+                                self.process_raw_course(course_name)
+                            
+                            if st.button(f"Select anyway", key=f"select_raw_{course_name}"):
+                                st.warning("⚠️ This course isn't processed yet. Process it first to enable querying.")
         else:
             st.sidebar.info("No courses found. Upload documents to get started.")
 
