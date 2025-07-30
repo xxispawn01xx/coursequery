@@ -1,0 +1,17 @@
+your DAGs.mp4
+INFO:document_processor:Transcribing audio/video file: 45 - How to deal with failures in your DAGs.mp4
+ERROR:document_processor:File not found during transcription archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\4 - Mastering your DAGs\45 - How to deal with failures in your DAGs.mp4: [WinError 2] The system cannot find the file specified
+INFO:document_processor:Successfully processed 45 - How to deal with failures in your DAGs.mp4: 109 characters
+INFO:document_processor:Processed 45 - How to deal with failures in your DAGs.mp4
+INFO:document_processor:Processing file: archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\4 - Mastering your DAGs\46 - Practice Retry and Alerting.mp4
+INFO:document_processor:Transcribing audio/video file: 46 - Practice Retry and Alerting.mp4
+ERROR:document_processor:File not found during transcription archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\4 - Mastering your DAGs\46 - Practice Retry and Alerting.mp4: [WinError 2] The system cannot find the file specified
+INFO:document_processor:Successfully processed 46 - Practice Retry and Alerting.mp4: 98 characters
+INFO:document_processor:Processed 46 - Practice Retry and Alerting.mp4
+INFO:document_processor:Processing file: archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\4 - Mastering your DAGs\47 - How to test your DAGs.mp4
+INFO:document_processor:Transcribing audio/video file: 47 - How to test your DAGs.mp4
+ERROR:document_processor:File not found during transcription archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\4 - Mastering your DAGs\47 - How to test your DAGs.mp4: [WinError 2] The system cannot find the file specified
+INFO:document_processor:Successfully processed 47 - How to test your DAGs.mp4: 92 characters
+INFO:document_processor:Processed 47 - How to test your DAGs.mp4
+INFO:document_processor:Processing file: archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\4 - Mastering your DAGs\48 - Practice Unit testing your DAGs.mp4
+INFO:document_processor:Transcribing audio/video file: 48 - Practice Unit testing your DAGs.mp4
