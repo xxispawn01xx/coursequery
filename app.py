@@ -74,6 +74,13 @@ except ImportError:
     HybridQueryEngine = None
     HYBRID_QUERY_ENGINE_AVAILABLE = False
 
+try:
+    from course_rename_handler import create_rename_handler
+    RENAME_HANDLER_AVAILABLE = True
+except ImportError:
+    create_rename_handler = None
+    RENAME_HANDLER_AVAILABLE = False
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -146,6 +153,19 @@ class RealEstateAIApp:
             self.book_indexer = BookIndexer()
         except ImportError:
             self.book_indexer = None
+        
+        # Initialize rename handler
+        if RENAME_HANDLER_AVAILABLE:
+            try:
+                self.rename_handler = create_rename_handler(
+                    str(self.config.raw_docs_dir), 
+                    str(self.config.indexed_courses_dir)
+                )
+            except Exception as e:
+                logger.warning(f"Could not initialize rename handler: {e}")
+                self.rename_handler = None
+        else:
+            self.rename_handler = None
         
         # Initialize session state
         if 'models_loaded' not in st.session_state:
@@ -544,6 +564,60 @@ class RealEstateAIApp:
     def sidebar_course_management(self):
         """Handle course management in the sidebar."""
         st.sidebar.header("📚 Course Management")
+        
+        # Check for renamed courses and offer to fix indexes
+        if self.rename_handler:
+            try:
+                rename_suggestions = self.rename_handler.get_rename_suggestions()
+                if rename_suggestions:
+                    st.sidebar.warning(f"⚠️ Found {len(rename_suggestions)} renamed courses")
+                    
+                    with st.sidebar.expander("🔄 Fix Renamed Courses"):
+                        st.info("Detected courses that may have been renamed. Click to fix the indexes:")
+                        
+                        for suggestion in rename_suggestions:
+                            old_name = suggestion['old_name']
+                            new_name = suggestion['new_name']
+                            confidence = suggestion['confidence']
+                            
+                            st.write(f"**{old_name}** → **{new_name}**")
+                            st.write(f"Confidence: {confidence:.0%}")
+                            
+                            col1, col2 = st.columns(2)
+                            with col1:
+                                if st.button(f"✅ Update", key=f"update_{old_name}"):
+                                    if self.rename_handler.apply_rename_suggestion(old_name, new_name):
+                                        st.success(f"Updated: {old_name} → {new_name}")
+                                        # Clear course cache and refresh
+                                        st.session_state.available_courses = []
+                                        st.rerun()
+                                    else:
+                                        st.error("Failed to update index")
+                            
+                            with col2:
+                                if st.button(f"🗑️ Clean", key=f"clean_{old_name}"):
+                                    # Remove orphaned index
+                                    import shutil
+                                    orphaned_path = self.config.indexed_courses_dir / old_name
+                                    if orphaned_path.exists():
+                                        shutil.rmtree(orphaned_path)
+                                        st.success(f"Cleaned up: {old_name}")
+                                        # Clear course cache and refresh
+                                        st.session_state.available_courses = []
+                                        st.rerun()
+                            
+                            st.divider()
+            except Exception as e:
+                logger.error(f"Error checking for renamed courses: {e}")
+        
+        # Quick fix for sidebar loading issues
+        if st.sidebar.button("🚨 Fix Sidebar Loading"):
+            st.sidebar.info("Clearing course cache and refreshing...")
+            # Clear all course-related session state
+            for key in list(st.session_state.keys()):
+                if 'course' in key.lower() or 'available' in key.lower():
+                    del st.session_state[key]
+            st.rerun()
         
         # Directory Path Configuration 
         st.sidebar.subheader("📁 Course Directory")
