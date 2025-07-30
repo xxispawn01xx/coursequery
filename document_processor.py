@@ -33,12 +33,12 @@ except ImportError:
     Image = None
     PIL_AVAILABLE = False
 
-# OpenAI for multimodal image analysis
+# OpenAI for multimodal image analysis (lazy loading)
 try:
     from openai import OpenAI
     import os
-    openai_client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
     OPENAI_AVAILABLE = True
+    openai_client = None  # Initialize later when needed
 except ImportError:
     OpenAI = None
     openai_client = None
@@ -171,8 +171,21 @@ class DocumentProcessor:
     
     def analyze_image_with_gpt4v(self, image_data: bytes, page_num: int = None) -> str:
         """Analyze image content using GPT-4V."""
+        global openai_client
+        
         if not OPENAI_AVAILABLE:
             return "[Image content - multimodal analysis not available]"
+        
+        # Lazy initialization of OpenAI client
+        if openai_client is None:
+            api_key = os.environ.get("OPENAI_API_KEY")
+            if not api_key:
+                return "[Image content - OpenAI API key not configured]"
+            try:
+                openai_client = OpenAI(api_key=api_key)
+            except Exception as e:
+                logger.error(f"Failed to initialize OpenAI client: {e}")
+                return "[Image content - OpenAI initialization failed]"
         
         try:
             # Encode image to base64
@@ -233,12 +246,12 @@ class DocumentProcessor:
                             if pix.n - pix.alpha < 4:  # Valid image
                                 img_data = pix.tobytes("png")
                                 
-                                # Analyze image with GPT-4V if available
-                                if OPENAI_AVAILABLE:
+                                # Analyze image with GPT-4V if available and configured
+                                if OPENAI_AVAILABLE and os.environ.get("OPENAI_API_KEY"):
                                     analysis = self.analyze_image_with_gpt4v(img_data, page_num + 1)
                                     content_parts.append(analysis)
                                 else:
-                                    content_parts.append(f"[IMAGE on page {page_num + 1}] - Image present but analysis not available")
+                                    content_parts.append(f"[IMAGE on page {page_num + 1}] - Image present (configure OPENAI_API_KEY for analysis)")
                             
                             pix = None  # Clean up
                             
