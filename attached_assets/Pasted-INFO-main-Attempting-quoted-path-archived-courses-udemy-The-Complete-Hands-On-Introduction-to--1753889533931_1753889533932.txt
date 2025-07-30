@@ -1,0 +1,29 @@
+INFO:__main__:Attempting quoted_path: "archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\4 - Coding Your First Data Pipeline with Airflow\20 - Define a DAG.mp4"
+WARNING:__main__:? quoted_path failed: [WinError 2] The system cannot find the file specified
+INFO:__main__:Attempting pathlib_string: archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\4 - Coding Your First Data Pipeline with Airflow\20 - Define a DAG.mp4
+WARNING:__main__:? pathlib_string failed: [WinError 2] The system cannot find the file specified
+ERROR:__main__:Local transcription failed for archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\4 - Coding Your First Data Pipeline with Airflow\20 - Define a DAG.mp4: All path format attempts failed
+ERROR:__main__:Error type: Exception
+ERROR:__main__:Current working directory: H:\Archive Classes\coursequery
+ERROR:__main__:File exists check: True
+INFO:__main__:File validation passed: 21 - Create a Table.mp4
+INFO:__main__:Loading Whisper model for RTX 3060...
+INFO:__main__:Transcribing: 21 - Create a Table.mp4
+INFO:__main__:Using validated path for Whisper: archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\4 - Coding Your First Data Pipeline with Airflow\21 - Create a Table.mp4
+INFO:__main__:File size: 26.0 MB
+INFO:__main__:Attempting forward_slashes: archived_courses/udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3/4 - Coding Your First Data Pipeline with Airflow/21 - Create a Table.mp4
+WARNING:__main__:? forward_slashes failed: [WinError 2] The system cannot find the file specified
+INFO:__main__:Attempting raw_string: archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\4 - Coding Your First Data Pipeline with Airflow\21 - Create a Table.mp4
+WARNING:__main__:? raw_string failed: [WinError 2] The system cannot find the file specified
+INFO:__main__:Attempting short_path: archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\4 - Coding Your First Data Pipeline with Airflow\21 - Create a Table.mp4
+WARNING:__main__:? short_path failed: [WinError 2] The system cannot find the file specified
+INFO:__main__:Attempting quoted_path: "archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\4 - Coding Your First Data Pipeline with Airflow\21 - Create a Table.mp4"
+WARNING:__main__:? quoted_path failed: [WinError 2] The system cannot find the file specified
+INFO:__main__:Attempting pathlib_string: archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\4 - Coding Your First Data Pipeline with Airflow\21 - Create a Table.mp4
+WARNING:__main__:? pathlib_string failed: [WinError 2] The system cannot find the file specified
+ERROR:__main__:Local transcription failed for archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\4 - Coding Your First Data Pipeline with Airflow\21 - Create a Table.mp4: All path format attempts failed
+ERROR:__main__:Error type: Exception
+ERROR:__main__:Current working directory: H:\Archive Classes\coursequery
+ERROR:__main__:File exists check: True
+INFO:__main__:File validation passed: 22 - Create a Postgres connection.mp4
+INFO:__main__:Loading Whisper model for RTX 3060...

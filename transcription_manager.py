@@ -74,6 +74,72 @@ class WhisperTranscriptionManager:
             logger.error(f"Failed to load Whisper model: {e}")
             return False
     
+    def _resolve_absolute_path(self, audio_path: str) -> str:
+        """Resolve audio path to absolute format for Windows compatibility.
+        
+        Args:
+            audio_path: Original path (relative or absolute)
+            
+        Returns:
+            str: Absolute path that Whisper can access
+        """
+        import os
+        
+        # Enhanced debugging for path resolution
+        logger.info(f"🔍 Resolving path: {audio_path}")
+        logger.info(f"📁 Current working directory: {os.getcwd()}")
+        
+        # Convert to Path object for manipulation
+        path_obj = Path(audio_path)
+        
+        # Log original path status
+        logger.info(f"📂 Original path exists: {path_obj.exists()}")
+        logger.info(f"📄 Original path is file: {path_obj.is_file() if path_obj.exists() else 'Unknown'}")
+        
+        # Try different path resolution strategies
+        strategies = [
+            ("absolute", os.path.abspath(audio_path)),
+            ("normpath", os.path.normpath(audio_path)),
+            ("resolved", str(path_obj.resolve())),
+            ("cwd_relative", os.path.join(os.getcwd(), audio_path)),
+        ]
+        
+        # Test each strategy
+        for strategy_name, resolved_path in strategies:
+            logger.info(f"🧪 Testing {strategy_name}: {resolved_path}")
+            
+            # Check if file exists and is accessible
+            if os.path.exists(resolved_path) and os.path.isfile(resolved_path):
+                try:
+                    # Test file accessibility by attempting to open
+                    with open(resolved_path, 'rb') as f:
+                        f.read(1024)  # Read first KB to verify access
+                    
+                    logger.info(f"✅ {strategy_name} strategy successful: {resolved_path}")
+                    return resolved_path
+                except Exception as access_error:
+                    logger.warning(f"❌ {strategy_name} exists but not accessible: {access_error}")
+            else:
+                logger.warning(f"❌ {strategy_name} file not found: {resolved_path}")
+        
+        # If all strategies fail, log comprehensive debugging info
+        logger.error(f"🚨 All path resolution strategies failed for: {audio_path}")
+        logger.error(f"📁 Working directory: {os.getcwd()}")
+        logger.error(f"📂 Original exists check: {os.path.exists(audio_path)}")
+        logger.error(f"📄 Original file check: {os.path.isfile(audio_path) if os.path.exists(audio_path) else 'N/A'}")
+        
+        # Try to provide helpful debugging information
+        if os.path.exists(audio_path):
+            try:
+                stat = os.stat(audio_path)
+                logger.error(f"📊 File stats - Size: {stat.st_size} bytes, Mode: {oct(stat.st_mode)}")
+            except Exception as stat_error:
+                logger.error(f"📊 Cannot get file stats: {stat_error}")
+        
+        # Return original path as last resort (let Whisper handle the error)
+        logger.warning(f"⚠️ Using original path as fallback: {audio_path}")
+        return audio_path
+
     def transcribe_audio(self, audio_path: str, language: Optional[str] = None) -> Dict[str, Any]:
         """Transcribe audio file using local Whisper.
         
@@ -89,15 +155,26 @@ class WhisperTranscriptionManager:
                 raise RuntimeError("Whisper model not available")
         
         try:
-            logger.info(f"Transcribing {audio_path} with Whisper {self.model_name}...")
+            # Resolve path to absolute format for Windows compatibility
+            resolved_path = self._resolve_absolute_path(audio_path)
+            
+            logger.info(f"🎵 Transcribing with Whisper {self.model_name}...")
+            logger.info(f"📂 Using resolved path: {resolved_path}")
             
             # RTX 3060 memory optimization
             if self.device == "cuda":
                 torch.cuda.empty_cache()
             
+            # Final file size check before transcription
+            try:
+                file_size = os.path.getsize(resolved_path) / (1024 * 1024)  # MB
+                logger.info(f"📊 File size: {file_size:.1f} MB")
+            except Exception as size_error:
+                logger.warning(f"⚠️ Cannot get file size: {size_error}")
+            
             # Transcribe with optimizations
             result = self.whisper_model.transcribe(
-                audio_path,
+                resolved_path,
                 language=language,
                 fp16=self.device == "cuda",  # Use FP16 on GPU for RTX 3060 efficiency
                 verbose=False
@@ -110,11 +187,26 @@ class WhisperTranscriptionManager:
                 "language": result.get("language", "unknown"),
                 "segments": result.get("segments", []),
                 "model_used": self.model_name,
-                "device_used": self.device
+                "device_used": self.device,
+                "file_path": resolved_path
             }
             
         except Exception as e:
-            logger.error(f"Transcription failed for {audio_path}: {e}")
+            logger.error(f"🚨 Transcription failed for {audio_path}: {e}")
+            logger.error(f"🔧 Error type: {type(e).__name__}")
+            logger.error(f"📁 Current working directory: {os.getcwd()}")
+            
+            # Additional debugging for file access errors
+            if "No such file or directory" in str(e) or "cannot find the file" in str(e):
+                logger.error(f"🔍 File access error - investigating...")
+                
+                # Check if it's a path encoding issue
+                try:
+                    encoded_path = audio_path.encode('utf-8').decode('utf-8')
+                    logger.error(f"🔤 UTF-8 encoded path: {encoded_path}")
+                except Exception as encoding_error:
+                    logger.error(f"🔤 Path encoding issue: {encoding_error}")
+            
             raise
     
     def transcribe_batch(self, audio_files: List[str], language: Optional[str] = None) -> Dict[str, Dict[str, Any]]:
