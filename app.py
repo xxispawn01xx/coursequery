@@ -2653,9 +2653,19 @@ class RealEstateAIApp:
                         else:
                             st.success("🎉 All media files already have transcriptions! Your course is complete.")
                             
-                        # Show transcription readiness for local RTX 3060
+                        # Show environment-specific guidance
                         if len(media_files) > 0:
-                            st.success("🚀 **Ready for RTX 3060 Transcription**: Media files detected and accessible for local Whisper processing.")
+                            # Check if these are actual accessible files
+                            accessible_files = 0
+                            for media_file in media_files[:5]:  # Check first 5
+                                if media_file.exists() and media_file.is_file():
+                                    accessible_files += 1
+                            
+                            if accessible_files > 0:
+                                st.success("🚀 **Ready for RTX 3060 Transcription**: Media files detected and accessible for local Whisper processing.")
+                            else:
+                                st.info("📋 **Course Structure Detected**: Files shown are from your course index. For actual transcription, ensure course files are accessible on your local system.")
+                                st.info("💡 **Development Note**: This environment shows course structure but actual media files are on your local H:\\ drive where transcription should be performed.")
                             
                     except Exception as e:
                         st.error(f"Error scanning course directory: {e}")
@@ -2982,11 +2992,53 @@ class RealEstateAIApp:
             logger.debug(f"Checking file: {media_path}")
             logger.debug(f"Absolute path: {media_path.absolute()}")
             
+            # Check for duplicate nested directory structure and fix it
+            path_parts = media_path.parts
+            if len(path_parts) >= 3:
+                # Look for duplicate course name in path
+                course_name_part = None
+                for i, part in enumerate(path_parts):
+                    if part.startswith('[') and 'Udemy' in part:
+                        course_name_part = part
+                        # Check if next part is the same (duplicate)
+                        if i + 1 < len(path_parts) and path_parts[i + 1] == part:
+                            logger.warning(f"Detected duplicate directory: {part}")
+                            # Rebuild path without duplicate
+                            fixed_parts = list(path_parts)
+                            fixed_parts.pop(i + 1)  # Remove duplicate
+                            fixed_path = Path(*fixed_parts)
+                            logger.info(f"Fixed path: {fixed_path}")
+                            media_path = fixed_path
+                            break
+            
             if not media_path.exists():
                 logger.error(f"Media file not found: {media_file}")
                 logger.error(f"Absolute path attempted: {media_path.absolute()}")
                 logger.error(f"Parent directory exists: {media_path.parent.exists()}")
-                return False
+                
+                # Try to find the actual file location
+                file_name = media_path.name
+                logger.info(f"Searching for file: {file_name}")
+                
+                # Search in course directories
+                try:
+                    from config import Config
+                    config = Config()
+                    
+                    # Search for any media files that actually exist
+                    found_files = list(config.raw_docs_dir.rglob(file_name))
+                    if found_files:
+                        media_path = found_files[0]
+                        logger.info(f"Found file at: {media_path}")
+                    else:
+                        logger.error(f"File '{file_name}' not found in any course directory")
+                        logger.info("This is normal in development environment - actual course files are on your local H:\ drive")
+                        logger.info("For testing, use files that exist in your current environment")
+                        return False
+                        
+                except Exception as e:
+                    logger.error(f"Error searching for file: {e}")
+                    return False
                 
             if not media_path.is_file():
                 logger.error(f"Path is not a file: {media_file}")
@@ -3005,11 +3057,31 @@ class RealEstateAIApp:
             
             # Transcribe with RTX 3060 optimization
             logger.info(f"Transcribing: {media_path.name}")
-            result = model.transcribe(
-                str(media_file),
-                fp16=True,  # Use FP16 for RTX 3060 efficiency
-                verbose=False
-            )
+            
+            # Fix Windows path issues - try multiple methods
+            try:
+                # Method 1: Use resolved absolute path
+                resolved_path = str(media_path.resolve())
+                logger.debug(f"Trying resolved path: {resolved_path}")
+                
+                result = model.transcribe(
+                    resolved_path,
+                    fp16=True,  # Use FP16 for RTX 3060 efficiency
+                    verbose=False
+                )
+                
+            except Exception as path_error:
+                logger.warning(f"Resolved path failed, trying forward slashes: {path_error}")
+                
+                # Method 2: Use forward slashes
+                forward_slash_path = str(media_path).replace('\\', '/')
+                logger.debug(f"Trying forward slash path: {forward_slash_path}")
+                
+                result = model.transcribe(
+                    forward_slash_path,
+                    fp16=True,
+                    verbose=False
+                )
             transcription = result["text"]
             
             # Save transcription

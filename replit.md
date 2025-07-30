@@ -166,6 +166,8 @@ When you "index a course," the system processes all documents in that course fol
 - **Dependency Validation**: Interface shows real-time status of Whisper and PyTorch/CUDA installation
 - **Debug Tools**: Added comprehensive debugging scripts to identify and resolve transcription issues
 - **Path Validation**: Enhanced file path checking with detailed logging for troubleshooting access issues
+- **Windows Path Fix**: Added multiple path resolution methods to handle Windows backslashes and special characters in course names
+- **Robust File Access**: Implemented fallback path formats when primary path resolution fails for Whisper transcription
 
 ### July 30, 2025 - Centralized Directory Configuration & Offline Mode Fixes
 - **Single Source Directory Management**: Created `directory_config.py` with centralized MASTER_COURSE_DIRECTORY variable
