@@ -1,0 +1,53 @@
+document_processor:Processing file: H:\Archive Classes\coursequery\archived_courses\EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024)\assignment - Math Minute_ Calculating Valuations & Share of Company.pdf
+INFO:document_processor:Successfully processed assignment - Math Minute_ Calculating Valuations & Share of Company.pdf: 236 characters
+INFO:document_processor:Processing file: H:\Archive Classes\coursequery\archived_courses\EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024)\assignment - NVF In the News #1.pdf
+INFO:document_processor:Successfully processed assignment - NVF In the News #1.pdf: 1584 characters
+INFO:document_processor:Processing file: H:\Archive Classes\coursequery\archived_courses\EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024)\assignment - NVF In the News #2.pdf
+INFO:document_processor:Successfully processed assignment - NVF In the News #2.pdf: 1584 characters
+INFO:document_processor:Processing file: H:\Archive Classes\coursequery\archived_courses\EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024)\assignment - NVF In the News #3.pdf
+INFO:document_processor:Successfully processed assignment - NVF In the News #3.pdf: 1584 characters
+INFO:document_processor:Processing file: H:\Archive Classes\coursequery\archived_courses\EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024)\assignment - NVF In the News #4.pdf
+INFO:document_processor:Successfully processed assignment - NVF In the News #4.pdf: 1584 characters
+INFO:document_processor:Processing file: H:\Archive Classes\coursequery\archived_courses\EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024)\assignment - NVF In the News #5.pdf
+INFO:document_processor:Successfully processed assignment - NVF In the News #5.pdf: 1584 characters
+INFO:document_processor:Processing file: H:\Archive Classes\coursequery\archived_courses\EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024)\assignment - NVF In the News #6.pdf
+INFO:document_processor:Successfully processed assignment - NVF In the News #6.pdf: 1584 characters
+INFO:document_processor:Processing file: H:\Archive Classes\coursequery\archived_courses\EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024)\assignment - NVF In the News #7.pdf
+INFO:document_processor:Successfully processed assignment - NVF In the News #7.pdf: 1584 characters
+INFO:document_processor:Processing file: H:\Archive Classes\coursequery\archived_courses\EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024)\assignment - NVF In the News #8.pdf
+INFO:document_processor:Successfully processed assignment - NVF In the News #8.pdf: 1584 characters
+INFO:document_processor:Processing file: H:\Archive Classes\coursequery\archived_courses\EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024)\assignment - Reverse Income Statement.pdf
+INFO:document_processor:Successfully processed assignment - Reverse Income Statement.pdf: 240 characters
+INFO:document_processor:Processing file: H:\Archive Classes\coursequery\archived_courses\EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024)\assignment - Team Project_ Video and Written Piece.pdf
+INFO:document_processor:Successfully processed assignment - Team Project_ Video and Written Piece.pdf: 2476 characters
+INFO:document_processor:Processing file: H:\Archive Classes\coursequery\archived_courses\EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024)\assignment - Who gets what when you sell_.pdf
+INFO:document_processor:Successfully processed assignment - Who gets what when you sell_.pdf: 1753 characters
+INFO:document_processor:Processing file: H:\Archive Classes\coursequery\archived_courses\EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024)\Class 1 NVF 2024 EW FT MBA .pdf
+INFO:document_processor:Successfully processed Class 1 NVF 2024 EW FT MBA .pdf: 11542 characters
+INFO:document_processor:Processing file: H:\Archive Classes\coursequery\archived_courses\EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024)\Example 1_group project_video.mp4
+INFO:document_processor:Loaded Whisper medium model on cuda
+INFO:document_processor:Transcribing audio/video file: Example 1_group project_video.mp4
+ERROR:document_processor:Error transcribing H:\Archive Classes\coursequery\archived_courses\EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024)\Example 1_group project_video.mp4: [WinError 2] The system cannot find the file specified
+ERROR:document_processor:Error processing H:\Archive Classes\coursequery\archived_courses\EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024)\Example 1_group project_video.mp4: [WinError 2] The system cannot find the file specified
+ERROR:course_indexer:Error re-indexing course EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024): [WinError 2] The system cannot find the file specified
+ERROR:__main__:Re-indexing error: [WinError 2] The system cannot find the file specified
+INFO:course_indexer:🔍 DEBUG: Starting index load for course: EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024)
+INFO:course_indexer:📁 DEBUG: Course index directory: H:\Archive Classes\coursequery\indexed_courses\EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024)
+INFO:course_indexer:📂 DEBUG: Index path: H:\Archive Classes\coursequery\indexed_courses\EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024)\index
+INFO:course_indexer:📋 DEBUG: Index path exists: True
+INFO:course_indexer:📄 DEBUG: Index directory contains 5 files:
+INFO:course_indexer:  - default__vector_store.json
+INFO:course_indexer:  - docstore.json
+INFO:course_indexer:  - graph_store.json
+INFO:course_indexer:  - image__vector_store.json
+INFO:course_indexer:  - index_store.json
+INFO:course_indexer:⏳ DEBUG: Creating storage context from H:\Archive Classes\coursequery\indexed_courses\EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024)\index
+Loading llama_index.core.storage.kvstore.simple_kvstore from H:\Archive Classes\coursequery\indexed_courses\EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024)\index\docstore.json.
+Loading llama_index.core.storage.kvstore.simple_kvstore from H:\Archive Classes\coursequery\indexed_courses\EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024)\index\index_store.json.
+INFO:course_indexer:✅ DEBUG: Storage context created successfully
+INFO:course_indexer:🤖 DEBUG: Embedding wrapper available: False
+INFO:course_indexer:⏳ DEBUG: Starting index load from storage...
+INFO:course_indexer:🔧 DEBUG: Loading with default embeddings
+INFO:llama_index.core.indices.loading:Loading all indices.
+INFO:course_indexer:✅ DEBUG: Index loaded successfully in 0.00 seconds
+INFO:course_indexer:✅ Loaded index for course: EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024)

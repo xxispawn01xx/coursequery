@@ -40,46 +40,87 @@ class OfflineCourseManager:
             if self.indexed_courses_dir.exists():
                 logger.info("📊 Checking indexed courses...")
                 
-                for course_dir in self.indexed_courses_dir.iterdir():
+                try:
+                    course_dirs = list(self.indexed_courses_dir.iterdir())
+                except (OSError, PermissionError) as e:
+                    logger.error(f"❌ Cannot access indexed courses directory: {e}")
+                    course_dirs = []
+                
+                for course_dir in course_dirs:
                     if course_dir.is_dir():
                         course_name = course_dir.name
                         logger.info(f"  📂 Found indexed: {course_name}")
                         
-                        # Check for metadata
-                        metadata_path = course_dir / "metadata.json"
-                        if metadata_path.exists():
+                        # Validate course directory accessibility
+                        try:
+                            # Check if we can actually access this directory
+                            index_path = course_dir / "index"
+                            metadata_path = course_dir / "metadata.json"
+                            
+                            # Test directory access
+                            accessible = True
                             try:
-                                with open(metadata_path, 'r') as f:
-                                    metadata = json.load(f)
-                                
+                                list(course_dir.iterdir())
+                            except (OSError, PermissionError) as access_error:
+                                logger.warning(f"⚠️ Course directory not accessible: {course_name} - {access_error}")
+                                accessible = False
+                            
+                            if not accessible:
+                                # Mark as inaccessible but still list it
                                 course_info = {
                                     'name': course_name,
-                                    'status': 'indexed',
-                                    'document_count': metadata.get('document_count', 0),
-                                    'last_indexed': metadata.get('last_indexed', 'Unknown'),
-                                    'total_content_length': metadata.get('total_content_length', 0),
-                                    'document_types': metadata.get('document_types', {}),
+                                    'status': 'inaccessible',
+                                    'document_count': 'Cannot access',
+                                    'last_indexed': 'Unknown',
+                                    'error': str(access_error) if 'access_error' in locals() else 'Directory not accessible'
                                 }
-                                
-                            except Exception as e:
-                                logger.warning(f"⚠️ Cannot read metadata for {course_name}: {e}")
+                            elif metadata_path.exists():
+                                try:
+                                    with open(metadata_path, 'r', encoding='utf-8') as f:
+                                        metadata = json.load(f)
+                                    
+                                    course_info = {
+                                        'name': course_name,
+                                        'status': 'indexed',
+                                        'document_count': metadata.get('document_count', 0),
+                                        'last_indexed': metadata.get('last_indexed', 'Unknown'),
+                                        'total_content_length': metadata.get('total_content_length', 0),
+                                        'document_types': metadata.get('document_types', {}),
+                                    }
+                                    
+                                except Exception as e:
+                                    logger.warning(f"⚠️ Cannot read metadata for {course_name}: {e}")
+                                    course_info = {
+                                        'name': course_name,
+                                        'status': 'indexed_no_metadata',
+                                        'document_count': 'Unknown',
+                                        'last_indexed': 'Unknown',
+                                        'error': f'Metadata read error: {e}'
+                                    }
+                            else:
                                 course_info = {
                                     'name': course_name,
-                                    'status': 'indexed',
+                                    'status': 'indexed_no_metadata',
                                     'document_count': 'Unknown',
                                     'last_indexed': 'Unknown',
                                 }
-                        else:
-                            course_info = {
+                            
+                            courses.append(course_info)
+                            course_names.add(course_name)
+                            indexed_count += 1
+                            
+                        except Exception as e:
+                            logger.error(f"❌ Error processing course {course_name}: {e}")
+                            # Still add it to the list but mark as problematic
+                            courses.append({
                                 'name': course_name,
-                                'status': 'indexed',
-                                'document_count': 'Unknown',
+                                'status': 'error',
+                                'document_count': 'Error',
                                 'last_indexed': 'Unknown',
-                            }
-                        
-                        courses.append(course_info)
-                        course_names.add(course_name)
-                        indexed_count += 1
+                                'error': str(e)
+                            })
+                            course_names.add(course_name)
+                            indexed_count += 1
             
             logger.info(f"✅ Found {indexed_count} indexed courses")
             
