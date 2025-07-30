@@ -177,31 +177,88 @@ class WhisperTranscriptionManager:
             except FileNotFoundError as ffmpeg_error:
                 if "ffmpeg" in str(ffmpeg_error).lower() or "WinError 2" in str(ffmpeg_error):
                     logger.error("❌ FFmpeg not found or not accessible")
-                    logger.info("🔧 Attempting direct audio loading...")
+                    logger.info("🔧 Attempting direct audio loading with multiple fallbacks...")
                     
-                    # Try using librosa for direct audio loading if available
+                    # Try multiple audio loading approaches
+                    audio_array = None
+                    
+                    # Method 1: Try librosa
                     try:
                         import librosa
                         import numpy as np
                         
-                        # Load audio directly using librosa
+                        logger.info("🎵 Trying librosa for audio loading...")
                         audio_data, sr = librosa.load(str(audio_file), sr=16000)
-                        
-                        # Convert to numpy array format expected by Whisper
                         audio_array = np.array(audio_data, dtype=np.float32)
-                        
-                        logger.info(f"✅ Direct audio loading successful: {len(audio_array)} samples at {sr}Hz")
-                        
-                        # Transcribe using the loaded audio array
-                        result = self.whisper_model.transcribe(audio_array, **options)
+                        logger.info(f"✅ Librosa loading successful: {len(audio_array)} samples at {sr}Hz")
                         
                     except ImportError:
-                        logger.error("❌ librosa not available for direct audio loading")
-                        logger.error("💡 Install librosa: pip install librosa")
-                        raise Exception("FFmpeg not found and librosa not available. Install FFmpeg or librosa for audio processing.")
+                        logger.info("❌ librosa not available, trying other methods...")
                     except Exception as librosa_error:
-                        logger.error(f"❌ Direct audio loading failed: {librosa_error}")
-                        raise Exception(f"Both FFmpeg and direct audio loading failed: {librosa_error}")
+                        logger.error(f"❌ Librosa loading failed: {librosa_error}")
+                    
+                    # Method 2: Try moviepy if librosa failed
+                    if audio_array is None:
+                        try:
+                            from moviepy.editor import VideoFileClip
+                            import numpy as np
+                            
+                            logger.info("🎬 Trying moviepy for audio extraction...")
+                            with VideoFileClip(str(audio_file)) as video:
+                                audio = video.audio
+                                if audio is not None:
+                                    # Extract audio as numpy array
+                                    audio_array = audio.to_soundarray(fps=16000)
+                                    if len(audio_array.shape) > 1:
+                                        audio_array = audio_array.mean(axis=1)  # Convert to mono
+                                    audio_array = audio_array.astype(np.float32)
+                                    logger.info(f"✅ Moviepy loading successful: {len(audio_array)} samples")
+                                else:
+                                    raise Exception("No audio track found in video")
+                                    
+                        except ImportError:
+                            logger.info("❌ moviepy not available, trying other methods...")
+                        except Exception as moviepy_error:
+                            logger.error(f"❌ Moviepy loading failed: {moviepy_error}")
+                    
+                    # Method 3: Try pydub if others failed
+                    if audio_array is None:
+                        try:
+                            from pydub import AudioSegment
+                            import numpy as np
+                            
+                            logger.info("🔊 Trying pydub for audio loading...")
+                            audio = AudioSegment.from_file(str(audio_file))
+                            
+                            # Convert to mono and 16kHz
+                            audio = audio.set_channels(1).set_frame_rate(16000)
+                            
+                            # Convert to numpy array
+                            audio_array = np.array(audio.get_array_of_samples(), dtype=np.float32)
+                            audio_array = audio_array / 32768.0  # Normalize to [-1, 1]
+                            
+                            logger.info(f"✅ Pydub loading successful: {len(audio_array)} samples")
+                            
+                        except ImportError:
+                            logger.info("❌ pydub not available")
+                        except Exception as pydub_error:
+                            logger.error(f"❌ Pydub loading failed: {pydub_error}")
+                    
+                    # If we got audio data, try transcribing
+                    if audio_array is not None:
+                        try:
+                            logger.info("🎯 Transcribing with directly loaded audio...")
+                            result = self.whisper_model.transcribe(audio_array, **options)
+                            logger.info("✅ Direct audio transcription successful!")
+                        except Exception as transcribe_error:
+                            logger.error(f"❌ Direct audio transcription failed: {transcribe_error}")
+                            raise Exception(f"Direct audio loading successful but transcription failed: {transcribe_error}")
+                    else:
+                        # All methods failed
+                        logger.error("❌ All audio loading methods failed")
+                        logger.info("💡 Install one of: librosa, moviepy, or pydub for audio processing")
+                        logger.info("💡 Or install FFmpeg: https://ffmpeg.org/download.html")
+                        raise Exception("FFmpeg not found and no alternative audio libraries available. Install FFmpeg, librosa, moviepy, or pydub.")
                 else:
                     raise ffmpeg_error
             
