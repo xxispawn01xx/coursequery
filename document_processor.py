@@ -165,7 +165,7 @@ class DocumentProcessor:
                 content = self._process_subtitle_file(file_path)
             elif file_extension in ['.txt', '.md', '.rtf']:
                 content = self._process_text_file(file_path)
-            elif file_extension in ['.py', '.js', '.html', '.css', '.sql', '.json', '.xml', '.yaml', '.yml']:
+            elif file_extension in ['.py', '.js', '.html', '.css', '.sql', '.json', '.xml', '.yaml', '.yml', '.dag', '.cfg', '.ini', '.conf', '.pickle', '.pkl', '.sh', '.bat', '.dockerfile', '.gitignore', '.env', '.csv', '.tsv', '.parquet', '.h5', '.hdf5', '.feather', '.arrow', '.npy', '.npz', '.joblib', '.prometheus', '.rules', '.alerts', '.properties', '.toml', '.lock', '.requirements', '.r', '.rmd', '.scala', '.ipynb', '.spark', '.hive', '.pig', '.avro', '.orc', '.delta', '.iceberg']:
                 content = self._process_code_file(file_path)
             else:
                 raise ValueError(f"Unsupported file type: {file_extension}")
@@ -500,11 +500,16 @@ class DocumentProcessor:
     
     def _process_code_file(self, file_path: Path) -> str:
         """Process code and configuration files."""
+        file_extension = file_path.suffix.lower()
+        
+        # Handle binary files that need special processing
+        if file_extension in ['.pickle', '.pkl']:
+            return self._process_pickle_file(file_path)
+        
         try:
             with open(file_path, 'r', encoding='utf-8') as f:
                 content = f.read()
             
-            file_extension = file_path.suffix.lower()
             file_type_map = {
                 '.py': 'PYTHON CODE',
                 '.js': 'JAVASCRIPT CODE', 
@@ -514,7 +519,44 @@ class DocumentProcessor:
                 '.json': 'JSON CONFIG',
                 '.xml': 'XML CONFIG',
                 '.yaml': 'YAML CONFIG',
-                '.yml': 'YAML CONFIG'
+                '.yml': 'YAML CONFIG',
+                '.dag': 'AIRFLOW DAG',
+                '.cfg': 'CONFIG FILE',
+                '.ini': 'CONFIG FILE',
+                '.conf': 'CONFIG FILE',
+                '.sh': 'SHELL SCRIPT',
+                '.bat': 'BATCH SCRIPT',
+                '.dockerfile': 'DOCKER FILE',
+                '.gitignore': 'GIT CONFIG',
+                '.env': 'ENVIRONMENT CONFIG',
+                '.csv': 'CSV DATA',
+                '.tsv': 'TSV DATA', 
+                '.parquet': 'PARQUET DATA',
+                '.h5': 'HDF5 DATA',
+                '.hdf5': 'HDF5 DATA',
+                '.feather': 'FEATHER DATA',
+                '.arrow': 'ARROW DATA',
+                '.npy': 'NUMPY ARRAY',
+                '.npz': 'NUMPY ARCHIVE',
+                '.joblib': 'JOBLIB DATA',
+                '.prometheus': 'PROMETHEUS CONFIG',
+                '.rules': 'PROMETHEUS RULES',
+                '.alerts': 'PROMETHEUS ALERTS',
+                '.properties': 'PROPERTIES CONFIG',
+                '.toml': 'TOML CONFIG',
+                '.lock': 'DEPENDENCY LOCK',
+                '.requirements': 'REQUIREMENTS FILE',
+                '.r': 'R SCRIPT',
+                '.rmd': 'R MARKDOWN',
+                '.scala': 'SCALA CODE',
+                '.ipynb': 'JUPYTER NOTEBOOK',
+                '.spark': 'SPARK CONFIG',
+                '.hive': 'HIVE SCRIPT',
+                '.pig': 'PIG SCRIPT',
+                '.avro': 'AVRO SCHEMA',
+                '.orc': 'ORC DATA',
+                '.delta': 'DELTA LAKE',
+                '.iceberg': 'ICEBERG TABLE'
             }
             
             file_type = file_type_map.get(file_extension, 'CODE FILE')
@@ -533,6 +575,48 @@ class DocumentProcessor:
             logger.error(f"Error processing code file {file_path}: {e}")
             return f"[CODE FILE - {file_path.name} - Processing failed: {e}]"
     
+    def _process_pickle_file(self, file_path: Path) -> str:
+        """Process pickle files by extracting metadata and structure info."""
+        try:
+            import pickle
+            import sys
+            
+            # Read pickle file safely
+            with open(file_path, 'rb') as f:
+                # Get file size for context
+                file_size = file_path.stat().st_size
+                
+                try:
+                    # Attempt to load and analyze pickle content
+                    obj = pickle.load(f)
+                    
+                    # Extract basic information about the pickled object
+                    obj_type = type(obj).__name__
+                    obj_module = getattr(type(obj), '__module__', 'unknown')
+                    
+                    # Generate description based on object type
+                    if isinstance(obj, dict):
+                        description = f"Dictionary with {len(obj)} keys: {list(obj.keys())[:10]}"
+                    elif isinstance(obj, list):
+                        description = f"List with {len(obj)} items, sample: {obj[:3] if obj else '[]'}"
+                    elif isinstance(obj, tuple):
+                        description = f"Tuple with {len(obj)} items"
+                    elif hasattr(obj, '__dict__'):
+                        attrs = list(obj.__dict__.keys())[:10]
+                        description = f"Object with attributes: {attrs}"
+                    else:
+                        description = f"Object of type {obj_type}"
+                    
+                    return f"[PICKLE FILE - {file_path.name}]\nType: {obj_type}\nModule: {obj_module}\nSize: {file_size} bytes\nContent: {description}"
+                    
+                except Exception as load_error:
+                    # If pickle loading fails, provide basic file info
+                    return f"[PICKLE FILE - {file_path.name}]\nSize: {file_size} bytes\nNote: Could not load pickle content ({load_error})\nThis file contains serialized Python data that may be used by Apache Airflow DAGs or other Python components."
+                    
+        except Exception as e:
+            logger.error(f"Error processing pickle file {file_path}: {e}")
+            return f"[PICKLE FILE - {file_path.name} - Processing failed: {e}]"
+    
     def get_supported_formats(self) -> List[str]:
         """Return list of supported file formats."""
         return [
@@ -546,6 +630,12 @@ class DocumentProcessor:
             '.vtt', '.srt', '.ass', '.ssa', '.sub',
             # Code/script formats
             '.py', '.js', '.html', '.css', '.sql', '.json', '.xml', '.yaml', '.yml',
+            '.dag', '.cfg', '.ini', '.conf', '.pickle', '.pkl', '.sh', '.bat', 
+            '.dockerfile', '.gitignore', '.env', '.csv', '.tsv', '.parquet', '.h5', 
+            '.hdf5', '.feather', '.arrow', '.npy', '.npz', '.joblib', '.prometheus',
+            '.rules', '.alerts', '.properties', '.toml', '.lock', '.requirements',
+            '.r', '.rmd', '.scala', '.ipynb', '.spark', '.hive', '.pig', '.avro', 
+            '.orc', '.delta', '.iceberg',
             # Archive formats (we can extract and process contents)
             '.zip', '.rar', '.7z'
         ]
