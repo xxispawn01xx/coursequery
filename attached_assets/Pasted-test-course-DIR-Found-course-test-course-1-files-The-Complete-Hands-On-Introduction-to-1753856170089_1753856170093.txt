@@ -1,0 +1,530 @@
+test_course (DIR)
+📁 Found course: test_course (1 files)
+  - The_Complete_Hands-On_Introduction_to_Apache_Airflow_3 (DIR)
+📚 Course The_Complete_Hands-On_Introduction_to_Apache_Airflow_3 already indexed - skipping
+  - VCPE-20241208T200025Z-001 (DIR)
+📚 Course VCPE-20241208T200025Z-001 already indexed - skipping
+  - WE Launch 2022 (DIR)
+📁 Found course: WE Launch 2022 (52 files)
+  - WE Launch 2023 (DIR)
+📁 Found course: WE Launch 2023 (49 files)
+  - [FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide (DIR)
+📚 Course [FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide already indexed - skipping
+  - [Resource] Haas Quantitative Readiness (DIR)
+📁 Found course: [Resource] Haas Quantitative Readiness (14 files)
+✅ Total courses found: 33 (scanned 32 directories)
+✂️ After filtering ignored courses: 19 remaining
+💡 Running in pure offline mode with centralized directory config
+📁 Master directory: H:\Archive Classes\coursequery\archived_courses
+📁 Active directory: H:\Archive Classes\coursequery\archived_courses
+INFO:course_indexer:🔍 DEBUG: Starting index load for course: coursequery
+INFO:course_indexer:📁 DEBUG: Course index directory: H:\Archive Classes\coursequery\indexed_courses\coursequery
+INFO:course_indexer:📂 DEBUG: Index path: H:\Archive Classes\coursequery\indexed_courses\coursequery\index
+INFO:course_indexer:📋 DEBUG: Index path exists: True
+INFO:course_indexer:📄 DEBUG: Index directory contains 5 files:
+INFO:course_indexer:  - default__vector_store.json
+INFO:course_indexer:  - docstore.json
+INFO:course_indexer:  - graph_store.json
+INFO:course_indexer:  - image__vector_store.json
+INFO:course_indexer:  - index_store.json
+INFO:course_indexer:⏳ DEBUG: Creating storage context from H:\Archive Classes\coursequery\indexed_courses\coursequery\index
+Loading llama_index.core.storage.kvstore.simple_kvstore from H:\Archive Classes\coursequery\indexed_courses\coursequery\index\docstore.json.
+Loading llama_index.core.storage.kvstore.simple_kvstore from H:\Archive Classes\coursequery\indexed_courses\coursequery\index\index_store.json.
+INFO:course_indexer:✅ DEBUG: Storage context created successfully
+INFO:course_indexer:🤖 DEBUG: Embedding wrapper available: False
+INFO:course_indexer:⏳ DEBUG: Starting index load from storage...
+INFO:course_indexer:🔧 DEBUG: Loading with default embeddings
+INFO:llama_index.core.indices.loading:Loading all indices.
+INFO:course_indexer:✅ DEBUG: Index loaded successfully in 0.06 seconds
+INFO:course_indexer:✅ Loaded index for course: coursequery
+💡 Running in pure offline mode with centralized directory config
+📁 Master directory: H:\Archive Classes\coursequery\archived_courses
+📁 Active directory: H:\Archive Classes\coursequery\archived_courses
+🔒 FORCED to use local directories:
+📁 Raw docs: archived_courses
+📊 Indexed: indexed_courses
+💡 Running in pure offline mode with centralized directory config
+📁 Master directory: H:\Archive Classes\coursequery\archived_courses
+📁 Active directory: H:\Archive Classes\coursequery\archived_courses
+💡 Running in pure offline mode with centralized directory config
+📁 Master directory: H:\Archive Classes\coursequery\archived_courses
+📁 Active directory: H:\Archive Classes\coursequery\archived_courses
+INFO:__main__:✅ Using full CourseIndexer
+INFO:course_ignore_manager:Loaded 14 ignored courses
+INFO:book_indexer:No book index found, starting fresh
+🔄 Starting course refresh...
+📁 Scanning directory: archived_courses
+📁 Raw courses: archived_courses
+📊 Indexed courses: indexed_courses
+📚 Indexed course: coursequery (1025 documents)
+📚 Indexed course: EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024) (49 documents)
+📚 Indexed course: EWMBA 202-LEC-31A & 32A - Financial Accounting (Spring 2024) (0 files, no metadata)
+📚 Indexed course: EWMBA 203-LEC-32B - Introduction to Finance (Spring 2024) (43 documents)
+📚 Indexed course: EWMBA 254-LEC-02F - Power and Politics in Organizations (Fall 2023) (42 documents)
+📚 Indexed course: EWMBA 258P-LEC-11F - The Science of Productivity and Performance (Spring 2025) (88 documents)
+📚 Indexed course: PHW223 2024 Strategy in Health Care Organizations (37 documents)
+📚 Indexed course: The_Complete_Hands-On_Introduction_to_Apache_Airflow_3 (150 documents)
+📚 Indexed course: VCPE-20241208T200025Z-001 (29 documents)
+📚 Indexed course: [FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide (479 documents)
+📂 Directory contents:
+  - EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024) (DIR)
+📚 Course EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024) already indexed - skipping
+  - EW & MBA 291E-LEC-01F - Interpersonal Skills and Embodied Systems Leadership (Fall 2023) (DIR)
+📁 Found course: EW & MBA 291E-LEC-01F - Interpersonal Skills and Embodied Systems Leadership (Fall 2023) (46 files)
+  - EWMBA 200S-LEC-31B & 32B - Data and Decisions (Fall 2023) (DIR)
+📁 Found course: EWMBA 200S-LEC-31B & 32B - Data and Decisions (Fall 2023) (15 files)
+  - EWMBA 201B-LEC-31A & 32A - Macroeconomics in the Global Economy (Spring 2024) (DIR)
+📁 Found course: EWMBA 201B-LEC-31A & 32A - Macroeconomics in the Global Economy (Spring 2024) (72 files)
+  - EWMBA 201B_ Macroeconomics (WEEKEND) - Core Waiver Exam (DIR)
+📁 Found course: EWMBA 201B_ Macroeconomics (WEEKEND) - Core Waiver Exam (2 files)
+  - EWMBA 202-LEC-31A & 32A - Financial Accounting (Spring 2024) (DIR)
+📚 Course EWMBA 202-LEC-31A & 32A - Financial Accounting (Spring 2024) already indexed - skipping
+  - EWMBA 203-LEC-32B - Introduction to Finance (Spring 2024) (DIR)
+📚 Course EWMBA 203-LEC-32B - Introduction to Finance (Spring 2024) already indexed - skipping
+  - EWMBA 203_ Introduction to Finance (WEEKEND) - Core Waiver Exam (DIR)
+📁 Found course: EWMBA 203_ Introduction to Finance (WEEKEND) - Core Waiver Exam (1 files)
+  - EWMBA 205-LEC-31A & 32A - Leading People (Fall 2023) (DIR)
+📁 Found course: EWMBA 205-LEC-31A & 32A - Leading People (Fall 2023) (66 files)
+  - EWMBA 205D - Business Communication in Diverse Work Environments (Spring 2025) (DIR)
+📁 Found course: EWMBA 205D - Business Communication in Diverse Work Environments (Spring 2025) (34 files)
+  - EWMBA 207-LEC-32B - Ethics and Responsibility in Business (Spring 2024) (DIR)
+📁 Found course: EWMBA 207-LEC-32B - Ethics and Responsibility in Business (Spring 2024) (59 files)
+  - EWMBA 209-Sat - Strategic Leadership (Fall 2024) (DIR)
+📁 Found course: EWMBA 209-Sat - Strategic Leadership (Fall 2024) (84 files)
+  - EWMBA 252-LEC-001 - Negotiations and Conflict Resolution (Summer 2024) (DIR)
+📁 Found course: EWMBA 252-LEC-001 - Negotiations and Conflict Resolution (Summer 2024) (121 files)
+  - EWMBA 254-LEC-02F - Power and Politics in Organizations (Fall 2023) (DIR)
+📚 Course EWMBA 254-LEC-02F - Power and Politics in Organizations (Fall 2023) already indexed - skipping
+  - EWMBA 258P-LEC-11F - The Science of Productivity and Performance (Spring 2025) (DIR)
+📚 Course EWMBA 258P-LEC-11F - The Science of Productivity and Performance (Spring 2025) already indexed - skipping
+  - EWMBA D&D Pre-Term '22 (DIR)
+📁 Found course: EWMBA D&D Pre-Term '22 (5 files)
+  - EWMBA D&D Pre-Term '23 (DIR)
+📁 Found course: EWMBA D&D Pre-Term '23 (5 files)
+  - index (DIR)
+📁 Found course: index (0 files)
+  - Leadership Communication (Fall 2024) (DIR)
+📁 Found course: Leadership Communication (Fall 2024) (32 files)
+  - Marketing Core Oski (Fall 23) (DIR)
+📁 Found course: Marketing Core Oski (Fall 23) (48 files)
+  - metadata.json (FILE)
+  - NUS-Haas Bay Area Entrepreneurship, Investing & Innovation  (Spring 2024) (DIR)
+📁 Found course: NUS-Haas Bay Area Entrepreneurship, Investing & Innovation  (Spring 2024) (26 files)
+  - PHW223 2024 Strategy in Health Care Organizations (DIR)
+📚 Course PHW223 2024 Strategy in Health Care Organizations already indexed - skipping
+  - python_course (DIR)
+📁 Found course: python_course (2 files)
+  - SHAPE Student Training - UCB - 2025-2026 (DIR)
+📁 Found course: SHAPE Student Training - UCB - 2025-2026 (6 files)
+  - Teams@Haas - Weekend MBA 2023 (DIR)
+📁 Found course: Teams@Haas - Weekend MBA 2023 (13 files)
+  - test_course (DIR)
+📁 Found course: test_course (1 files)
+  - The_Complete_Hands-On_Introduction_to_Apache_Airflow_3 (DIR)
+📚 Course The_Complete_Hands-On_Introduction_to_Apache_Airflow_3 already indexed - skipping
+  - VCPE-20241208T200025Z-001 (DIR)
+📚 Course VCPE-20241208T200025Z-001 already indexed - skipping
+  - WE Launch 2022 (DIR)
+📁 Found course: WE Launch 2022 (52 files)
+  - WE Launch 2023 (DIR)
+📁 Found course: WE Launch 2023 (49 files)
+  - [FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide (DIR)
+📚 Course [FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide already indexed - skipping
+  - [Resource] Haas Quantitative Readiness (DIR)
+📁 Found course: [Resource] Haas Quantitative Readiness (14 files)
+✅ Total courses found: 33 (scanned 32 directories)
+✂️ After filtering ignored courses: 19 remaining
+INFO:course_indexer:🔍 DEBUG: Starting index load for course: coursequery
+INFO:course_indexer:📁 DEBUG: Course index directory: H:\Archive Classes\coursequery\indexed_courses\coursequery
+INFO:course_indexer:📂 DEBUG: Index path: H:\Archive Classes\coursequery\indexed_courses\coursequery\index
+INFO:course_indexer:📋 DEBUG: Index path exists: True
+INFO:course_indexer:📄 DEBUG: Index directory contains 5 files:
+INFO:course_indexer:  - default__vector_store.json
+INFO:course_indexer:  - docstore.json
+INFO:course_indexer:  - graph_store.json
+INFO:course_indexer:  - image__vector_store.json
+INFO:course_indexer:  - index_store.json
+INFO:course_indexer:⏳ DEBUG: Creating storage context from H:\Archive Classes\coursequery\indexed_courses\coursequery\index
+Loading llama_index.core.storage.kvstore.simple_kvstore from H:\Archive Classes\coursequery\indexed_courses\coursequery\index\docstore.json.
+Loading llama_index.core.storage.kvstore.simple_kvstore from H:\Archive Classes\coursequery\indexed_courses\coursequery\index\index_store.json.
+INFO:course_indexer:✅ DEBUG: Storage context created successfully
+INFO:course_indexer:🤖 DEBUG: Embedding wrapper available: False
+INFO:course_indexer:⏳ DEBUG: Starting index load from storage...
+INFO:course_indexer:🔧 DEBUG: Loading with default embeddings
+INFO:llama_index.core.indices.loading:Loading all indices.
+INFO:course_indexer:✅ DEBUG: Index loaded successfully in 0.05 seconds
+INFO:course_indexer:✅ Loaded index for course: coursequery
+INFO:course_indexer:🔍 DEBUG: Starting index load for course: EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024)
+INFO:course_indexer:📁 DEBUG: Course index directory: H:\Archive Classes\coursequery\indexed_courses\EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024)
+INFO:course_indexer:📂 DEBUG: Index path: H:\Archive Classes\coursequery\indexed_courses\EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024)\index
+INFO:course_indexer:📋 DEBUG: Index path exists: True
+INFO:course_indexer:📄 DEBUG: Index directory contains 5 files:
+INFO:course_indexer:  - default__vector_store.json
+INFO:course_indexer:  - docstore.json
+INFO:course_indexer:  - graph_store.json
+INFO:course_indexer:  - image__vector_store.json
+INFO:course_indexer:  - index_store.json
+INFO:course_indexer:⏳ DEBUG: Creating storage context from H:\Archive Classes\coursequery\indexed_courses\EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024)\index
+Loading llama_index.core.storage.kvstore.simple_kvstore from H:\Archive Classes\coursequery\indexed_courses\EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024)\index\docstore.json.
+Loading llama_index.core.storage.kvstore.simple_kvstore from H:\Archive Classes\coursequery\indexed_courses\EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024)\index\index_store.json.
+INFO:course_indexer:✅ DEBUG: Storage context created successfully
+INFO:course_indexer:🤖 DEBUG: Embedding wrapper available: False
+INFO:course_indexer:⏳ DEBUG: Starting index load from storage...
+INFO:course_indexer:🔧 DEBUG: Loading with default embeddings
+INFO:llama_index.core.indices.loading:Loading all indices.
+INFO:course_indexer:✅ DEBUG: Index loaded successfully in 0.00 seconds
+INFO:course_indexer:✅ Loaded index for course: EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024)
+💡 Running in pure offline mode with centralized directory config
+📁 Master directory: H:\Archive Classes\coursequery\archived_courses
+📁 Active directory: H:\Archive Classes\coursequery\archived_courses
+🔒 FORCED to use local directories:
+📁 Raw docs: archived_courses
+📊 Indexed: indexed_courses
+💡 Running in pure offline mode with centralized directory config
+📁 Master directory: H:\Archive Classes\coursequery\archived_courses
+📁 Active directory: H:\Archive Classes\coursequery\archived_courses
+💡 Running in pure offline mode with centralized directory config
+📁 Master directory: H:\Archive Classes\coursequery\archived_courses
+📁 Active directory: H:\Archive Classes\coursequery\archived_courses
+INFO:__main__:✅ Using full CourseIndexer
+INFO:course_ignore_manager:Loaded 14 ignored courses
+INFO:book_indexer:No book index found, starting fresh
+🔄 Starting course refresh...
+📁 Scanning directory: archived_courses
+📁 Raw courses: archived_courses
+📊 Indexed courses: indexed_courses
+📚 Indexed course: coursequery (1025 documents)
+📚 Indexed course: EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024) (49 documents)
+📚 Indexed course: EWMBA 202-LEC-31A & 32A - Financial Accounting (Spring 2024) (0 files, no metadata)
+📚 Indexed course: EWMBA 203-LEC-32B - Introduction to Finance (Spring 2024) (43 documents)
+📚 Indexed course: EWMBA 254-LEC-02F - Power and Politics in Organizations (Fall 2023) (42 documents)
+📚 Indexed course: EWMBA 258P-LEC-11F - The Science of Productivity and Performance (Spring 2025) (88 documents)
+📚 Indexed course: PHW223 2024 Strategy in Health Care Organizations (37 documents)
+📚 Indexed course: The_Complete_Hands-On_Introduction_to_Apache_Airflow_3 (150 documents)
+📚 Indexed course: VCPE-20241208T200025Z-001 (29 documents)
+📚 Indexed course: [FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide (479 documents)
+📂 Directory contents:
+  - EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024) (DIR)
+📚 Course EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024) already indexed - skipping
+  - EW & MBA 291E-LEC-01F - Interpersonal Skills and Embodied Systems Leadership (Fall 2023) (DIR)
+📁 Found course: EW & MBA 291E-LEC-01F - Interpersonal Skills and Embodied Systems Leadership (Fall 2023) (46 files)
+  - EWMBA 200S-LEC-31B & 32B - Data and Decisions (Fall 2023) (DIR)
+📁 Found course: EWMBA 200S-LEC-31B & 32B - Data and Decisions (Fall 2023) (15 files)
+  - EWMBA 201B-LEC-31A & 32A - Macroeconomics in the Global Economy (Spring 2024) (DIR)
+📁 Found course: EWMBA 201B-LEC-31A & 32A - Macroeconomics in the Global Economy (Spring 2024) (72 files)
+  - EWMBA 201B_ Macroeconomics (WEEKEND) - Core Waiver Exam (DIR)
+📁 Found course: EWMBA 201B_ Macroeconomics (WEEKEND) - Core Waiver Exam (2 files)
+  - EWMBA 202-LEC-31A & 32A - Financial Accounting (Spring 2024) (DIR)
+📚 Course EWMBA 202-LEC-31A & 32A - Financial Accounting (Spring 2024) already indexed - skipping
+  - EWMBA 203-LEC-32B - Introduction to Finance (Spring 2024) (DIR)
+📚 Course EWMBA 203-LEC-32B - Introduction to Finance (Spring 2024) already indexed - skipping
+  - EWMBA 203_ Introduction to Finance (WEEKEND) - Core Waiver Exam (DIR)
+📁 Found course: EWMBA 203_ Introduction to Finance (WEEKEND) - Core Waiver Exam (1 files)
+  - EWMBA 205-LEC-31A & 32A - Leading People (Fall 2023) (DIR)
+📁 Found course: EWMBA 205-LEC-31A & 32A - Leading People (Fall 2023) (66 files)
+  - EWMBA 205D - Business Communication in Diverse Work Environments (Spring 2025) (DIR)
+📁 Found course: EWMBA 205D - Business Communication in Diverse Work Environments (Spring 2025) (34 files)
+  - EWMBA 207-LEC-32B - Ethics and Responsibility in Business (Spring 2024) (DIR)
+📁 Found course: EWMBA 207-LEC-32B - Ethics and Responsibility in Business (Spring 2024) (59 files)
+  - EWMBA 209-Sat - Strategic Leadership (Fall 2024) (DIR)
+📁 Found course: EWMBA 209-Sat - Strategic Leadership (Fall 2024) (84 files)
+  - EWMBA 252-LEC-001 - Negotiations and Conflict Resolution (Summer 2024) (DIR)
+📁 Found course: EWMBA 252-LEC-001 - Negotiations and Conflict Resolution (Summer 2024) (121 files)
+  - EWMBA 254-LEC-02F - Power and Politics in Organizations (Fall 2023) (DIR)
+📚 Course EWMBA 254-LEC-02F - Power and Politics in Organizations (Fall 2023) already indexed - skipping
+  - EWMBA 258P-LEC-11F - The Science of Productivity and Performance (Spring 2025) (DIR)
+📚 Course EWMBA 258P-LEC-11F - The Science of Productivity and Performance (Spring 2025) already indexed - skipping
+  - EWMBA D&D Pre-Term '22 (DIR)
+📁 Found course: EWMBA D&D Pre-Term '22 (5 files)
+  - EWMBA D&D Pre-Term '23 (DIR)
+📁 Found course: EWMBA D&D Pre-Term '23 (5 files)
+  - index (DIR)
+📁 Found course: index (0 files)
+  - Leadership Communication (Fall 2024) (DIR)
+📁 Found course: Leadership Communication (Fall 2024) (32 files)
+  - Marketing Core Oski (Fall 23) (DIR)
+📁 Found course: Marketing Core Oski (Fall 23) (48 files)
+  - metadata.json (FILE)
+  - NUS-Haas Bay Area Entrepreneurship, Investing & Innovation  (Spring 2024) (DIR)
+📁 Found course: NUS-Haas Bay Area Entrepreneurship, Investing & Innovation  (Spring 2024) (26 files)
+  - PHW223 2024 Strategy in Health Care Organizations (DIR)
+📚 Course PHW223 2024 Strategy in Health Care Organizations already indexed - skipping
+  - python_course (DIR)
+📁 Found course: python_course (2 files)
+  - SHAPE Student Training - UCB - 2025-2026 (DIR)
+📁 Found course: SHAPE Student Training - UCB - 2025-2026 (6 files)
+  - Teams@Haas - Weekend MBA 2023 (DIR)
+📁 Found course: Teams@Haas - Weekend MBA 2023 (13 files)
+  - test_course (DIR)
+📁 Found course: test_course (1 files)
+  - The_Complete_Hands-On_Introduction_to_Apache_Airflow_3 (DIR)
+📚 Course The_Complete_Hands-On_Introduction_to_Apache_Airflow_3 already indexed - skipping
+  - VCPE-20241208T200025Z-001 (DIR)
+📚 Course VCPE-20241208T200025Z-001 already indexed - skipping
+  - WE Launch 2022 (DIR)
+📁 Found course: WE Launch 2022 (52 files)
+  - WE Launch 2023 (DIR)
+📁 Found course: WE Launch 2023 (49 files)
+  - [FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide (DIR)
+📚 Course [FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide already indexed - skipping
+  - [Resource] Haas Quantitative Readiness (DIR)
+📁 Found course: [Resource] Haas Quantitative Readiness (14 files)
+✅ Total courses found: 33 (scanned 32 directories)
+✂️ After filtering ignored courses: 19 remaining
+INFO:course_indexer:🔍 DEBUG: Starting index load for course: coursequery
+INFO:course_indexer:📁 DEBUG: Course index directory: H:\Archive Classes\coursequery\indexed_courses\coursequery
+INFO:course_indexer:📂 DEBUG: Index path: H:\Archive Classes\coursequery\indexed_courses\coursequery\index
+INFO:course_indexer:📋 DEBUG: Index path exists: True
+INFO:course_indexer:📄 DEBUG: Index directory contains 5 files:
+INFO:course_indexer:  - default__vector_store.json
+INFO:course_indexer:  - docstore.json
+INFO:course_indexer:  - graph_store.json
+INFO:course_indexer:  - image__vector_store.json
+INFO:course_indexer:  - index_store.json
+INFO:course_indexer:⏳ DEBUG: Creating storage context from H:\Archive Classes\coursequery\indexed_courses\coursequery\index
+Loading llama_index.core.storage.kvstore.simple_kvstore from H:\Archive Classes\coursequery\indexed_courses\coursequery\index\docstore.json.
+Loading llama_index.core.storage.kvstore.simple_kvstore from H:\Archive Classes\coursequery\indexed_courses\coursequery\index\index_store.json.
+INFO:course_indexer:✅ DEBUG: Storage context created successfully
+INFO:course_indexer:🤖 DEBUG: Embedding wrapper available: False
+INFO:course_indexer:⏳ DEBUG: Starting index load from storage...
+INFO:course_indexer:🔧 DEBUG: Loading with default embeddings
+INFO:llama_index.core.indices.loading:Loading all indices.
+INFO:course_indexer:✅ DEBUG: Index loaded successfully in 0.05 seconds
+INFO:course_indexer:✅ Loaded index for course: coursequery
+INFO:course_indexer:🔍 DEBUG: Starting index load for course: EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024)
+INFO:course_indexer:📁 DEBUG: Course index directory: H:\Archive Classes\coursequery\indexed_courses\EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024)
+INFO:course_indexer:📂 DEBUG: Index path: H:\Archive Classes\coursequery\indexed_courses\EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024)\index
+INFO:course_indexer:📋 DEBUG: Index path exists: True
+INFO:course_indexer:📄 DEBUG: Index directory contains 5 files:
+INFO:course_indexer:  - default__vector_store.json
+INFO:course_indexer:  - docstore.json
+INFO:course_indexer:  - graph_store.json
+INFO:course_indexer:  - image__vector_store.json
+INFO:course_indexer:  - index_store.json
+INFO:course_indexer:⏳ DEBUG: Creating storage context from H:\Archive Classes\coursequery\indexed_courses\EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024)\index
+Loading llama_index.core.storage.kvstore.simple_kvstore from H:\Archive Classes\coursequery\indexed_courses\EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024)\index\docstore.json.
+Loading llama_index.core.storage.kvstore.simple_kvstore from H:\Archive Classes\coursequery\indexed_courses\EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024)\index\index_store.json.
+INFO:course_indexer:✅ DEBUG: Storage context created successfully
+INFO:course_indexer:🤖 DEBUG: Embedding wrapper available: False
+INFO:course_indexer:⏳ DEBUG: Starting index load from storage...
+INFO:course_indexer:🔧 DEBUG: Loading with default embeddings
+INFO:llama_index.core.indices.loading:Loading all indices.
+INFO:course_indexer:✅ DEBUG: Index loaded successfully in 0.01 seconds
+INFO:course_indexer:✅ Loaded index for course: EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024)
+💡 Running in pure offline mode with centralized directory config
+📁 Master directory: H:\Archive Classes\coursequery\archived_courses
+📁 Active directory: H:\Archive Classes\coursequery\archived_courses
+🔒 FORCED to use local directories:
+📁 Raw docs: archived_courses
+📊 Indexed: indexed_courses
+💡 Running in pure offline mode with centralized directory config
+📁 Master directory: H:\Archive Classes\coursequery\archived_courses
+📁 Active directory: H:\Archive Classes\coursequery\archived_courses
+💡 Running in pure offline mode with centralized directory config
+📁 Master directory: H:\Archive Classes\coursequery\archived_courses
+📁 Active directory: H:\Archive Classes\coursequery\archived_courses
+INFO:__main__:✅ Using full CourseIndexer
+INFO:course_ignore_manager:Loaded 14 ignored courses
+INFO:book_indexer:No book index found, starting fresh
+🔄 Starting course refresh...
+📁 Scanning directory: archived_courses
+📁 Raw courses: archived_courses
+📊 Indexed courses: indexed_courses
+📚 Indexed course: coursequery (1025 documents)
+📚 Indexed course: EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024) (49 documents)
+📚 Indexed course: EWMBA 202-LEC-31A & 32A - Financial Accounting (Spring 2024) (0 files, no metadata)
+📚 Indexed course: EWMBA 203-LEC-32B - Introduction to Finance (Spring 2024) (43 documents)
+📚 Indexed course: EWMBA 254-LEC-02F - Power and Politics in Organizations (Fall 2023) (42 documents)
+📚 Indexed course: EWMBA 258P-LEC-11F - The Science of Productivity and Performance (Spring 2025) (88 documents)
+📚 Indexed course: PHW223 2024 Strategy in Health Care Organizations (37 documents)
+📚 Indexed course: The_Complete_Hands-On_Introduction_to_Apache_Airflow_3 (150 documents)
+📚 Indexed course: VCPE-20241208T200025Z-001 (29 documents)
+📚 Indexed course: [FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide (479 documents)
+📂 Directory contents:
+  - EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024) (DIR)
+📚 Course EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024) already indexed - skipping
+  - EW & MBA 291E-LEC-01F - Interpersonal Skills and Embodied Systems Leadership (Fall 2023) (DIR)
+📁 Found course: EW & MBA 291E-LEC-01F - Interpersonal Skills and Embodied Systems Leadership (Fall 2023) (46 files)
+  - EWMBA 200S-LEC-31B & 32B - Data and Decisions (Fall 2023) (DIR)
+📁 Found course: EWMBA 200S-LEC-31B & 32B - Data and Decisions (Fall 2023) (15 files)
+  - EWMBA 201B-LEC-31A & 32A - Macroeconomics in the Global Economy (Spring 2024) (DIR)
+📁 Found course: EWMBA 201B-LEC-31A & 32A - Macroeconomics in the Global Economy (Spring 2024) (72 files)
+  - EWMBA 201B_ Macroeconomics (WEEKEND) - Core Waiver Exam (DIR)
+📁 Found course: EWMBA 201B_ Macroeconomics (WEEKEND) - Core Waiver Exam (2 files)
+  - EWMBA 202-LEC-31A & 32A - Financial Accounting (Spring 2024) (DIR)
+📚 Course EWMBA 202-LEC-31A & 32A - Financial Accounting (Spring 2024) already indexed - skipping
+  - EWMBA 203-LEC-32B - Introduction to Finance (Spring 2024) (DIR)
+📚 Course EWMBA 203-LEC-32B - Introduction to Finance (Spring 2024) already indexed - skipping
+  - EWMBA 203_ Introduction to Finance (WEEKEND) - Core Waiver Exam (DIR)
+📁 Found course: EWMBA 203_ Introduction to Finance (WEEKEND) - Core Waiver Exam (1 files)
+  - EWMBA 205-LEC-31A & 32A - Leading People (Fall 2023) (DIR)
+📁 Found course: EWMBA 205-LEC-31A & 32A - Leading People (Fall 2023) (66 files)
+  - EWMBA 205D - Business Communication in Diverse Work Environments (Spring 2025) (DIR)
+📁 Found course: EWMBA 205D - Business Communication in Diverse Work Environments (Spring 2025) (34 files)
+  - EWMBA 207-LEC-32B - Ethics and Responsibility in Business (Spring 2024) (DIR)
+📁 Found course: EWMBA 207-LEC-32B - Ethics and Responsibility in Business (Spring 2024) (59 files)
+  - EWMBA 209-Sat - Strategic Leadership (Fall 2024) (DIR)
+📁 Found course: EWMBA 209-Sat - Strategic Leadership (Fall 2024) (84 files)
+  - EWMBA 252-LEC-001 - Negotiations and Conflict Resolution (Summer 2024) (DIR)
+📁 Found course: EWMBA 252-LEC-001 - Negotiations and Conflict Resolution (Summer 2024) (121 files)
+  - EWMBA 254-LEC-02F - Power and Politics in Organizations (Fall 2023) (DIR)
+📚 Course EWMBA 254-LEC-02F - Power and Politics in Organizations (Fall 2023) already indexed - skipping
+  - EWMBA 258P-LEC-11F - The Science of Productivity and Performance (Spring 2025) (DIR)
+📚 Course EWMBA 258P-LEC-11F - The Science of Productivity and Performance (Spring 2025) already indexed - skipping
+  - EWMBA D&D Pre-Term '22 (DIR)
+📁 Found course: EWMBA D&D Pre-Term '22 (5 files)
+  - EWMBA D&D Pre-Term '23 (DIR)
+📁 Found course: EWMBA D&D Pre-Term '23 (5 files)
+  - index (DIR)
+📁 Found course: index (0 files)
+  - Leadership Communication (Fall 2024) (DIR)
+📁 Found course: Leadership Communication (Fall 2024) (32 files)
+  - Marketing Core Oski (Fall 23) (DIR)
+📁 Found course: Marketing Core Oski (Fall 23) (48 files)
+  - metadata.json (FILE)
+  - NUS-Haas Bay Area Entrepreneurship, Investing & Innovation  (Spring 2024) (DIR)
+📁 Found course: NUS-Haas Bay Area Entrepreneurship, Investing & Innovation  (Spring 2024) (26 files)
+  - PHW223 2024 Strategy in Health Care Organizations (DIR)
+📚 Course PHW223 2024 Strategy in Health Care Organizations already indexed - skipping
+  - python_course (DIR)
+📁 Found course: python_course (2 files)
+  - SHAPE Student Training - UCB - 2025-2026 (DIR)
+📁 Found course: SHAPE Student Training - UCB - 2025-2026 (6 files)
+  - Teams@Haas - Weekend MBA 2023 (DIR)
+📁 Found course: Teams@Haas - Weekend MBA 2023 (13 files)
+  - test_course (DIR)
+📁 Found course: test_course (1 files)
+  - The_Complete_Hands-On_Introduction_to_Apache_Airflow_3 (DIR)
+📚 Course The_Complete_Hands-On_Introduction_to_Apache_Airflow_3 already indexed - skipping
+  - VCPE-20241208T200025Z-001 (DIR)
+📚 Course VCPE-20241208T200025Z-001 already indexed - skipping
+  - WE Launch 2022 (DIR)
+📁 Found course: WE Launch 2022 (52 files)
+  - WE Launch 2023 (DIR)
+📁 Found course: WE Launch 2023 (49 files)
+  - [FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide (DIR)
+📚 Course [FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide already indexed - skipping
+  - [Resource] Haas Quantitative Readiness (DIR)
+📁 Found course: [Resource] Haas Quantitative Readiness (14 files)
+✅ Total courses found: 33 (scanned 32 directories)
+✂️ After filtering ignored courses: 19 remaining
+INFO:course_indexer:🔍 DEBUG: Starting index load for course: coursequery
+INFO:course_indexer:📁 DEBUG: Course index directory: H:\Archive Classes\coursequery\indexed_courses\coursequery
+INFO:course_indexer:📂 DEBUG: Index path: H:\Archive Classes\coursequery\indexed_courses\coursequery\index
+INFO:course_indexer:📋 DEBUG: Index path exists: True
+INFO:course_indexer:📄 DEBUG: Index directory contains 5 files:
+INFO:course_indexer:  - default__vector_store.json
+INFO:course_indexer:  - docstore.json
+INFO:course_indexer:  - graph_store.json
+INFO:course_indexer:  - image__vector_store.json
+INFO:course_indexer:  - index_store.json
+INFO:course_indexer:⏳ DEBUG: Creating storage context from H:\Archive Classes\coursequery\indexed_courses\coursequery\index
+Loading llama_index.core.storage.kvstore.simple_kvstore from H:\Archive Classes\coursequery\indexed_courses\coursequery\index\docstore.json.
+Loading llama_index.core.storage.kvstore.simple_kvstore from H:\Archive Classes\coursequery\indexed_courses\coursequery\index\index_store.json.
+💡 Running in pure offline mode with centralized directory config
+📁 Master directory: H:\Archive Classes\coursequery\archived_courses
+📁 Active directory: H:\Archive Classes\coursequery\archived_courses
+🔒 FORCED to use local directories:
+📁 Raw docs: archived_courses
+📊 Indexed: indexed_courses
+💡 Running in pure offline mode with centralized directory config
+📁 Master directory: H:\Archive Classes\coursequery\archived_courses
+📁 Active directory: H:\Archive Classes\coursequery\archived_courses
+💡 Running in pure offline mode with centralized directory config
+📁 Master directory: H:\Archive Classes\coursequery\archived_courses
+📁 Active directory: H:\Archive Classes\coursequery\archived_courses
+INFO:__main__:✅ Using full CourseIndexer
+INFO:course_ignore_manager:Loaded 14 ignored courses
+INFO:book_indexer:No book index found, starting fresh
+🔄 Starting course refresh...
+📁 Scanning directory: archived_courses
+📁 Raw courses: archived_courses
+📊 Indexed courses: indexed_courses
+📚 Indexed course: coursequery (1025 documents)
+📚 Indexed course: EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024) (49 documents)
+📚 Indexed course: EWMBA 202-LEC-31A & 32A - Financial Accounting (Spring 2024) (0 files, no metadata)
+📚 Indexed course: EWMBA 203-LEC-32B - Introduction to Finance (Spring 2024) (43 documents)
+📚 Indexed course: EWMBA 254-LEC-02F - Power and Politics in Organizations (Fall 2023) (42 documents)
+📚 Indexed course: EWMBA 258P-LEC-11F - The Science of Productivity and Performance (Spring 2025) (88 documents)
+📚 Indexed course: PHW223 2024 Strategy in Health Care Organizations (37 documents)
+📚 Indexed course: The_Complete_Hands-On_Introduction_to_Apache_Airflow_3 (150 documents)
+📚 Indexed course: VCPE-20241208T200025Z-001 (29 documents)
+📚 Indexed course: [FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide (479 documents)
+📂 Directory contents:
+  - EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024) (DIR)
+📚 Course EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024) already indexed - skipping
+  - EW & MBA 291E-LEC-01F - Interpersonal Skills and Embodied Systems Leadership (Fall 2023) (DIR)
+📁 Found course: EW & MBA 291E-LEC-01F - Interpersonal Skills and Embodied Systems Leadership (Fall 2023) (46 files)
+  - EWMBA 200S-LEC-31B & 32B - Data and Decisions (Fall 2023) (DIR)
+📁 Found course: EWMBA 200S-LEC-31B & 32B - Data and Decisions (Fall 2023) (15 files)
+  - EWMBA 201B-LEC-31A & 32A - Macroeconomics in the Global Economy (Spring 2024) (DIR)
+INFO:course_indexer:✅ DEBUG: Storage context created successfully
+INFO:course_indexer:🤖 DEBUG: Embedding wrapper available: False
+INFO:course_indexer:⏳ DEBUG: Starting index load from storage...
+INFO:course_indexer:🔧 DEBUG: Loading with default embeddings
+INFO:llama_index.core.indices.loading:Loading all indices.
+INFO:course_indexer:✅ DEBUG: Index loaded successfully in 0.06 seconds
+INFO:course_indexer:✅ Loaded index for course: coursequery
+📁 Found course: EWMBA 201B-LEC-31A & 32A - Macroeconomics in the Global Economy (Spring 2024) (72 files)
+  - EWMBA 201B_ Macroeconomics (WEEKEND) - Core Waiver Exam (DIR)
+📁 Found course: EWMBA 201B_ Macroeconomics (WEEKEND) - Core Waiver Exam (2 files)
+  - EWMBA 202-LEC-31A & 32A - Financial Accounting (Spring 2024) (DIR)
+📚 Course EWMBA 202-LEC-31A & 32A - Financial Accounting (Spring 2024) already indexed - skipping
+  - EWMBA 203-LEC-32B - Introduction to Finance (Spring 2024) (DIR)
+📚 Course EWMBA 203-LEC-32B - Introduction to Finance (Spring 2024) already indexed - skipping
+  - EWMBA 203_ Introduction to Finance (WEEKEND) - Core Waiver Exam (DIR)
+📁 Found course: EWMBA 203_ Introduction to Finance (WEEKEND) - Core Waiver Exam (1 files)
+  - EWMBA 205-LEC-31A & 32A - Leading People (Fall 2023) (DIR)
+📁 Found course: EWMBA 205-LEC-31A & 32A - Leading People (Fall 2023) (66 files)
+  - EWMBA 205D - Business Communication in Diverse Work Environments (Spring 2025) (DIR)
+📁 Found course: EWMBA 205D - Business Communication in Diverse Work Environments (Spring 2025) (34 files)
+  - EWMBA 207-LEC-32B - Ethics and Responsibility in Business (Spring 2024) (DIR)
+📁 Found course: EWMBA 207-LEC-32B - Ethics and Responsibility in Business (Spring 2024) (59 files)
+  - EWMBA 209-Sat - Strategic Leadership (Fall 2024) (DIR)
+📁 Found course: EWMBA 209-Sat - Strategic Leadership (Fall 2024) (84 files)
+  - EWMBA 252-LEC-001 - Negotiations and Conflict Resolution (Summer 2024) (DIR)
+📁 Found course: EWMBA 252-LEC-001 - Negotiations and Conflict Resolution (Summer 2024) (121 files)
+  - EWMBA 254-LEC-02F - Power and Politics in Organizations (Fall 2023) (DIR)
+📚 Course EWMBA 254-LEC-02F - Power and Politics in Organizations (Fall 2023) already indexed - skipping
+  - EWMBA 258P-LEC-11F - The Science of Productivity and Performance (Spring 2025) (DIR)
+📚 Course EWMBA 258P-LEC-11F - The Science of Productivity and Performance (Spring 2025) already indexed - skipping
+  - EWMBA D&D Pre-Term '22 (DIR)
+📁 Found course: EWMBA D&D Pre-Term '22 (5 files)
+  - EWMBA D&D Pre-Term '23 (DIR)
+📁 Found course: EWMBA D&D Pre-Term '23 (5 files)
+  - index (DIR)
+📁 Found course: index (0 files)
+  - Leadership Communication (Fall 2024) (DIR)
+📁 Found course: Leadership Communication (Fall 2024) (32 files)
+  - Marketing Core Oski (Fall 23) (DIR)
+📁 Found course: Marketing Core Oski (Fall 23) (48 files)
+  - metadata.json (FILE)
+  - NUS-Haas Bay Area Entrepreneurship, Investing & Innovation  (Spring 2024) (DIR)
+📁 Found course: NUS-Haas Bay Area Entrepreneurship, Investing & Innovation  (Spring 2024) (26 files)
+  - PHW223 2024 Strategy in Health Care Organizations (DIR)
+📚 Course PHW223 2024 Strategy in Health Care Organizations already indexed - skipping
+  - python_course (DIR)
+📁 Found course: python_course (2 files)
+  - SHAPE Student Training - UCB - 2025-2026 (DIR)
+📁 Found course: SHAPE Student Training - UCB - 2025-2026 (6 files)
+  - Teams@Haas - Weekend MBA 2023 (DIR)
+📁 Found course: Teams@Haas - Weekend MBA 2023 (13 files)
+  - test_course (DIR)
+📁 Found course: test_course (1 files)
+  - The_Complete_Hands-On_Introduction_to_Apache_Airflow_3 (DIR)
+📚 Course The_Complete_Hands-On_Introduction_to_Apache_Airflow_3 already indexed - skipping
+  - VCPE-20241208T200025Z-001 (DIR)
+📚 Course VCPE-20241208T200025Z-001 already indexed - skipping
+  - WE Launch 2022 (DIR)
+📁 Found course: WE Launch 2022 (52 files)
+  - WE Launch 2023 (DIR)
+📁 Found course: WE Launch 2023 (49 files)
+  - [FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide (DIR)
+📚 Course [FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide already indexed - skipping
+  - [Resource] Haas Quantitative Readiness (DIR)
+📁 Found course: [Resource] Haas Quantitative Readiness (14 files)
+✅ Total courses found: 33 (scanned 32 directories)
+✂️ After filtering ignored courses: 19 remaining
+ERROR:__main__:Local transcription failed for archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\1 - Introduction\1 - Important Prerequisites.mp4: [WinError 2] The system cannot find the file specified
+ERROR:__main__:Local transcription failed for archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\1 - Introduction\2 - The Roadmap.mp4: [WinError 2] The system cannot find the file specified
+ERROR:__main__:Local transcription failed for archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\1 - Introduction\3 - Who I am.mp4: [WinError 2] The system cannot find the file specified
