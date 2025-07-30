@@ -790,7 +790,7 @@ class RealEstateAIApp:
             if uploaded_files and course_name:
                 if not DOCUMENT_PROCESSOR_AVAILABLE or self.doc_processor is None:
                     st.error("❌ Document processing dependencies are not installed. Please check the System Status tab.")
-                elif st.button("📊 Process Documents"):
+                elif st.button("📊 Process Documents", key="process_documents_btn"):
                     self.process_uploaded_files(uploaded_files, course_name, is_syllabus)
         
         else:  # Directory Path
@@ -845,7 +845,7 @@ class RealEstateAIApp:
             if directory_path and course_name:
                 if not DOCUMENT_PROCESSOR_AVAILABLE or self.doc_processor is None:
                     st.error("❌ Document processing dependencies are not installed. Please check the System Status tab.")
-                elif st.button("🚀 Process Directory"):
+                elif st.button("🚀 Process Directory", key="process_directory_btn"):
                     self.process_directory(directory_path, course_name)
 
     def process_uploaded_files(self, uploaded_files: List, course_name: str, is_syllabus: bool):
@@ -1005,7 +1005,7 @@ class RealEstateAIApp:
             st.sidebar.success(f"✅ Saved {len(saved_files)} files to course: {course_name}")
             
             # Auto-process the course
-            if st.sidebar.button(f"🚀 Process {course_name} Now"):
+            if st.sidebar.button(f"🚀 Process {course_name} Now", key=f"process_now_{course_name}"):
                 self.process_directory(str(course_dir), course_name)
         
         # Refresh course list
@@ -1317,7 +1317,7 @@ class RealEstateAIApp:
                     col1, col2 = st.columns(2)
                     
                     with col1:
-                        if st.button("🔍 Preview Training Data"):
+                        if st.button("🔍 Preview Training Data", key="preview_training_data_btn"):
                             training_data = fine_tuner.prepare_training_data(selected_course)
                             if training_data:
                                 st.write(f"**Available Training Examples:** {len(training_data)}")
@@ -1328,7 +1328,7 @@ class RealEstateAIApp:
                                     st.write(f"**Answer:** {sample['output'][:100]}...")
                     
                     with col2:
-                        if st.button("🚀 Simulate Learning Process"):
+                        if st.button("🚀 Simulate Learning Process", key="simulate_learning_btn"):
                             with st.spinner("Simulating model learning..."):
                                 result = fine_tuner.simulate_fine_tuning(selected_course, model_type)
                                 
