@@ -180,6 +180,16 @@ class WhisperTranscriptionManager:
             'total_characters': 0,      # Default to 0 until actual transcriptions are tracked
             'methods_used': {}          # Default to empty dict until methods are tracked
         }
+    
+    def get_all_transcriptions(self, course_name: str = None) -> List[Dict[str, Any]]:
+        """Get all transcriptions, optionally filtered by course name."""
+        # Return empty list for now - this would be populated when actual transcriptions are saved
+        # In a full implementation, this would read from a transcriptions database/file
+        return []
+    
+    def get_transcriptions_for_course(self, course_name: str) -> List[Dict[str, Any]]:
+        """Get transcriptions for a specific course."""
+        return self.get_all_transcriptions(course_name)
 
 # Alias for backward compatibility
 TranscriptionManager = WhisperTranscriptionManager

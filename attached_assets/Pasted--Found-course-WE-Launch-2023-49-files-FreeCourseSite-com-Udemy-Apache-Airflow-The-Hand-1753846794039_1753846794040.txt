@@ -1,0 +1,59 @@
+📁 Found course: WE Launch 2023 (49 files)
+  - [FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide (DIR)
+📚 Course [FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide already indexed - skipping
+  - [Resource] Haas Quantitative Readiness (DIR)
+📁 Found course: [Resource] Haas Quantitative Readiness (14 files)
+✅ Total courses found: 33 (scanned 32 directories)
+✂️ After filtering ignored courses: 19 remaining
+💡 Running in pure offline mode with centralized directory config
+📁 Master directory: H:\Archive Classes\coursequery\archived_courses
+📁 Active directory: H:\Archive Classes\coursequery\archived_courses
+────────────────────────── Traceback (most recent call last) ───────────────────────────
+  C:\Program
+  Files\Python312\Lib\site-packages\streamlit\runtime\scriptrunner\exec_code.py:128 in
+  exec_func_with_error_handling
+
+  C:\Program
+  Files\Python312\Lib\site-packages\streamlit\runtime\scriptrunner\script_runner.py:66
+  9 in code_to_exec
+
+  H:\Archive Classes\coursequery\app.py:3735 in <module>
+
+    3732
+    3733
+    3734 if __name__ == "__main__":
+  ❱ 3735 │   main()
+    3736
+
+  H:\Archive Classes\coursequery\app.py:3731 in main
+
+    3728 def main():
+    3729 │   """Application entry point."""
+    3730 │   app = RealEstateAIApp()
+  ❱ 3731 │   app.run()
+    3732
+    3733
+    3734 if __name__ == "__main__":
+
+  H:\Archive Classes\coursequery\app.py:2459 in run
+
+    2456 │   │   │   self.bulk_transcription_section()
+    2457 │   │
+    2458 │   │   with tab3:
+  ❱ 2459 │   │   │   self.vector_rag_section()
+    2460 │   │
+    2461 │   │   with tab4:
+    2462 │   │   │   self.query_interface()
+
+  H:\Archive Classes\coursequery\app.py:3017 in vector_rag_section
+
+    3014 │   │   # Show comprehensive content status
+    3015 │   │   if selected_course:
+    3016 │   │   │   # Get content from multiple sources
+  ❱ 3017 │   │   │   transcriptions = tm.get_all_transcriptions(selected_course)
+    3018 │   │   │
+    3019 │   │   │   # Check for documents from multiple sources
+    3020 │   │   │   raw_docs_dir = self.config.raw_docs_dir / selected_course
+────────────────────────────────────────────────────────────────────────────────────────
+AttributeError: 'WhisperTranscriptionManager' object has no attribute
+'get_all_transcriptions'
