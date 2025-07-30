@@ -161,8 +161,20 @@ class WhisperTranscriptionManager:
             "model_loaded": self.whisper_model is not None,
             "model_name": self.model_name,
             "device": self.device,
-            "gpu_available": torch.cuda.is_available(),
+            "gpu_available": TORCH_AVAILABLE and torch.cuda.is_available() if TORCH_AVAILABLE else False,
             "supported_formats": self.get_supported_formats()
+        }
+    
+    def get_stats(self) -> Dict[str, Any]:
+        """Get transcription manager statistics for UI display."""
+        return {
+            'model_name': self.model_name,
+            'device': self.device,
+            'torch_available': TORCH_AVAILABLE,
+            'whisper_loaded': self.whisper_model is not None,
+            'gpu_available': TORCH_AVAILABLE and torch.cuda.is_available() if TORCH_AVAILABLE else False,
+            'supported_formats': self.get_supported_formats(),
+            'status': 'Ready for RTX 3060 transcription' if TORCH_AVAILABLE else 'PyTorch not available - install locally for GPU acceleration'
         }
 
 # Alias for backward compatibility

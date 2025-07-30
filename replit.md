@@ -141,6 +141,7 @@ Authentication: Local HuggingFace token storage, no external dependencies requir
 - **Windows Path Compatibility**: Enhanced file processing to handle complex nested structures like Udemy course folders with duplicate names and special characters
 - **Simplified Directory Detection**: Course directory is now consistently relative to where streamlit is launched from (current working directory)
 - **TranscriptionManager Import Fix**: Resolved import error by adding backward compatibility alias and graceful torch fallback
+- **Fixed Missing get_stats Method**: Added get_stats() method to WhisperTranscriptionManager to resolve AttributeError in bulk transcription interface
 
 ### July 29, 2025 - Multi-Course Detection & Replit Integration
 - **Enhanced Course Detection**: System now detects both indexed courses and unprocessed course directories automatically
@@ -224,5 +225,8 @@ Authentication: Local HuggingFace token storage, no external dependencies requir
 - **Nested Path Handling**: ✅ **RESOLVED** - Successfully processes 300+ character Windows paths with special characters
 - **File Format Expansion**: ✅ **SUCCESS** - VTT files now captured with 6000-8000+ characters of lesson content per file
 - **Apache Airflow Course**: ✅ **COMPREHENSIVE** - Processing hundreds of VTT subtitle files containing actual lesson transcripts
+- **Document Counting Issue**: ✅ **IDENTIFIED & FIXED** - Root cause was Pydantic import errors preventing course saving to indexed directory
+- **Simple Course Indexer**: ✅ **IMPLEMENTED** - Bypasses complex LlamaIndex dependencies to properly save course metadata with accurate document counts
+- **TranscriptionManager**: ✅ **FULLY COMPATIBLE** - All methods including get_stats() working with backward compatibility aliases
 
 The architecture prioritizes privacy, local operation, and user control while maintaining enterprise-grade functionality for real estate education analysis.
