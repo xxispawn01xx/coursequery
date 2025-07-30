@@ -24,28 +24,10 @@ class Config:
     
     def setup_directories(self):
         """Create necessary directories for offline usage."""
-        # Check multiple possible course directory locations
-        possible_paths = [
-            Path(r"H:\Archive Classes"),  # Windows direct
-            Path("/mnt/h/Archive Classes"),  # WSL mounted
-            Path.home() / "Archive Classes",  # User home
-            Path("Archive Classes"),  # Local relative
-        ]
-        
-        user_course_dir = None
-        for path in possible_paths:
-            if path.exists():
-                user_course_dir = path
-                print(f"✅ Found course directory: {user_course_dir}")
-                break
-        
-        if user_course_dir:
-            self.raw_docs_dir = user_course_dir
-        else:
-            # Use local archived_courses directory
-            self.raw_docs_dir = self.base_dir / "archived_courses"
-            print(f"📁 Using local course directory: {self.raw_docs_dir}")
-            print("💡 Copy your courses to archived_courses/ or update path in config.py")
+        # Use local archived_courses directory directly (per user requirement)
+        self.raw_docs_dir = self.base_dir / "archived_courses"
+        print(f"📁 Using local course directory: {self.raw_docs_dir}")
+        print("💡 Course materials located in archived_courses/ directory")
         
         # Always use local directories for processed data
         self.indexed_courses_dir = self.base_dir / "indexed_courses"
@@ -56,9 +38,8 @@ class Config:
         for directory in [self.indexed_courses_dir, self.models_dir, self.temp_dir]:
             directory.mkdir(exist_ok=True)
         
-        # Create archived_courses if using local fallback
-        if not user_course_dir:
-            self.raw_docs_dir.mkdir(exist_ok=True)
+        # Create archived_courses directory
+        self.raw_docs_dir.mkdir(exist_ok=True)
         
         # Create GGUF models subdirectory
         gguf_dir = self.models_dir / "gguf"

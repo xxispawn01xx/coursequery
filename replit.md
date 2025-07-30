@@ -185,7 +185,7 @@ Authentication: Local HuggingFace token storage, no external dependencies requir
 - **Local**: ✅ **FULLY OPERATIONAL** - RTX 3060 running all AI models successfully on CUDA
 - **GPU Status**: ✅ **RTX 3060 PERFECT** - All models loading on cuda:0, memory fragmentation fix successful
 - **Local Models**: ✅ **ALL WORKING** - local_embeddings, local_llm, whisper all operational
-- **Course Directory**: Configured for H:\Archive Classes with local fallback
+- **Course Directory**: Uses local archived_courses/ directory (no external dependencies)
 - **Query Engine**: Complete offline AI system with RTX 3060 acceleration
 - **Configuration**: Pure offline mode - no cloud dependencies required
 - **Course Processing**: Enhanced multi-course detection with comprehensive debugging and testing
