@@ -74,6 +74,83 @@ class WhisperTranscriptionManager:
             logger.error(f"Failed to load Whisper model: {e}")
             return False
     
+    def transcribe_audio(self, audio_path: str, language: Optional[str] = None) -> Dict[str, Any]:
+        """Transcribe audio/video file using Whisper.
+        
+        Args:
+            audio_path: Path to audio/video file
+            language: Language code (optional)
+            
+        Returns:
+            Dict containing transcription result and metadata
+        """
+        if not self.whisper_model:
+            if not self.load_whisper_model():
+                raise Exception("Failed to load Whisper model")
+        
+        try:
+            from pathlib import Path
+            
+            # Validate file exists
+            audio_file = Path(audio_path)
+            if not audio_file.exists():
+                raise FileNotFoundError(f"Audio file not found: {audio_path}")
+            
+            if not self.is_supported_format(str(audio_file)):
+                raise ValueError(f"Unsupported format: {audio_file.suffix}")
+            
+            logger.info(f"🎯 Transcribing: {audio_file.name}")
+            logger.info(f"📁 File size: {audio_file.stat().st_size / (1024*1024):.1f} MB")
+            
+            # Set transcription options
+            options = {
+                "language": language,
+                "task": "transcribe",
+                "fp16": self.device == "cuda",  # Use FP16 on GPU for efficiency
+            }
+            
+            # Perform transcription
+            logger.info(f"🔄 Starting Whisper transcription on {self.device}...")
+            result = self.whisper_model.transcribe(str(audio_file), **options)
+            
+            # Clean up GPU memory
+            if self.device == "cuda" and TORCH_AVAILABLE:
+                torch.cuda.empty_cache()
+            
+            # Process result
+            transcription = {
+                "text": result.get("text", "").strip(),
+                "language": result.get("language", "unknown"),
+                "segments": result.get("segments", []),
+                "duration": len(result.get("segments", [])) * 30 if "segments" in result else 0,  # Estimate
+                "model": self.model_name,
+                "device": self.device
+            }
+            
+            char_count = len(transcription["text"])
+            logger.info(f"✅ Transcription complete: {char_count} characters")
+            
+            if char_count < 10:
+                logger.warning("⚠️ Very short transcription - might indicate audio issue")
+            
+            return transcription
+            
+        except Exception as e:
+            logger.error(f"❌ Transcription failed for {audio_path}: {e}")
+            logger.error(f"🔧 Error type: {type(e).__name__}")
+            
+            # Additional debugging info
+            try:
+                from pathlib import Path
+                file_path = Path(audio_path)
+                logger.error(f"📁 File exists: {file_path.exists()}")
+                logger.error(f"📁 File readable: {os.access(audio_path, os.R_OK)}")
+                logger.error(f"📁 Full path: {file_path.absolute()}")
+            except Exception as debug_error:
+                logger.error(f"📁 Debug info error: {debug_error}")
+            
+            raise
+    
     def _resolve_absolute_path(self, audio_path: str) -> str:
         """Resolve audio path to absolute format for Windows compatibility.
         

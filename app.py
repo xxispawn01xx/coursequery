@@ -3241,47 +3241,72 @@ class RealEstateAIApp:
         try:
             from transcription_manager import WhisperTranscriptionManager
             from pathlib import Path
+            import os
             
             # Initialize enhanced Whisper transcription manager
             whisper_manager = WhisperTranscriptionManager()
             
-            # Load Whisper model if not already loaded
-            if not whisper_manager.load_whisper_model("base"):  # Use base model for RTX 3060
-                logger.error("Failed to load Whisper model")
+            media_path = Path(media_file)
+            logger.info(f"🎯 Processing: {media_path.name}")
+            
+            # Validate file exists and is accessible
+            if not media_path.exists():
+                logger.error(f"❌ File not found: {media_path}")
                 return False
             
-            media_path = Path(media_file)
-            logger.info(f"File validation passed: {media_path.name}")
-            logger.info(f"Loading Whisper model for RTX 3060...")
-            logger.info(f"Transcribing: {media_path.name}")
-            
-            # Use enhanced transcription manager with comprehensive path resolution
-            result = whisper_manager.transcribe_audio(str(media_file))
-            
-            if result and "text" in result:
-                # Save transcription using existing transcription manager
-                transcription_text = result["text"]
-                output_file = tm.save_transcription(
-                    media_file=media_file,
-                    transcription_text=transcription_text,
-                    course_name=course_name,
-                    preserve_structure=True  # Maintain folder structure
-                )
+            if not media_path.is_file():
+                logger.error(f"❌ Not a file: {media_path}")
+                return False
                 
-                logger.info(f"✅ Transcription saved: {output_file}")
-                logger.info(f"📊 Characters transcribed: {len(transcription_text)}")
-                return True
+            if not os.access(str(media_path), os.R_OK):
+                logger.error(f"❌ File not readable: {media_path}")
+                return False
+            
+            logger.info(f"✅ File validation passed: {media_path.name}")
+            logger.info(f"📁 File size: {media_path.stat().st_size / (1024*1024):.1f} MB")
+            
+            # Perform transcription
+            result = whisper_manager.transcribe_audio(str(media_path))
+            
+            if result and "text" in result and result["text"].strip():
+                transcription_text = result["text"].strip()
+                
+                # Use simple file-based saving instead of complex tm.save_transcription
+                # Save VTT file next to original video
+                vtt_file = media_path.with_suffix('.vtt')
+                
+                try:
+                    with open(vtt_file, 'w', encoding='utf-8') as f:
+                        f.write("WEBVTT\n\n")
+                        f.write("NOTE\n")
+                        f.write(f"Transcribed by Whisper {result.get('model', 'unknown')} on {result.get('device', 'unknown')}\n\n")
+                        f.write("00:00:00.000 --> 99:59:59.999\n")
+                        f.write(transcription_text)
+                        f.write("\n")
+                    
+                    logger.info(f"✅ Transcription saved: {vtt_file}")
+                    logger.info(f"📊 Characters transcribed: {len(transcription_text)}")
+                    return True
+                    
+                except Exception as save_error:
+                    logger.error(f"❌ Failed to save transcription: {save_error}")
+                    return False
             else:
-                logger.error("❌ Transcription failed - no result returned")
+                logger.error("❌ Transcription failed - no text returned")
+                if result:
+                    logger.error(f"🔍 Result keys: {list(result.keys())}")
+                    logger.error(f"🔍 Text length: {len(result.get('text', ''))}")
                 return False
         
-        except ImportError:
-            logger.error("Whisper not installed. Install with: pip install openai-whisper")
+        except ImportError as ie:
+            logger.error(f"❌ Import error: {ie}")
+            logger.error("💡 Install Whisper with: pip install openai-whisper")
             return False
         except Exception as e:
-            logger.error(f"🚨 Enhanced transcription failed for {media_file}: {e}")
+            logger.error(f"❌ Transcription failed for {media_file}: {e}")
             logger.error(f"🔧 Error type: {type(e).__name__}")
-            logger.error(f"📁 Current working directory: {os.getcwd()}")
+            import traceback
+            logger.error(f"🔍 Full traceback: {traceback.format_exc()}")
             return False
     
     def _get_short_path(self, path_str):
