@@ -9,7 +9,14 @@ import os
 import tempfile
 from pathlib import Path
 from typing import Optional, Dict, Any, List
-import torch
+
+# Try to import torch, fall back gracefully if not available
+try:
+    import torch
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
+    torch = None
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +27,7 @@ class WhisperTranscriptionManager:
         """Initialize Whisper transcription manager."""
         self.whisper_model = None
         self.model_name = "base"  # Start with base model for RTX 3060
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.device = "cuda" if TORCH_AVAILABLE and torch.cuda.is_available() else "cpu"
         
     def load_whisper_model(self, model_size: str = "base") -> bool:
         """Load Whisper model for transcription.
@@ -158,6 +165,9 @@ class WhisperTranscriptionManager:
             "supported_formats": self.get_supported_formats()
         }
 
+# Alias for backward compatibility
+TranscriptionManager = WhisperTranscriptionManager
+
 # Global instance for reuse
 _whisper_manager = None
 
@@ -167,3 +177,8 @@ def get_whisper_manager() -> WhisperTranscriptionManager:
     if _whisper_manager is None:
         _whisper_manager = WhisperTranscriptionManager()
     return _whisper_manager
+
+# Also provide the expected name
+def get_transcription_manager() -> WhisperTranscriptionManager:
+    """Get transcription manager instance (alias for consistency)."""
+    return get_whisper_manager()

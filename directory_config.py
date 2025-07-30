@@ -16,8 +16,8 @@ class DirectoryConfigManager:
         # =====================================
         # MASTER COURSE DIRECTORY CONFIGURATION
         # =====================================
-        # CHANGE THIS SINGLE VARIABLE TO UPDATE PATHS EVERYWHERE
-        self.MASTER_COURSE_DIRECTORY = r"H:\Archive Classes\coursequery\archived_courses"
+        # First try to find coursequery directory dynamically
+        self.MASTER_COURSE_DIRECTORY = self.find_coursequery_directory()
         
         # Configuration file for persistence
         self.config_file = Path(__file__).parent / "directory_config.json"
@@ -27,6 +27,62 @@ class DirectoryConfigManager:
         
         # Set up all derived paths
         self.setup_all_paths()
+    
+    def find_coursequery_directory(self):
+        """Find the coursequery directory regardless of its location."""
+        
+        # Check common locations where coursequery might be
+        possible_locations = [
+            # Current working directory and parents
+            Path.cwd(),
+            Path.cwd().parent,
+            Path.cwd().parent.parent,
+            
+            # H drive (original location)
+            Path(r"H:\Archive Classes\coursequery") if os.path.exists("H:\\") else None,
+            
+            # Other common drive letters
+            Path(r"C:\coursequery") if os.path.exists("C:\\") else None,
+            Path(r"D:\coursequery") if os.path.exists("D:\\") else None,
+            Path(r"E:\coursequery") if os.path.exists("E:\\") else None,
+            
+            # User directory
+            Path.home() / "coursequery",
+            Path.home() / "Documents" / "coursequery",
+            Path.home() / "Desktop" / "coursequery",
+        ]
+        
+        # Remove None values
+        possible_locations = [loc for loc in possible_locations if loc is not None]
+        
+        # Search for coursequery directory
+        for base_path in possible_locations:
+            try:
+                if base_path.exists():
+                    # Check if this IS the coursequery directory
+                    if base_path.name == "coursequery" and (base_path / "archived_courses").exists():
+                        print(f"📁 Found coursequery at: {base_path}")
+                        return str(base_path / "archived_courses")
+                    
+                    # Check if coursequery is a subdirectory  
+                    coursequery_path = base_path / "coursequery"
+                    if coursequery_path.exists() and (coursequery_path / "archived_courses").exists():
+                        print(f"📁 Found coursequery at: {coursequery_path}")
+                        return str(coursequery_path / "archived_courses")
+                    
+                    # Recursively search in subdirectories (up to 2 levels deep)
+                    for item in base_path.iterdir():
+                        if item.is_dir() and item.name == "coursequery":
+                            archived_courses = item / "archived_courses" 
+                            if archived_courses.exists():
+                                print(f"📁 Found coursequery at: {item}")
+                                return str(archived_courses)
+            except (PermissionError, OSError):
+                continue
+        
+        # Default fallback
+        print("📁 Using default H:\\ drive location")
+        return r"H:\Archive Classes\coursequery\archived_courses"
     
     def load_configuration(self):
         """Load saved directory configuration if available."""
