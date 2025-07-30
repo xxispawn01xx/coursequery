@@ -611,7 +611,7 @@ class RealEstateAIApp:
                 logger.error(f"Error checking for renamed courses: {e}")
         
         # Quick fix for sidebar loading issues
-        if st.sidebar.button("🚨 Fix Sidebar Loading", key="fix_sidebar_loading_btn"):
+        if st.sidebar.button("🚨 Fix Sidebar Loading", key="emergency_sidebar_fix"):
             st.sidebar.info("Clearing course cache and refreshing...")
             # Clear all course-related session state
             for key in list(st.session_state.keys()):
@@ -1395,7 +1395,7 @@ class RealEstateAIApp:
         with col2:
             include_sources = st.checkbox("Include source references", value=True)
         
-        if query and st.button("🔍 Ask Question"):
+        if query and st.button("🔍 Ask Question", key="ask_question_btn"):
             # Pure offline mode - no restrictions
             
             # Check if models are loaded before attempting query
@@ -1419,7 +1419,7 @@ class RealEstateAIApp:
             with col1:
                 st.subheader("💭 Chat History")
             with col2:
-                if st.button("📥 Export Chat"):
+                if st.button("📥 Export Chat", key="export_chat_btn"):
                     self.export_chat_history()
             
             for i, chat in enumerate(reversed(st.session_state.chat_history[-5:])):  # Show last 5
@@ -1577,7 +1577,7 @@ class RealEstateAIApp:
                 
                 # Check if response contains spreadsheet/table data and offer Excel generation
                 if any(keyword in query.lower() for keyword in ['excel', 'spreadsheet', 'table', 'csv', 'financial analysis', 'budget', 'calculation']):
-                    if st.button("📊 Generate Excel File from Response"):
+                    if st.button("📊 Generate Excel File from Response", key="generate_excel_btn"):
                         self.generate_excel_from_response(answer, query)
                 
                 # Display sources if requested
@@ -1816,18 +1816,18 @@ class RealEstateAIApp:
                 col1, col2 = st.columns(2)
                 
                 with col1:
-                    if st.button("🧠 Generate Concept Map"):
+                    if st.button("🧠 Generate Concept Map", key="generate_concept_map_btn"):
                         with st.spinner("Creating concept map from course embeddings..."):
                             self.generate_concept_map(st.session_state.selected_course)
                 
                 with col2:
-                    if st.button("📊 Visualize Embeddings"):
+                    if st.button("📊 Visualize Embeddings", key="visualize_embeddings_btn"):
                         with st.spinner("Analyzing document embeddings..."):
                             self.visualize_embeddings(st.session_state.selected_course)
                 
                 # Knowledge Graph Section
                 st.subheader("🔗 Knowledge Relationships")
-                if st.button("🌐 Show Knowledge Graph"):
+                if st.button("🌐 Show Knowledge Graph", key="show_knowledge_graph_btn"):
                     with st.spinner("Building knowledge graph..."):
                         self.show_knowledge_graph(st.session_state.selected_course)
                 
@@ -2283,7 +2283,7 @@ class RealEstateAIApp:
         col1, col2 = st.columns(2)
         
         with col1:
-            if st.button("🔄 Unignore All Courses"):
+            if st.button("🔄 Unignore All Courses", key="unignore_all_courses_btn"):
                 success_count = 0
                 for course_name in ignored_courses:
                     if self.ignore_manager.unignore_course(course_name):
@@ -2296,7 +2296,7 @@ class RealEstateAIApp:
                     st.error("❌ Failed to unignore courses")
         
         with col2:
-            if st.button("📄 Show Config File Path"):
+            if st.button("📄 Show Config File Path", key="show_config_path_btn"):
                 st.code(stats['config_file'])
                 st.caption("You can manually edit this JSON file if needed")
         
@@ -2324,7 +2324,7 @@ class RealEstateAIApp:
             help="Enter the full path to a course directory containing books/ebooks"
         )
         
-        if directory_path and st.button("🔍 Scan for Books"):
+        if directory_path and st.button("🔍 Scan for Books", key="scan_books_btn"):
             scan_path = Path(directory_path)
             
             if not scan_path.exists():
@@ -2360,7 +2360,7 @@ class RealEstateAIApp:
                 overwrite_existing = st.checkbox("🔄 Overwrite existing embeddings", value=False)
             
             # Process all books button
-            if embed_all and st.button("🚀 Process All Books"):
+            if embed_all and st.button("🚀 Process All Books", key="process_all_books_btn"):
                 if not self.doc_processor or not self.course_indexer:
                     st.error("❌ Document processor or course indexer not available")
                     return
@@ -2821,14 +2821,14 @@ class RealEstateAIApp:
         
         # Preview files to be processed
         if media_directory and course_name and file_types:
-            if st.button("🔍 Preview Files"):
+            if st.button("🔍 Preview Files", key="preview_files_btn"):
                 self.preview_media_files(media_directory, file_types, tm, course_name, skip_existing)
         elif not media_directory or not course_name:
             st.info("Please select a course or enter directory path and course name first.")
         
         # Start bulk transcription
         if media_directory and course_name and file_types:
-            if st.button("🚀 Start Bulk Transcription", type="primary"):
+            if st.button("🚀 Start Bulk Transcription", type="primary", key="start_bulk_transcription_btn"):
                 self.start_bulk_transcription(
                     media_directory, course_name, file_types, tm,
                     transcription_method, preserve_structure, skip_existing, 
@@ -2842,15 +2842,15 @@ class RealEstateAIApp:
         
         col1, col2, col3 = st.columns(3)
         with col1:
-            if st.button("📊 View All Transcriptions"):
+            if st.button("📊 View All Transcriptions", key="view_all_transcriptions_btn"):
                 self.show_all_transcriptions(tm)
         with col2:
-            if st.button("🧹 Cleanup Orphaned Files"):
+            if st.button("🧹 Cleanup Orphaned Files", key="cleanup_orphaned_files_btn"):
                 with st.spinner("Cleaning up..."):
                     tm.cleanup_orphaned_transcriptions()
                     st.success("Cleanup completed!")
         with col3:
-            if st.button("📁 Open Transcriptions Folder"):
+            if st.button("📁 Open Transcriptions Folder", key="open_transcriptions_folder_btn"):
                 st.info(f"Transcriptions stored in: `{stats['storage_location']}`")
     
     def preview_media_files(self, directory: str, file_types: list, tm, 
@@ -3391,7 +3391,7 @@ class RealEstateAIApp:
                     with col3:
                         st.metric("Cache Hit Rate", f"{history_stats.get('cache_hit_rate', 0):.1f}%")
                     with col4:
-                        if st.button("🗑️ Clear All"):
+                        if st.button("🗑️ Clear All", key="clear_all_analytics_btn"):
                             cleared_cache = rag_engine.response_cache.clear_all_cache()
                             cleared_history = rag_engine.query_history.clear_all_history()
                             st.success(f"Cleared {cleared_cache} cached responses and {cleared_history} query histories")
@@ -3516,7 +3516,7 @@ class RealEstateAIApp:
                     pass
             
             if has_content:
-                if st.button("🔄 Generate Vector Embeddings from ALL Course Materials", type="primary"):
+                if st.button("🔄 Generate Vector Embeddings from ALL Course Materials", type="primary", key="generate_vector_embeddings_btn"):
                     with st.spinner("Processing documents, transcriptions, and indexed materials..."):
                         try:
                             # Check if embedding model is loaded properly
@@ -3654,7 +3654,7 @@ class RealEstateAIApp:
         # Key management buttons
         col1, col2, col3 = st.columns(3)
         with col1:
-            if st.button("💾 Save Current Keys"):
+            if st.button("💾 Save Current Keys", key="save_current_keys_btn"):
                 success = key_storage.save_keys(
                     openai_key=st.session_state.manual_openai_key,
                     perplexity_key=st.session_state.manual_perplexity_key
@@ -3665,7 +3665,7 @@ class RealEstateAIApp:
                     st.error("Failed to save keys")
         
         with col2:
-            if st.button("🔄 Reload Stored Keys"):
+            if st.button("🔄 Reload Stored Keys", key="reload_stored_keys_btn"):
                 stored_keys = key_storage.load_keys()
                 st.session_state.manual_openai_key = stored_keys.get('openai', '')
                 st.session_state.manual_perplexity_key = stored_keys.get('perplexity', '')
@@ -3673,7 +3673,7 @@ class RealEstateAIApp:
                 st.rerun()
         
         with col3:
-            if st.button("🗑️ Clear All Keys"):
+            if st.button("🗑️ Clear All Keys", key="clear_all_keys_btn"):
                 key_storage.clear_keys()
                 st.session_state.manual_openai_key = ""
                 st.session_state.manual_perplexity_key = ""
@@ -3783,7 +3783,7 @@ class RealEstateAIApp:
                 
                 # Process query
                 if query:
-                    if st.button("🚀 Search & Generate Response"):
+                    if st.button("🚀 Search & Generate Response", key="search_generate_response_btn"):
                         with st.spinner("Searching relevant content and generating response..."):
                             try:
                                 # Step 1: Vector search
@@ -3838,7 +3838,7 @@ class RealEstateAIApp:
                 
                 # Search across all courses
                 st.subheader("🌐 Search All Courses")
-                if st.button("🔍 Search Across All Courses"):
+                if st.button("🔍 Search Across All Courses", key="search_all_courses_btn"):
                     if query:
                         with st.spinner("Searching all courses..."):
                             try:
@@ -3863,7 +3863,7 @@ class RealEstateAIApp:
         
         col1, col2, col3 = st.columns(3)
         with col1:
-            if st.button("📋 View All Vector Databases"):
+            if st.button("📋 View All Vector Databases", key="view_vector_databases_btn"):
                 vector_files = list(rag_engine.vectors_dir.glob("*_vectors.json"))
                 if vector_files:
                     for vector_file in vector_files:
@@ -3878,7 +3878,7 @@ class RealEstateAIApp:
                     st.info("No vector databases found.")
         
         with col2:
-            if st.button("🧹 Clear Vector Cache"):
+            if st.button("🧹 Clear Vector Cache", key="clear_vector_cache_btn"):
                 try:
                     # Clear memory cache
                     rag_engine.course_vectors.clear()
@@ -3887,7 +3887,7 @@ class RealEstateAIApp:
                     st.error(f"Error clearing cache: {e}")
         
         with col3:
-            if st.button("📁 Open Vectors Folder"):
+            if st.button("📁 Open Vectors Folder", key="open_vectors_folder_btn"):
                 st.info(f"Vector files stored in: `{rag_engine.vectors_dir}`")
 
         # Footer
