@@ -188,6 +188,7 @@ When you "index a course," the system processes all documents in that course fol
 - **Eliminated Hardcoded Paths**: Updated all system files to reference central configuration variable instead of hardcoded paths
 - **Single Point of Control**: Now changing one variable (ROOT_COURSEQUERY_DIRECTORY) updates paths system-wide
 - **Configuration Documentation**: Created CENTRAL_CONFIG_GUIDE.md explaining how to change root directory in one place
+- **Migration Guide**: Created MIGRATION_CHECKLIST.md with exact steps for copying essential data when cloning repo to new H:\ location
 
 ### July 30, 2025 - Centralized Directory Configuration & Offline Mode Fixes
 - **Single Source Directory Management**: Created `directory_config.py` with centralized MASTER_COURSE_DIRECTORY variable
