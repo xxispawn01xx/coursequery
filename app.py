@@ -2961,13 +2961,47 @@ class RealEstateAIApp:
             with col1:
                 ffmpeg_path = st.text_input(
                     "FFmpeg Directory Path (Optional)",
+                    value=st.session_state.get('ffmpeg_path', ''),
                     placeholder="C:\\ffmpeg\\bin or leave empty for auto-detection",
-                    help="Specify FFmpeg directory if transcription fails with 'file not found' errors"
+                    help="Specify custom FFmpeg installation path if auto-detection fails",
+                    key="ffmpeg_path_input"
                 )
             
             with col2:
                 if st.button("🔍 Test FFmpeg", key="test_ffmpeg_btn"):
                     self.test_ffmpeg_setup(ffmpeg_path)
+            
+            # Audio processing method selection
+            audio_method = st.selectbox(
+                "Audio Processing Method",
+                [
+                    "Auto-detect (Try FFmpeg first, fallback to alternatives)",
+                    "Force FFmpeg (Fastest, requires FFmpeg installation)",
+                    "Use librosa (Python library, slower but reliable)",
+                    "Use moviepy (Good for videos, moderate speed)",
+                    "Use pydub (Universal, slowest but most compatible)"
+                ],
+                index=0,
+                key="audio_method_selector",
+                help="Choose how to process audio from video files for Whisper transcription"
+            )
+            
+            # Store configuration in session state
+            st.session_state.ffmpeg_path = ffmpeg_path
+            st.session_state.audio_method = audio_method
+            
+            # Show current configuration
+            with st.expander("📋 Current Configuration"):
+                st.write(f"**FFmpeg Path**: {ffmpeg_path if ffmpeg_path else 'Auto-detect'}")
+                st.write(f"**Audio Method**: {audio_method}")
+                
+                if audio_method != "Auto-detect (Try FFmpeg first, fallback to alternatives)":
+                    if "librosa" in audio_method:
+                        st.info("💡 Install librosa: `pip install librosa`")
+                    elif "moviepy" in audio_method:
+                        st.info("💡 Install moviepy: `pip install moviepy`")
+                    elif "pydub" in audio_method:
+                        st.info("💡 Install pydub: `pip install pydub`")
             
             # Audio processing method selection
             audio_method = st.selectbox(
@@ -3218,7 +3252,7 @@ class RealEstateAIApp:
                     
                     # Perform transcription
                     if use_local:
-                        success = self.transcribe_file_local(media_file, course_name, tm)
+                        success = self.transcribe_file_local(media_file, course_name, tm, ffmpeg_path, audio_method)
                     else:
                         success = self.transcribe_file_cloud(media_file, course_name, tm)
                     
