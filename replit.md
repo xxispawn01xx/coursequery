@@ -113,6 +113,42 @@ Authentication: Local HuggingFace token storage, no external dependencies requir
 - **Index Optimization**: Manual re-indexing controls for performance tuning
 - **Resource Monitoring**: GPU/CPU usage tracking and optimization
 
+## How Course Indexing Works
+
+When you "index a course," the system processes all documents in that course folder and creates searchable vector embeddings. Here's what actually happens:
+
+### Document Processing
+- **Multi-format Support**: PDFs, DOCX, PPTX, EPUB files are converted to text
+- **Video/Audio Transcription**: Media files are transcribed using Whisper (locally on RTX 3060)
+- **Content Chunking**: Large documents are split into manageable pieces for better search
+- **Metadata Extraction**: File types, paths, and content statistics are preserved
+
+### Vector Embeddings Generation
+- **Per-Course Isolation**: Each course gets its own separate vector index
+- **Local MiniLM Model**: Converts text chunks into numerical vectors for semantic search
+- **Persistent Storage**: Embeddings are saved to disk for instant reuse
+- **Syllabus Weighting**: Course syllabi get higher priority in search results
+
+### Individual vs Combined Processing
+- **Individual Courses**: Each course maintains separate embeddings for focused, specific answers
+- **Combined Processing**: You could merge multiple courses, but this would dilute specificity
+- **Best Practice**: Keep courses separate for precise, context-aware responses
+
+### Perplexity Integration Workflow
+1. **Local Processing**: Course documents → vector embeddings (RTX 3060, offline)
+2. **Query Matching**: Your question finds relevant course chunks via vector similarity (local)
+3. **Context Assembly**: Most relevant chunks are gathered as focused context (local)
+4. **Cloud API Call**: Only the focused context + question sent to Perplexity for intelligent response
+5. **Cost Efficiency**: Pay only for actual queries, not document processing or embeddings
+6. **Quality Control**: Generated content is vetted from all course materials for accuracy
+
+### Answer Specificity
+**More specific answers come from smaller, focused course collections** because:
+- Less noise in the vector space
+- More targeted content matching
+- Higher relevance scores for course-specific topics
+- Better context assembly for the AI model
+
 ## Recent Changes
 
 ### July 30, 2025 - Centralized Directory Configuration & Offline Mode Fixes
