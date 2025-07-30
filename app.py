@@ -3112,35 +3112,31 @@ class RealEstateAIApp:
             logger.info(f"Using validated path for Whisper: {transcribe_path}")
             logger.info(f"File size: {Path(transcribe_path).stat().st_size / (1024*1024):.1f} MB")
             
-            # Convert Windows path for Whisper compatibility
-            whisper_path = transcribe_path.replace('\\', '/')
-            logger.info(f"Converting path for Whisper: {whisper_path}")
+            # Try multiple path formats for Whisper compatibility
+            path_attempts = [
+                ("forward_slashes", transcribe_path.replace('\\', '/')),
+                ("raw_string", transcribe_path),
+                ("short_path", self._get_short_path(transcribe_path)),
+                ("pathlib_object", Path(transcribe_path))
+            ]
             
-            try:
-                result = model.transcribe(
-                    whisper_path,
-                    fp16=True,  # Use FP16 for RTX 3060 efficiency
-                    verbose=False
-                )
-            except Exception as e:
-                logger.warning(f"Forward slash path failed: {e}")
-                # Try with raw string path
+            result = None
+            for attempt_name, path_to_try in path_attempts:
                 try:
+                    logger.info(f"Attempting {attempt_name}: {path_to_try}")
                     result = model.transcribe(
-                        rf"{transcribe_path}",
-                        fp16=True,
+                        path_to_try,
+                        fp16=True,  # Use FP16 for RTX 3060 efficiency
                         verbose=False
                     )
-                    logger.info("Raw string path successful")
-                except Exception as e2:
-                    logger.error(f"Both path formats failed: {e2}")
-                    # Try with pathlib Path object
-                    result = model.transcribe(
-                        Path(transcribe_path),
-                        fp16=True,
-                        verbose=False
-                    )
-                    logger.info("Path object successful")
+                    logger.info(f"✅ {attempt_name} successful!")
+                    break
+                except Exception as e:
+                    logger.warning(f"❌ {attempt_name} failed: {e}")
+                    continue
+            
+            if result is None:
+                raise Exception("All path format attempts failed")
             transcription = result["text"]
             
             # Save transcription
@@ -3154,7 +3150,36 @@ class RealEstateAIApp:
             return False
         except Exception as e:
             logger.error(f"Local transcription failed for {media_file}: {e}")
+            logger.error(f"Error type: {type(e).__name__}")
+            logger.error(f"Current working directory: {os.getcwd()}")
+            logger.error(f"File exists check: {Path(transcribe_path).exists() if 'transcribe_path' in locals() else 'Path not set'}")
             return False
+    
+    def _get_short_path(self, path_str):
+        """Get Windows short path (8.3 format) to avoid special character issues."""
+        try:
+            import ctypes
+            from ctypes import wintypes
+            
+            # Windows API to get short path
+            _GetShortPathNameW = ctypes.windll.kernel32.GetShortPathNameW
+            _GetShortPathNameW.argtypes = [wintypes.LPCWSTR, wintypes.LPWSTR, wintypes.DWORD]
+            _GetShortPathNameW.restype = wintypes.DWORD
+            
+            # Buffer for the short path
+            buffer_size = 260
+            buffer = ctypes.create_unicode_buffer(buffer_size)
+            
+            # Get short path
+            ret = _GetShortPathNameW(path_str, buffer, buffer_size)
+            
+            if ret:
+                return buffer.value
+            else:
+                return path_str  # Fallback to original path
+                
+        except Exception:
+            return path_str  # Fallback to original path
     
     def transcribe_file_cloud(self, media_file, course_name: str, tm) -> bool:
         """Transcribe a single file using OpenAI API."""
