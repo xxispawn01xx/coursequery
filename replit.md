@@ -123,6 +123,8 @@ Authentication: Local HuggingFace token storage, no external dependencies requir
 - **Whisper Offline Ready**: Created complete offline Whisper transcription manager optimized for RTX 3060 (install locally: pip install openai-whisper)
 - **DialoGPT Completely Removed**: Eliminated DialoGPT from entire application for faster, cleaner operation per user requirements
 - **Pure Local Architecture**: All model files deleted from Replit project - models exist only locally on user's RTX 3060 system
+- **Course Detection Fixed**: Updated app to properly detect courses from actual directory paths with session state clearing
+- **Frontend Caching Resolved**: Added session state clearing and forced rerun to update course list display
 
 ### July 28, 2025 - PyTorch Security & RTX 3060 Memory Fixes
 - **Complete Repository Cleanup**: Eliminated 5.7GB package cache bloat, reduced to 22MB clean codebase

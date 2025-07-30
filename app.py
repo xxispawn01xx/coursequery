@@ -369,19 +369,27 @@ class RealEstateAIApp:
         """Refresh the list of available courses with direct folder detection."""
         print("🔄 Starting course refresh...")
         
-        # Direct folder detection (bypass course_indexer issues)
+        # Clear cached session state to force frontend refresh
+        for key in ['available_courses', 'selected_course', 'course_list']:
+            if key in st.session_state:
+                del st.session_state[key]
+        
         courses = []
         
-        # Check directories exist
-        raw_docs_exists = self.config.raw_docs_dir.exists()
-        indexed_exists = self.config.indexed_courses_dir.exists()
+        # Use the actual paths from config
+        raw_docs_path = self.config.raw_docs_dir
+        indexed_path = self.config.indexed_courses_dir
         
-        print(f"📁 Directories - archived_courses: {raw_docs_exists}, indexed: {indexed_exists}")
+        raw_docs_exists = raw_docs_path.exists()
+        indexed_exists = indexed_path.exists()
+        
+        print(f"📁 Using paths - raw: {raw_docs_path}, indexed: {indexed_path}")
+        print(f"📁 Directories exist - archived_courses: {raw_docs_exists}, indexed: {indexed_exists}")
         
         # Get already indexed courses
         indexed_courses = set()
         if indexed_exists:
-            for item in self.config.indexed_courses_dir.iterdir():
+            for item in indexed_path.iterdir():
                 if item.is_dir():
                     indexed_courses.add(item.name)
                     courses.append({
@@ -392,10 +400,10 @@ class RealEstateAIApp:
                     })
                     print(f"📚 Found indexed course: {item.name}")
         
-        # Get archived courses (ready for processing)
+        # Get archived courses (ready for processing)  
         if raw_docs_exists:
-            print(f"📂 Scanning archived_courses...")
-            for item in self.config.raw_docs_dir.iterdir():
+            print(f"📂 Scanning {raw_docs_path}...")
+            for item in raw_docs_path.iterdir():
                 if item.is_dir() and item.name not in indexed_courses:
                     # Count supported files
                     file_count = 0
@@ -405,16 +413,21 @@ class RealEstateAIApp:
                             if ext in ['.pdf', '.docx', '.pptx', '.epub', '.mp4', '.avi', '.mov', '.mp3', '.wav']:
                                 file_count += 1
                     
-                    courses.append({
-                        'name': item.name,
-                        'status': 'raw',
-                        'document_count': file_count,
-                        'last_indexed': 'Not processed'
-                    })
-                    print(f"📁 Found archived course: {item.name} ({file_count} files)")
+                    if file_count > 0:  # Only add courses with supported files
+                        courses.append({
+                            'name': item.name,
+                            'status': 'raw',
+                            'document_count': file_count,
+                            'last_indexed': 'Not processed'
+                        })
+                        print(f"📁 Found archived course: {item.name} ({file_count} files)")
         
         print(f"✅ Total courses found: {len(courses)}")
+        
+        # Store in session state and force rerun to update UI
         st.session_state.available_courses = courses
+        st.session_state.courses_refreshed = True
+        
         return courses
 
     def sidebar_course_management(self):
@@ -450,6 +463,9 @@ class RealEstateAIApp:
                 with st.spinner("Refreshing courses..."):
                     courses = self.refresh_available_courses()
                     st.success(f"Found {len(courses)} courses")
+                    
+                    # Force a rerun to update the main interface
+                    st.rerun()
                     
                     # Show debug info in sidebar
                     with st.expander("🔍 Debug Info"):
