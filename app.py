@@ -472,10 +472,36 @@ class RealEstateAIApp:
         """Handle course management in the sidebar."""
         st.sidebar.header("📚 Course Management")
         
-        # Show course directory configuration
-        course_path = self.config.raw_docs_dir
-        st.sidebar.success(f"📁 Using local directory: archived_courses/")
-        st.sidebar.info("Course materials are stored locally in the archived_courses/ folder")
+        # Directory Path Configuration 
+        st.sidebar.subheader("📁 Course Directory")
+        
+        # Show current path
+        current_path = str(self.config.raw_docs_dir)
+        st.sidebar.text(f"Current: {current_path}")
+        
+        # Manual path input
+        with st.sidebar.expander("📝 Set Custom Directory Path"):
+            custom_path = st.text_input(
+                "Enter full directory path:",
+                value="H:\\Archive Classes\\coursequery\\archived_courses",
+                help="Enter the full path to your course directory",
+                key="custom_path_input"
+            )
+            
+            if st.button("📂 Update Directory Path", key="update_path_btn"):
+                try:
+                    path_obj = Path(custom_path)
+                    if path_obj.exists() and path_obj.is_dir():
+                        # Update config
+                        self.config.raw_docs_dir = path_obj
+                        st.success(f"✅ Directory updated: {path_obj}")
+                        # Clear cache and refresh
+                        st.session_state.clear()
+                        st.rerun()
+                    else:
+                        st.error(f"❌ Directory not found: {custom_path}")
+                except Exception as e:
+                    st.error(f"❌ Invalid path: {e}")
         
         # File uploader for courses
         st.sidebar.subheader("📁 Upload Course Directory")
