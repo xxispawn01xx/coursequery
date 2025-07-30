@@ -2535,28 +2535,87 @@ class RealEstateAIApp:
             methods_text = ", ".join(f"{k}: {v}" for k, v in stats['methods_used'].items()) if stats['methods_used'] else "None yet"
             st.metric("Methods Used", len(stats['methods_used']))
         
-        # Directory selection for bulk processing
-        st.subheader("📁 Select Media Directory")
+        # Smart course selection for bulk processing
+        st.subheader("📚 Select Course for Transcription")
+        
+        # Get available courses from existing system
+        available_courses = self.refresh_available_courses() if hasattr(self, 'refresh_available_courses') else []
+        
+        if available_courses:
+            course_options = [course['name'] for course in available_courses]
+            selected_course = st.selectbox(
+                "Choose Course:",
+                course_options,
+                help="Select from your existing courses - system will auto-detect media files"
+            )
+            
+            if selected_course:
+                # Get course directory automatically
+                course_dir = self.config.raw_docs_dir / selected_course
+                media_directory = str(course_dir)
+                course_name = selected_course
+                
+                # Auto-scan for media and VTT files
+                if course_dir.exists():
+                    media_files = []
+                    vtt_files = []
+                    video_extensions = ['.mp4', '.avi', '.mov', '.mkv']
+                    audio_extensions = ['.mp3', '.wav', '.flac', '.m4a']
+                    
+                    for ext in video_extensions + audio_extensions:
+                        media_files.extend(list(course_dir.rglob(f"*{ext}")))
+                    
+                    for vtt_ext in ['.vtt', '.srt']:
+                        vtt_files.extend(list(course_dir.rglob(f"*{vtt_ext}")))
+                    
+                    # Display smart summary
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        st.metric("📹 Videos/Audio", len(media_files))
+                    with col2:
+                        st.metric("📝 VTT/Subtitles", len(vtt_files))
+                    with col3:
+                        videos_with_vtt = 0
+                        for media_file in media_files:
+                            vtt_name = media_file.stem + '.vtt'
+                            srt_name = media_file.stem + '.srt'
+                            if any(vtt.name in [vtt_name, srt_name] for vtt in vtt_files):
+                                videos_with_vtt += 1
+                        needs_transcription = len(media_files) - videos_with_vtt
+                        st.metric("⚡ Need Transcription", needs_transcription)
+                    
+                    if len(vtt_files) > 0:
+                        st.success(f"✅ Found {len(vtt_files)} existing subtitle files - these are already processed in your course index")
+                    
+                    if needs_transcription > 0:
+                        st.info(f"🎯 {needs_transcription} media files need transcription to complete your course")
+                    else:
+                        st.success("🎉 All media files already have transcriptions! Your course is complete.")
+                else:
+                    st.warning(f"Course directory not found: {course_dir}")
+                    media_directory = ""
+                    course_name = ""
+        else:
+            st.warning("No courses detected. Please upload course materials first in the Documents tab.")
+            # Fallback to manual input
+            st.subheader("📁 Manual Directory Input")
+            media_directory = st.text_input(
+                "Media Directory Path",
+                placeholder="C:\\Users\\YourName\\Documents\\Course Videos",
+                help="Enter the full path to your folder containing audio/video files"
+            )
+            course_name = st.text_input(
+                "Course Name",
+                placeholder="Real Estate Course 2025",
+                help="Name to organize transcriptions under"
+            )
         
         # Method selection
+        st.subheader("🔧 Transcription Method")
         transcription_method = st.radio(
-            "Transcription Method:",
+            "Choose Method:",
             ["🖥️ Local Whisper (RTX 3060)", "☁️ OpenAI Whisper API"],
             help="Local Whisper uses your GPU and saves money. API requires OpenAI key but works without GPU."
-        )
-        
-        # Directory input
-        media_directory = st.text_input(
-            "Media Directory Path",
-            placeholder="C:\\Users\\YourName\\Documents\\Course Videos",
-            help="Enter the full path to your folder containing audio/video files"
-        )
-        
-        # Course name for organization
-        course_name = st.text_input(
-            "Course Name",
-            placeholder="Real Estate Course 2025",
-            help="Name to organize transcriptions under"
         )
         
         # File type selection

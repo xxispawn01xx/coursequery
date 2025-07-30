@@ -157,6 +157,15 @@ The system already processes VTT (subtitle) files automatically:
 - Video files without VTT → Candidate for transcription
 - All content → Combined into unified course embeddings
 
+### Smart Transcription Interface Implementation
+**Current Enhancement:**
+- **Course Dropdown Selection**: Replace manual directory input with course selection
+- **Automatic Path Detection**: System auto-populates directory from selected course
+- **VTT File Recognition**: Shows count of existing subtitle files
+- **Transcription Gap Analysis**: Displays exactly which videos need transcription
+- **Smart Status Display**: "Found 12 videos: 8 have VTT subtitles, 4 need transcription"
+- **Completion Validation**: Clear indication when course transcription is complete
+
 **API Endpoints:**
 ```
 POST /query-course

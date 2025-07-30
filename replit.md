@@ -151,6 +151,15 @@ When you "index a course," the system processes all documents in that course fol
 
 ## Recent Changes
 
+### July 30, 2025 - Smart Course-Based Transcription Interface
+- **Intelligent Course Selection**: Replaced manual directory input with course dropdown in transcription interface
+- **Automatic VTT Detection**: System now automatically detects existing VTT/SRT subtitle files in course directories
+- **Smart Transcription Analysis**: Shows exactly which videos already have subtitles vs which need transcription
+- **Gap Analysis Display**: Clear metrics showing "Found 12 videos: 8 have VTT subtitles, 4 need transcription"
+- **Course Integration**: Transcription interface now uses existing course detection system for seamless workflow
+- **Completion Validation**: Interface indicates when all media files already have transcriptions
+- **Fallback Support**: Manual directory input still available when no courses are detected
+
 ### July 30, 2025 - Centralized Directory Configuration & Offline Mode Fixes
 - **Single Source Directory Management**: Created `directory_config.py` with centralized MASTER_COURSE_DIRECTORY variable
 - **System-Wide Path Cascading**: One variable change updates paths across all components (course processing, book embeddings, indexing, transcription)
