@@ -1,0 +1,78 @@
+irflow_3\1 - Course Introduction\3 - Who I am.mp4
+ERROR:__main__:🚨 Enhanced transcription failed for archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\3 - Who I am.mp4: [WinError 2] The system cannot find the file specified
+ERROR:__main__:🔧 Error type: FileNotFoundError
+ERROR:__main__:📁 Current working directory: H:\Archive Classes\coursequery
+INFO:transcription_manager:Loading Whisper base model on cuda...
+INFO:transcription_manager:🚀 RTX 3060 detected - optimizing Whisper for GPU
+INFO:transcription_manager:RTX 3060 VRAM: 12.0GB available / 12.0GB total
+INFO:transcription_manager:✅ Whisper base loaded successfully on cuda
+INFO:__main__:File validation passed: 4 - Set up your Development Environment.mp4
+INFO:__main__:Loading Whisper model for RTX 3060...
+INFO:__main__:Transcribing: 4 - Set up your Development Environment.mp4
+INFO:transcription_manager:🔍 Resolving path: archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\4 - Set up your Development Environment.mp4
+INFO:transcription_manager:📁 Current working directory: H:\Archive Classes\coursequery
+INFO:transcription_manager:📂 Original path exists: True
+INFO:transcription_manager:📄 Original path is file: True
+INFO:transcription_manager:🧪 Testing absolute: H:\Archive Classes\coursequery\archived_courses\udem y The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\4 - Set up your Development Environment.mp4
+INFO:transcription_manager:✅ absolute strategy successful: H:\Archive Classes\coursequery\archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\4 - Set up your Development Environment.mp4
+INFO:transcription_manager:🎵 Transcribing with Whisper base...
+INFO:transcription_manager:📂 Using resolved path: H:\Archive Classes\coursequery\archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\4 - Set up your Development Environment.mp4
+INFO:transcription_manager:📊 File size: 16.1 MB
+ERROR:transcription_manager:🚨 Transcription failed for archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\4 - Set up your Development Environment.mp4: [WinError 2] The system cannot find the file specified
+ERROR:transcription_manager:🔧 Error type: FileNotFoundError
+ERROR:transcription_manager:📁 Current working directory: H:\Archive Classes\coursequery
+ERROR:transcription_manager:🔍 File access error - investigating...
+ERROR:transcription_manager:🔤 UTF-8 encoded path: archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\4 - Set up your Development Environment.mp4
+ERROR:__main__:🚨 Enhanced transcription failed for archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\4 - Set up your Development Environment.mp4: [WinError 2] The system cannot find the file specified
+ERROR:__main__:🔧 Error type: FileNotFoundError
+ERROR:__main__:📁 Current working directory: H:\Archive Classes\coursequery
+INFO:transcription_manager:Loading Whisper base model on cuda...
+INFO:transcription_manager:🚀 RTX 3060 detected - optimizing Whisper for GPU
+INFO:transcription_manager:RTX 3060 VRAM: 12.0GB available / 12.0GB total
+INFO:transcription_manager:✅ Whisper base loaded successfully on cuda
+INFO:__main__:File validation passed: 5 - Optional - Quick intro to Docker.mp4
+INFO:__main__:Loading Whisper model for RTX 3060...
+INFO:__main__:Transcribing: 5 - Optional - Quick intro to Docker.mp4
+INFO:transcription_manager:🔍 Resolving path: archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\5 - Optional - Quick intro to Docker.mp4
+INFO:transcription_manager:📁 Current working directory: H:\Archive Classes\coursequery
+INFO:transcription_manager:📂 Original path exists: True
+INFO:transcription_manager:📄 Original path is file: True
+INFO:transcription_manager:🧪 Testing absolute: H:\Archive Classes\coursequery\archived_courses\udem y The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\5 - Optional - Quick intro to Docker.mp4
+INFO:transcription_manager:✅ absolute strategy successful: H:\Archive Classes\coursequery\archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\5 - Optional - Quick intro to Docker.mp4
+INFO:transcription_manager:🎵 Transcribing with Whisper base...
+INFO:transcription_manager:📂 Using resolved path: H:\Archive Classes\coursequery\archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\5 - Optional - Quick intro to Docker.mp4
+INFO:transcription_manager:📊 File size: 8.5 MB
+ERROR:transcription_manager:🚨 Transcription failed for archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\5 - Optional - Quick intro to Docker.mp4: [WinError 2] The system cannot find the file specified
+ERROR:transcription_manager:🔧 Error type: FileNotFoundError
+ERROR:transcription_manager:📁 Current working directory: H:\Archive Classes\coursequery
+ERROR:transcription_manager:🔍 File access error - investigating...
+ERROR:transcription_manager:🔤 UTF-8 encoded path: archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\5 - Optional - Quick intro to Docker.mp4
+ERROR:__main__:🚨 Enhanced transcription failed for archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\5 - Optional - Quick intro to Docker.mp4: [WinError 2] The system cannot find the file specified
+ERROR:__main__:🔧 Error type: FileNotFoundError
+ERROR:__main__:📁 Current working directory: H:\Archive Classes\coursequery
+INFO:transcription_manager:Loading Whisper base model on cuda...
+INFO:transcription_manager:🚀 RTX 3060 detected - optimizing Whisper for GPU
+INFO:transcription_manager:RTX 3060 VRAM: 12.0GB available / 12.0GB total
+INFO:transcription_manager:✅ Whisper base loaded successfully on cuda
+INFO:__main__:File validation passed: 10 - Airflow is not.mp4
+INFO:__main__:Loading Whisper model for RTX 3060...
+INFO:__main__:Transcribing: 10 - Airflow is not.mp4
+INFO:transcription_manager:🔍 Resolving path: archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\2 - Getting Started with Airflow\10 - Airflow is not.mp4
+INFO:transcription_manager:📁 Current working directory: H:\Archive Classes\coursequery
+INFO:transcription_manager:📂 Original path exists: True
+INFO:transcription_manager:📄 Original path is file: True
+INFO:transcription_manager:🧪 Testing absolute: H:\Archive Classes\coursequery\archived_courses\udem y The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\2 - Getting Started with Airflow\10 - Airflow is not.mp4
+INFO:transcription_manager:✅ absolute strategy successful: H:\Archive Classes\coursequery\archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\2 - Getting Started with Airflow\10 - Airflow is not.mp4
+INFO:transcription_manager:🎵 Transcribing with Whisper base...
+INFO:transcription_manager:📂 Using resolved path: H:\Archive Classes\coursequery\archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\2 - Getting Started with Airflow\10 - Airflow is not.mp4
+INFO:transcription_manager:📊 File size: 4.9 MB
+ERROR:transcription_manager:🚨 Transcription failed for archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\2 - Getting Started with Airflow\10 - Airflow is not.mp4: [WinError 2] The system cannot find the file specified
+ERROR:transcription_manager:🔧 Error type: FileNotFoundError
+ERROR:transcription_manager:📁 Current working directory: H:\Archive Classes\coursequery
+ERROR:transcription_manager:🔍 File access error - investigating...
+ERROR:transcription_manager:🔤 UTF-8 encoded path: archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\2 - Getting Started with Airflow\10 - Airflow is not.mp4
+ERROR:__main__:🚨 Enhanced transcription failed for archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\2 - Getting Started with Airflow\10 - Airflow is not.mp4: [WinError 2] The system cannot find the file specified
+ERROR:__main__:🔧 Error type: FileNotFoundError
+ERROR:__main__:📁 Current working directory: H:\Archive Classes\coursequery
+INFO:transcription_manager:Loading Whisper base model on cuda...
+INFO:transcription_manager:🚀 RTX 3060 detected - optimizing Whisper for GPU

@@ -2614,7 +2614,7 @@ class RealEstateAIApp:
         with col2:
             try:
                 import torch
-                if torch.cuda.is_available():
+                if hasattr(torch, 'cuda') and torch.cuda.is_available():
                     st.success("✅ CUDA available for RTX 3060")
                 else:
                     st.warning("⚠️ CUDA not available")
@@ -2972,7 +2972,7 @@ class RealEstateAIApp:
                 try:
                     import whisper
                     import torch
-                    if not torch.cuda.is_available():
+                    if not (hasattr(torch, 'cuda') and torch.cuda.is_available()):
                         st.warning("CUDA not available. Falling back to CPU (slower).")
                 except ImportError:
                     st.error("Whisper not installed. Please install with: pip install openai-whisper")

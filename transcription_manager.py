@@ -139,6 +139,76 @@ class WhisperTranscriptionManager:
         # Return original path as last resort (let Whisper handle the error)
         logger.warning(f"⚠️ Using original path as fallback: {audio_path}")
         return audio_path
+    
+    def _format_path_for_whisper(self, resolved_path: str) -> str:
+        """Format resolved path specifically for Whisper compatibility on Windows.
+        
+        Args:
+            resolved_path: Absolute path that exists and is accessible
+            
+        Returns:
+            str: Path formatted for Whisper on Windows
+        """
+        import os
+        
+        logger.info(f"🎯 Formatting path for Whisper: {resolved_path}")
+        
+        # Try multiple Whisper-specific path formats
+        whisper_formats = [
+            ("raw_absolute", resolved_path),
+            ("forward_slash", resolved_path.replace("\\", "/")),
+            ("double_backslash", resolved_path.replace("\\", "\\\\")),
+            ("pathlib_str", str(Path(resolved_path))),
+            ("os_normpath", os.path.normpath(resolved_path)),
+        ]
+        
+        # Test each format with actual file access
+        for format_name, test_path in whisper_formats:
+            try:
+                logger.info(f"🧪 Testing Whisper format {format_name}: {test_path}")
+                
+                # Test if the path can be opened (what Whisper will try to do)
+                with open(test_path, 'rb') as f:
+                    f.read(1024)  # Read first KB to verify access
+                
+                logger.info(f"✅ Whisper format {format_name} accessible: {test_path}")
+                return test_path
+                
+            except Exception as format_error:
+                logger.warning(f"❌ Whisper format {format_name} failed: {format_error}")
+                continue
+        
+        # If all formats fail, try Windows short path as last resort
+        try:
+            import ctypes
+            from ctypes import wintypes
+            
+            # Windows API to get short path (8.3 format)
+            _GetShortPathNameW = ctypes.windll.kernel32.GetShortPathNameW
+            _GetShortPathNameW.argtypes = [wintypes.LPCWSTR, wintypes.LPWSTR, wintypes.DWORD]
+            _GetShortPathNameW.restype = wintypes.DWORD
+            
+            buffer_size = 260
+            buffer = ctypes.create_unicode_buffer(buffer_size)
+            ret = _GetShortPathNameW(resolved_path, buffer, buffer_size)
+            
+            if ret:
+                short_path = buffer.value
+                logger.info(f"🔧 Using Windows short path: {short_path}")
+                
+                # Test short path access
+                with open(short_path, 'rb') as f:
+                    f.read(1024)
+                
+                logger.info(f"✅ Windows short path accessible: {short_path}")
+                return short_path
+                
+        except Exception as short_path_error:
+            logger.warning(f"❌ Windows short path failed: {short_path_error}")
+        
+        # Final fallback - return original resolved path
+        logger.error(f"🚨 All Whisper path formats failed, using original: {resolved_path}")
+        return resolved_path
 
     def transcribe_audio(self, audio_path: str, language: Optional[str] = None) -> Dict[str, Any]:
         """Transcribe audio file using local Whisper.
@@ -172,9 +242,13 @@ class WhisperTranscriptionManager:
             except Exception as size_error:
                 logger.warning(f"⚠️ Cannot get file size: {size_error}")
             
+            # Additional Whisper path formatting for Windows
+            whisper_path = self._format_path_for_whisper(resolved_path)
+            logger.info(f"🎯 Final Whisper path: {whisper_path}")
+            
             # Transcribe with optimizations
             result = self.whisper_model.transcribe(
-                resolved_path,
+                whisper_path,
                 language=language,
                 fp16=self.device == "cuda",  # Use FP16 on GPU for RTX 3060 efficiency
                 verbose=False
