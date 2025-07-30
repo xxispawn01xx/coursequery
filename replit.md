@@ -151,7 +151,7 @@ When you "index a course," the system processes all documents in that course fol
 
 ## Recent Changes
 
-### July 30, 2025 - Smart Course-Based Transcription Interface
+### July 30, 2025 - Smart Course-Based Transcription Interface & RTX 3060 Setup
 - **Intelligent Course Selection**: Replaced manual directory input with course dropdown in transcription interface
 - **Automatic VTT Detection**: System now automatically detects existing VTT/SRT subtitle files in course directories
 - **Smart Transcription Analysis**: Shows exactly which videos already have subtitles vs which need transcription
@@ -160,8 +160,12 @@ When you "index a course," the system processes all documents in that course fol
 - **Completion Validation**: Interface indicates when all media files already have transcriptions
 - **Fallback Support**: Manual directory input still available when no courses are detected
 - **Long Course Name Handling**: Automatically truncates very long course names for better UI display
-- **Environment Awareness**: Clear indication that transcription works locally on RTX 3060, not in Replit development environment
+- **Local RTX 3060 Optimization**: Enhanced transcription for offline operation with proper file validation and RTX 3060 GPU acceleration
 - **Error Resilience**: Graceful handling of file access errors and missing directories with informative user feedback
+- **Comprehensive Setup Guide**: Created RTX_3060_TRANSCRIPTION_SETUP.md with complete installation and optimization instructions
+- **Dependency Validation**: Interface shows real-time status of Whisper and PyTorch/CUDA installation
+- **Debug Tools**: Added comprehensive debugging scripts to identify and resolve transcription issues
+- **Path Validation**: Enhanced file path checking with detailed logging for troubleshooting access issues
 
 ### July 30, 2025 - Centralized Directory Configuration & Offline Mode Fixes
 - **Single Source Directory Management**: Created `directory_config.py` with centralized MASTER_COURSE_DIRECTORY variable

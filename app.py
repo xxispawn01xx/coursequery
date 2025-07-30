@@ -2501,19 +2501,47 @@ class RealEstateAIApp:
         st.header("🎥 Bulk Media Transcription")
         st.info("**RTX 3060 Optimized**: Process entire folders of audio/video files while preserving folder structure")
         
-        # Economic benefits callout
-        with st.expander("💰 Cost Savings with Local Transcription"):
+        # Economic benefits and setup callout
+        with st.expander("💰 Cost Savings & Setup Requirements"):
             st.markdown("""
             **Your RTX 3060 saves $522/year vs cloud transcription:**
             - Local Whisper: $0.0002/minute 
             - OpenAI API: $0.006/minute (30x more expensive)
             - Process hours of content for pennies in electricity
             
+            **Required Setup for RTX 3060:**
+            ```bash
+            pip install openai-whisper
+            pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+            ```
+            
             **Optimal Workflow:**
-            1. Use RTX 3060 for bulk transcription (this tab)
-            2. Upload transcribed text to Google Drive
-            3. Query via ChatGPT Plus for superior responses
+            1. Install dependencies above for RTX 3060 acceleration
+            2. Use this tab for bulk transcription 
+            3. Transfer vector embeddings (5-50MB) to work environment
+            4. Query with cloud APIs for superior responses
             """)
+            
+        # Show current installation status
+        col1, col2 = st.columns(2)
+        with col1:
+            try:
+                import whisper
+                st.success("✅ Whisper installed")
+            except ImportError:
+                st.error("❌ Whisper not installed")
+                st.code("pip install openai-whisper")
+                
+        with col2:
+            try:
+                import torch
+                if torch.cuda.is_available():
+                    st.success("✅ CUDA available for RTX 3060")
+                else:
+                    st.warning("⚠️ CUDA not available")
+            except ImportError:
+                st.error("❌ PyTorch not installed")
+                st.code("pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118")
         
         # Import transcription manager
         try:
@@ -2625,9 +2653,9 @@ class RealEstateAIApp:
                         else:
                             st.success("🎉 All media files already have transcriptions! Your course is complete.")
                             
-                        # Show environment notice for Replit
+                        # Show transcription readiness for local RTX 3060
                         if len(media_files) > 0:
-                            st.info("📍 **Note**: This is the Replit development environment. For actual transcription, transfer to your local RTX 3060 system where course files are accessible.")
+                            st.success("🚀 **Ready for RTX 3060 Transcription**: Media files detected and accessible for local Whisper processing.")
                             
                     except Exception as e:
                         st.error(f"Error scanning course directory: {e}")
@@ -2747,13 +2775,29 @@ class RealEstateAIApp:
                 st.error(f"Directory not found: {directory}")
                 return
             
-            # Find all media files
+            # Find all media files with debugging
             media_files = []
             for file_type in file_types:
-                media_files.extend(media_dir.rglob(f"*{file_type}"))
+                found_files = list(media_dir.rglob(f"*{file_type}"))
+                media_files.extend(found_files)
+                logger.info(f"Found {len(found_files)} {file_type} files in {media_dir}")
+            
+            logger.info(f"Total media files found: {len(media_files)}")
+            
+            # Debug: Show first few files with their full paths
+            for i, file_path in enumerate(media_files[:3]):
+                logger.info(f"Sample file {i+1}: {file_path}")
+                logger.info(f"  Exists: {file_path.exists()}")
+                logger.info(f"  Is file: {file_path.is_file()}")
+                if file_path.exists():
+                    try:
+                        logger.info(f"  Size: {file_path.stat().st_size} bytes")
+                    except OSError as e:
+                        logger.warning(f"  Cannot access file stats: {e}")
             
             if not media_files:
                 st.warning("No media files found in the specified directory.")
+                logger.warning(f"No media files found in {media_dir} for types: {file_types}")
                 return
             
             # Filter based on existing transcriptions
@@ -2931,17 +2975,52 @@ class RealEstateAIApp:
         """Transcribe a single file using local Whisper."""
         try:
             import whisper
+            from pathlib import Path
+            
+            # Validate file exists and is accessible
+            media_path = Path(media_file)
+            logger.debug(f"Checking file: {media_path}")
+            logger.debug(f"Absolute path: {media_path.absolute()}")
+            
+            if not media_path.exists():
+                logger.error(f"Media file not found: {media_file}")
+                logger.error(f"Absolute path attempted: {media_path.absolute()}")
+                logger.error(f"Parent directory exists: {media_path.parent.exists()}")
+                return False
+                
+            if not media_path.is_file():
+                logger.error(f"Path is not a file: {media_file}")
+                return False
+                
+            logger.info(f"File validation passed: {media_path.name}")
+            
+            # Check if transcription already exists
+            if tm.has_transcription(media_file, course_name):
+                logger.info(f"Transcription already exists for: {media_path.name}")
+                return True
             
             # Load model (cached after first load)
-            model = whisper.load_model("medium")  # Good balance of speed/accuracy for RTX 3060
+            logger.info(f"Loading Whisper model for RTX 3060...")
+            model = whisper.load_model("base")  # Start with base for RTX 3060 compatibility
             
-            # Transcribe
-            result = model.transcribe(str(media_file))
+            # Transcribe with RTX 3060 optimization
+            logger.info(f"Transcribing: {media_path.name}")
+            result = model.transcribe(
+                str(media_file),
+                fp16=True,  # Use FP16 for RTX 3060 efficiency
+                verbose=False
+            )
             transcription = result["text"]
             
             # Save transcription
-            return tm.save_transcription(media_file, course_name, transcription, "whisper_local")
+            success = tm.save_transcription(media_file, course_name, transcription, "whisper_local")
+            if success:
+                logger.info(f"✅ Successfully transcribed: {media_path.name} ({len(transcription)} characters)")
+            return success
             
+        except ImportError:
+            logger.error("Whisper not installed. Install with: pip install openai-whisper")
+            return False
         except Exception as e:
             logger.error(f"Local transcription failed for {media_file}: {e}")
             return False
