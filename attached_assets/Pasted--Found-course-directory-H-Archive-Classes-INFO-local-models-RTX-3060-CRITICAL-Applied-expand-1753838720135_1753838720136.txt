@@ -1,0 +1,68 @@
+✅ Found course directory: H:\Archive Classes
+INFO:local_models:🔧 RTX 3060 CRITICAL: Applied expandable_segments:True before GPU access
+INFO:local_models:🔧 RTX 3060 Fix: Set CUDA_LAUNCH_BLOCKING=1
+INFO:local_models:🔧 RTX 3060 Fix: Set TORCH_USE_CUDA_DSA=1
+INFO:local_models:🧹 RTX 3060: Applied aggressive memory cleanup and allocator reset
+INFO:local_models:Initialized LocalModelManager with device: cuda:0
+📁 Using local H:\ course directory: H:\Archive Classes\coursequery\archived_courses
+💡 Running in pure offline mode
+INFO:hybrid_query_engine:✅ Whisper available for local transcription
+INFO:hybrid_query_engine:Available models: {'local_embeddings': True, 'local_llm': True, 'whisper': True, 'openai_api': False, 'perplexity_api': False}
+📁 Using local H:\ course directory: H:\Archive Classes\coursequery\archived_courses
+💡 Running in pure offline mode
+📁 Using local H:\ course directory: H:\Archive Classes\coursequery\archived_courses
+💡 Running in pure offline mode
+INFO:local_models:⏱️ Loading local models (type: mistral) - Start time: 21:24:59
+INFO:memory_optimizer:Memory Status:
+INFO:memory_optimizer:  RAM: 11.9/23.8GB (50.1%)
+INFO:memory_optimizer:  Swap: 0.9/24.0GB (3.8%)
+INFO:memory_optimizer:  Available: 11.9GB
+INFO:local_models:GPU Memory: 12.0GB - RTX 3060 can handle 7B models
+INFO:local_models:🔬 RTX 3060 Configuration - Hardware verified healthy via memtestcl
+INFO:local_models:✅ Memtestcl confirmed RTX 3060 memory is healthy (0 errors)
+INFO:local_models:Proceeding with optimized GPU configuration...
+INFO:local_models:🚀 Applying verified HuggingFace forum RTX 3060 fixes...
+INFO:local_models:🧹 Performing aggressive RTX 3060 memory cleanup...
+INFO:local_models:🔍 Testing RTX 3060 with forum-verified method...
+INFO:local_models:✅ RTX 3060 ready - 12.0GB VRAM (forum fixes + memory optimization applied)
+INFO:local_models:✅ HF_TOKEN found: hf_yqKQa...xxxf
+INFO:local_models:Mistral check - Models: False, Pipeline: False, Other models clear: True
+INFO:local_models:🚀 RTX 3060 memory after cleanup: 3509MB used / 12287MB total (28.6%)
+INFO:local_models:🚀 Loading models on memtest-verified RTX 3060...
+INFO:local_models:Loading Mistral 7B model with RTX 3060 compatibility fixes...
+WARNING:local_models:🔒 Using smaller models due to RTX 3060 memory fragmentation and PyTorch CVE-2025-32434
+INFO:local_models:💡 RTX 3060 Strategy: Load smaller models first to test memory allocator fixes
+INFO:local_models:🔄 Attempting DistilGPT-2 (Small, Safe for RTX 3060)...
+INFO:local_models:🔍 Step 1: Loading with safetensors (secure format)...
+INFO:local_models:✅ Safetensors loading successful - secure format verified!
+INFO:local_models:📝 Loading tokenizer...
+INFO:local_models:🚀 Step 3: Loading on RTX 3060 GPU with optimizations...
+INFO:local_models:Using 4-bit quantization for RTX 3060 12GB efficiency
+INFO:local_models:Applying HuggingFace forum RTX 3060 fix...
+INFO:local_models:Moving model to GPU manually (safer than device_map)
+INFO:local_models:🔧 Creating text generation pipeline...
+Device set to use cuda:0
+INFO:local_models:✅ Successfully loaded DistilGPT-2 (Small, Safe for RTX 3060) with RTX 3060 optimizations!
+INFO:local_models:Loading embedding model...
+INFO:local_models:Loading embedding model from cache: H:\Archive Classes\coursequery\models - ⬇️  First download (may take several minutes)
+ERROR:local_models:Failed to load embedding model: cannot access local variable 'torch' where it is not associated with a value
+WARNING:local_models:Continuing without embedding model - Q&A will be limited
+WARNING:local_models:Embedding model failed to load - Q&A functionality will be limited
+INFO:local_models:✅ All models loaded successfully (mistral) - Total time: 1.17s
+INFO:__main__:Model manager loaded successfully with mistral
+📁 Using local H:\ course directory: H:\Archive Classes\coursequery\archived_courses
+💡 Running in pure offline mode
+📁 Using local H:\ course directory: H:\Archive Classes\coursequery\archived_courses
+💡 Running in pure offline mode
+WARNING:course_indexer:HuggingFaceLLM not available, using manual generation
+INFO:__main__:Query engine initialized successfully
+INFO:__main__:Models and query engine loaded successfully with mistral
+📁 Using local H:\ course directory: H:\Archive Classes\coursequery\archived_courses
+💡 Running in pure offline mode
+🔒 FORCED to use local directories:
+📁 Raw docs: archived_courses
+📊 Indexed: indexed_courses
+📁 Using local H:\ course directory: H:\Archive Classes\coursequery\archived_courses
+💡 Running in pure offline mode
+📁 Using local H:\ course directory: H:\Archive Classes\coursequery\archived_courses
+💡 Running in pure offline mode

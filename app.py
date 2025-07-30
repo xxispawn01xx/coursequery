@@ -380,24 +380,24 @@ class RealEstateAIApp:
         return True
 
     def refresh_available_courses(self):
-        """Refresh the list of available courses - works both locally and on Replit."""
+        """Refresh the list of available courses - pure offline mode."""
         print("🔄 Starting course refresh...")
         
-        # Clear ALL cached session state to force complete refresh
-        st.session_state.clear()
+        # Clear cached course data only
+        for key in ['available_courses', 'selected_course']:
+            if key in st.session_state:
+                del st.session_state[key]
         
         courses = []
         
-        # OFFLINE PATH DETECTION: Use the configured local path
+        # Use the configured raw docs directory
         raw_docs_path = Path(self.config.raw_docs_dir)
-        print(f"📁 Using configured path: {raw_docs_path}")
+        print(f"📁 Scanning directory: {raw_docs_path}")
         
         if not raw_docs_path.exists():
-            print(f"❌ Course directory not found: {raw_docs_path}")
-            # Create local directory as fallback for pure offline mode
-            raw_docs_path = Path(__file__).parent / "archived_courses"
-            raw_docs_path.mkdir(exist_ok=True)
-            print(f"📁 Created local fallback: {raw_docs_path}")
+            print(f"❌ Directory not found: {raw_docs_path}")
+            st.session_state.available_courses = []
+            return []
         
         # Always use local indexed_courses directory for processed courses
         indexed_path = Path(__file__).parent / "indexed_courses"
@@ -421,17 +421,19 @@ class RealEstateAIApp:
                 })
                 print(f"📚 Indexed course: {item.name} ({doc_count} files)")
         
-        # Get courses from your actual directory (H:\ or local)
-        print(f"📂 Scanning {raw_docs_path} for courses...")
+        # Scan for courses in the directory
         course_count = 0
         
         try:
+            print(f"📂 Directory contents:")
             for item in raw_docs_path.iterdir():
+                print(f"  - {item.name} ({'DIR' if item.is_dir() else 'FILE'})")
+                
                 if item.is_dir():
                     course_count += 1
                     course_name = item.name
                     
-                    # Count supported files in this course
+                    # Count supported files in this course directory
                     file_count = 0
                     supported_extensions = ['.pdf', '.docx', '.pptx', '.epub', '.mp4', '.avi', '.mov', '.mp3', '.wav']
                     
@@ -439,33 +441,29 @@ class RealEstateAIApp:
                         if file_path.is_file() and file_path.suffix.lower() in supported_extensions:
                             file_count += 1
                     
-                    # Add course (indexed or ready to process)
+                    # Check if already indexed
                     if course_name in indexed_courses:
-                        # Already added above with indexed status
+                        print(f"📚 Course {course_name} already indexed - skipping")
                         continue
-                    else:
-                        # Ready to process
-                        courses.append({
-                            'name': course_name,
-                            'status': 'raw',
-                            'document_count': file_count,
-                            'last_indexed': 'Ready to process'
-                        })
                     
-                    print(f"📁 Course: {course_name} ({file_count} files)")
+                    # Add as unprocessed course
+                    courses.append({
+                        'name': course_name,
+                        'status': 'raw',
+                        'document_count': file_count,
+                        'last_indexed': 'Not processed'
+                    })
+                    
+                    print(f"📁 Found course: {course_name} ({file_count} files)")
         
         except Exception as e:
             print(f"❌ Error scanning directory: {e}")
+            st.error(f"Error accessing directory: {e}")
         
         print(f"✅ Total courses found: {len(courses)} (scanned {course_count} directories)")
         
-        # Force complete UI refresh
+        # Store results
         st.session_state.available_courses = courses
-        st.session_state.force_refresh = True
-        
-        # Immediate rerun to update display
-        st.rerun()
-        
         return courses
 
     def sidebar_course_management(self):
@@ -542,10 +540,12 @@ class RealEstateAIApp:
                         
                         if courses:
                             for course in courses:
-                                st.write(f"• {course['name']} ({course['status']})")
+                                st.write(f"• {course['name']} ({course['status']}) - {course['document_count']} files")
                         else:
                             st.write("No courses detected")
-            st.rerun()
+                    
+                    # Force UI refresh
+                    st.rerun()
         
         # Available courses
         courses = st.session_state.available_courses
