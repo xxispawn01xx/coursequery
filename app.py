@@ -2538,8 +2538,15 @@ class RealEstateAIApp:
         # Smart course selection for bulk processing
         st.subheader("📚 Select Course for Transcription")
         
-        # Get available courses from existing system
-        available_courses = self.refresh_available_courses() if hasattr(self, 'refresh_available_courses') else []
+        # Initialize variables to avoid "possibly unbound" errors
+        media_directory = ""
+        course_name = ""
+        
+        # Get available courses from existing system  
+        try:
+            available_courses = self.refresh_available_courses()
+        except:
+            available_courses = []
         
         if available_courses:
             course_options = [course['name'] for course in available_courses]
@@ -2664,6 +2671,8 @@ class RealEstateAIApp:
         if media_directory and course_name and file_types:
             if st.button("🔍 Preview Files"):
                 self.preview_media_files(media_directory, file_types, tm, course_name, skip_existing)
+        elif not media_directory or not course_name:
+            st.info("Please select a course or enter directory path and course name first.")
         
         # Start bulk transcription
         if media_directory and course_name and file_types:
@@ -2673,6 +2682,8 @@ class RealEstateAIApp:
                     transcription_method, preserve_structure, skip_existing, 
                     batch_size, show_progress
                 )
+        elif not media_directory or not course_name:
+            st.info("Please complete course selection or manual input to start transcription.")
         
         # Management section
         st.subheader("📋 Transcription Management")

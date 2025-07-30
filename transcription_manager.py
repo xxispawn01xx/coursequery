@@ -194,8 +194,41 @@ class WhisperTranscriptionManager:
     
     def has_transcription(self, media_file, course_name: str) -> bool:
         """Check if a transcription already exists for this file."""
-        # For offline mode, assume no existing transcriptions
-        return False
+        # Check if VTT/SRT file exists alongside the media file
+        from pathlib import Path
+        media_path = Path(media_file)
+        
+        # Check for VTT and SRT files with same name
+        vtt_file = media_path.with_suffix('.vtt')
+        srt_file = media_path.with_suffix('.srt')
+        
+        return vtt_file.exists() or srt_file.exists()
+    
+    def save_transcription(self, media_file, course_name: str, transcription: str, method: str) -> bool:
+        """Save transcription to file."""
+        try:
+            from pathlib import Path
+            
+            # Create transcription file next to original media file
+            media_path = Path(media_file)
+            transcription_file = media_path.with_suffix('.vtt')
+            
+            # Create simple VTT format
+            vtt_content = f"""WEBVTT
+
+00:00:00.000 --> 99:59:59.999
+{transcription}
+"""
+            
+            # Save the transcription
+            transcription_file.write_text(vtt_content, encoding='utf-8')
+            
+            logger.info(f"✅ Saved transcription: {transcription_file}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Failed to save transcription: {e}")
+            return False
     
     def cleanup_orphaned_transcriptions(self):
         """Clean up orphaned transcription files."""
