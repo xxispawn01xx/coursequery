@@ -16,6 +16,34 @@ except ImportError:
     PyPDF2 = None
     PYPDF2_AVAILABLE = False
 
+# Image processing libraries
+try:
+    import fitz  # PyMuPDF for image extraction
+    PYMUPDF_AVAILABLE = True
+except ImportError:
+    fitz = None
+    PYMUPDF_AVAILABLE = False
+
+try:
+    from PIL import Image
+    import io
+    import base64
+    PIL_AVAILABLE = True
+except ImportError:
+    Image = None
+    PIL_AVAILABLE = False
+
+# OpenAI for multimodal image analysis
+try:
+    from openai import OpenAI
+    import os
+    openai_client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+    OPENAI_AVAILABLE = True
+except ImportError:
+    OpenAI = None
+    openai_client = None
+    OPENAI_AVAILABLE = False
+
 try:
     import docx
     DOCX_AVAILABLE = True
@@ -141,8 +169,90 @@ class DocumentProcessor:
             logger.error(f"Error processing {file_path}: {e}")
             raise
     
+    def analyze_image_with_gpt4v(self, image_data: bytes, page_num: int = None) -> str:
+        """Analyze image content using GPT-4V."""
+        if not OPENAI_AVAILABLE:
+            return "[Image content - multimodal analysis not available]"
+        
+        try:
+            # Encode image to base64
+            base64_image = base64.b64encode(image_data).decode('utf-8')
+            
+            page_context = f" on page {page_num}" if page_num else ""
+            
+            response = openai_client.chat.completions.create(
+                model="gpt-4o",  # Latest multimodal model
+                messages=[
+                    {
+                        "role": "user", 
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": f"Analyze this image from a business/academic document{page_context}. Describe charts, graphs, diagrams, tables, key data points, and any text visible in the image. Focus on extracting meaningful business insights and data that would be useful for learning and analysis."
+                            },
+                            {
+                                "type": "image_url",
+                                "image_url": {"url": f"data:image/png;base64,{base64_image}"}
+                            }
+                        ]
+                    }
+                ],
+                max_tokens=1000
+            )
+            
+            return f"[IMAGE ANALYSIS{page_context}]: {response.choices[0].message.content}"
+            
+        except Exception as e:
+            logger.error(f"Error analyzing image: {e}")
+            return "[Image content - analysis failed]"
+
     def _process_pdf(self, file_path: Path) -> str:
-        """Extract text from PDF file."""
+        """Extract text and analyze images from PDF files."""
+        content_parts = []
+        
+        # First try PyMuPDF for comprehensive extraction
+        if PYMUPDF_AVAILABLE and PIL_AVAILABLE:
+            try:
+                doc = fitz.open(file_path)
+                
+                for page_num in range(doc.page_count):
+                    page = doc[page_num]
+                    
+                    # Extract text
+                    text = page.get_text()
+                    if text.strip():
+                        content_parts.append(f"[Page {page_num + 1} Text]\n{text}")
+                    
+                    # Extract and analyze images
+                    image_list = page.get_images()
+                    for img_index, img in enumerate(image_list):
+                        try:
+                            xref = img[0]
+                            pix = fitz.Pixmap(doc, xref)
+                            
+                            if pix.n - pix.alpha < 4:  # Valid image
+                                img_data = pix.tobytes("png")
+                                
+                                # Analyze image with GPT-4V if available
+                                if OPENAI_AVAILABLE:
+                                    analysis = self.analyze_image_with_gpt4v(img_data, page_num + 1)
+                                    content_parts.append(analysis)
+                                else:
+                                    content_parts.append(f"[IMAGE on page {page_num + 1}] - Image present but analysis not available")
+                            
+                            pix = None  # Clean up
+                            
+                        except Exception as e:
+                            logger.warning(f"Error processing image {img_index} on page {page_num + 1}: {e}")
+                            continue
+                
+                doc.close()
+                return "\n\n".join(content_parts) if content_parts else ""
+                
+            except Exception as e:
+                logger.warning(f"PyMuPDF processing failed for {file_path}: {e}, falling back to PyPDF2")
+        
+        # Fallback to PyPDF2 for text-only extraction
         try:
             with open(file_path, 'rb') as file:
                 pdf_reader = PyPDF2.PdfReader(file)
