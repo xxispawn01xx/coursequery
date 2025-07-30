@@ -168,6 +168,8 @@ When you "index a course," the system processes all documents in that course fol
 - **Path Validation**: Enhanced file path checking with detailed logging for troubleshooting access issues
 - **Windows Path Fix**: Added multiple path resolution methods to handle Windows backslashes and special characters in course names
 - **Robust File Access**: Implemented fallback path formats when primary path resolution fails for Whisper transcription
+- **Duplicate Path Resolution**: Fixed duplicate nested directory structures in Apache Airflow course paths for successful RTX 3060 transcription
+- **Path Correction Pipeline**: Enhanced file validation to detect, correct, and use proper paths throughout the transcription process
 
 ### July 30, 2025 - Centralized Directory Configuration & Offline Mode Fixes
 - **Single Source Directory Management**: Created `directory_config.py` with centralized MASTER_COURSE_DIRECTORY variable

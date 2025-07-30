@@ -3030,6 +3030,8 @@ class RealEstateAIApp:
                     if found_files:
                         media_path = found_files[0]
                         logger.info(f"Found file at: {media_path}")
+                        # Update the media_file parameter to use the corrected path for saving
+                        media_file = str(media_path)
                     else:
                         logger.error(f"File '{file_name}' not found in any course directory")
                         logger.info("This is normal in development environment - actual course files are on your local H:\ drive")
@@ -3058,30 +3060,15 @@ class RealEstateAIApp:
             # Transcribe with RTX 3060 optimization
             logger.info(f"Transcribing: {media_path.name}")
             
-            # Fix Windows path issues - try multiple methods
-            try:
-                # Method 1: Use resolved absolute path
-                resolved_path = str(media_path.resolve())
-                logger.debug(f"Trying resolved path: {resolved_path}")
-                
-                result = model.transcribe(
-                    resolved_path,
-                    fp16=True,  # Use FP16 for RTX 3060 efficiency
-                    verbose=False
-                )
-                
-            except Exception as path_error:
-                logger.warning(f"Resolved path failed, trying forward slashes: {path_error}")
-                
-                # Method 2: Use forward slashes
-                forward_slash_path = str(media_path).replace('\\', '/')
-                logger.debug(f"Trying forward slash path: {forward_slash_path}")
-                
-                result = model.transcribe(
-                    forward_slash_path,
-                    fp16=True,
-                    verbose=False
-                )
+            # Fix Windows path issues - use the corrected media_path from validation
+            transcribe_path = str(media_path.resolve())
+            logger.debug(f"Using validated path for Whisper: {transcribe_path}")
+            
+            result = model.transcribe(
+                transcribe_path,
+                fp16=True,  # Use FP16 for RTX 3060 efficiency
+                verbose=False
+            )
             transcription = result["text"]
             
             # Save transcription
