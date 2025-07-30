@@ -28,6 +28,7 @@ except ImportError:
     pd = None
 
 from config import Config
+from pathlib import Path
 
 # Optional AI module imports
 try:
@@ -75,6 +76,19 @@ class RealEstateAIApp:
     def __init__(self):
         """Initialize the application."""
         self.config = Config()
+        
+        # FORCE local directory usage - override any H:\ detection
+        app_dir = Path(__file__).parent
+        self.config.raw_docs_dir = app_dir / "archived_courses" 
+        self.config.indexed_courses_dir = app_dir / "indexed_courses"
+        
+        # Create directories if they don't exist
+        self.config.raw_docs_dir.mkdir(exist_ok=True)
+        self.config.indexed_courses_dir.mkdir(exist_ok=True)
+        
+        print(f"🔒 FORCED to use local directories:")
+        print(f"📁 Raw docs: {self.config.raw_docs_dir}")
+        print(f"📊 Indexed: {self.config.indexed_courses_dir}")
         
         # Initialize available components
         self.doc_processor = DocumentProcessor() if DOCUMENT_PROCESSOR_AVAILABLE else None
@@ -376,9 +390,10 @@ class RealEstateAIApp:
         
         courses = []
         
-        # Use the actual paths from config
-        raw_docs_path = self.config.raw_docs_dir
-        indexed_path = self.config.indexed_courses_dir
+        # Force use of local directories (ignore any H:\ paths)
+        app_dir = Path(__file__).parent
+        raw_docs_path = app_dir / "archived_courses"
+        indexed_path = app_dir / "indexed_courses"
         
         raw_docs_exists = raw_docs_path.exists()
         indexed_exists = indexed_path.exists()
