@@ -121,9 +121,23 @@ class DocumentProcessor:
         """
         logger.info(f"Processing file: {file_path}")
         
+        # Enhanced debugging for nested paths
+        logger.debug(f"📍 Full path: {str(file_path)}")
+        logger.debug(f"🔍 Path exists: {file_path.exists()}")
+        logger.debug(f"📁 Is file: {file_path.is_file()}")
+        logger.debug(f"📂 Parent exists: {file_path.parent.exists()}")
+        
+        # Check if path is too long (Windows limit)
+        path_length = len(str(file_path))
+        if path_length > 250:
+            logger.warning(f"⚠️ Very long path ({path_length} chars): {file_path.name}")
+        
         # Determine file type
         mime_type, _ = mimetypes.guess_type(str(file_path))
         file_extension = file_path.suffix.lower()
+        
+        logger.debug(f"🎯 File extension: {file_extension}")
+        logger.debug(f"📋 MIME type: {mime_type}")
         
         # Extract content based on file type
         try:

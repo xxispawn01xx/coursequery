@@ -137,6 +137,8 @@ Authentication: Local HuggingFace token storage, no external dependencies requir
 - **Enhanced Error Reporting**: Detailed summaries show exactly which files processed successfully vs failed with specific reasons
 - **Expanded File Format Support**: Added support for 25+ file types including VTT/SRT subtitles, code files, configs, and additional media formats
 - **Comprehensive Course Processing**: Now captures VTT subtitle content, Python/JS code examples, JSON configs, and diverse media files for complete coverage
+- **Enhanced Path Debugging**: Added comprehensive logging to diagnose nested folder structures with special characters and long Windows paths
+- **Windows Path Compatibility**: Enhanced file processing to handle complex nested structures like Udemy course folders with duplicate names and special characters
 
 ### July 29, 2025 - Multi-Course Detection & Replit Integration
 - **Enhanced Course Detection**: System now detects both indexed courses and unprocessed course directories automatically

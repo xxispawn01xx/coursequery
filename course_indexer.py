@@ -542,32 +542,59 @@ class CourseIndexer:
             processed_count = 0
             failed_count = 0
             
-            for file_path in course_raw_dir.rglob('*'):  # Use rglob for recursive search
-                if file_path.is_file() and doc_processor.is_supported_format(file_path):
+            # First, scan and log all files found
+            all_files_found = []
+            logger.info(f"🔍 Scanning for files in: {course_raw_dir}")
+            
+            try:
+                for file_path in course_raw_dir.rglob('*'):
+                    if file_path.is_file():
+                        all_files_found.append(file_path)
+                        
+                logger.info(f"📁 Found {len(all_files_found)} total files in course directory")
+                
+                # Log file type breakdown
+                from collections import Counter
+                extensions = Counter(f.suffix.lower() for f in all_files_found)
+                logger.info(f"📊 File types found:")
+                for ext, count in extensions.most_common(10):
+                    status = "✅" if ext in doc_processor.get_supported_formats() else "❌"
+                    logger.info(f"  {status} {ext}: {count} files")
+                
+            except Exception as e:
+                logger.error(f"❌ Error scanning directory: {e}")
+                all_files_found = []
+            
+            # Now process supported files
+            for file_path in all_files_found:
+                if doc_processor.is_supported_format(file_path):
                     try:
                         # Check if file exists and is accessible before processing
                         if not file_path.exists():
-                            logger.warning(f"⚠️ File not found during re-indexing: {file_path}")
+                            logger.warning(f"⚠️ File not found during processing: {file_path}")
                             failed_count += 1
                             continue
                         
-                        # Test file accessibility
+                        # Test file accessibility with more detailed error info
                         try:
-                            file_path.stat()
+                            file_stat = file_path.stat()
+                            logger.debug(f"📄 Processing: {file_path.name} ({file_stat.st_size} bytes)")
                         except (OSError, PermissionError) as access_error:
-                            logger.warning(f"⚠️ File not accessible during re-indexing: {file_path} - {access_error}")
+                            logger.warning(f"⚠️ File not accessible: {file_path} - {access_error}")
                             failed_count += 1
                             continue
                         
                         # Assume syllabus files contain 'syllabus' in the name
                         is_syllabus = 'syllabus' in file_path.name.lower()
                         
+                        logger.info(f"🔄 Processing {file_path.suffix}: {file_path.name}")
                         processed_doc = doc_processor.process_file(file_path, is_syllabus)
                         documents.append(processed_doc)
                         processed_count += 1
+                        logger.info(f"✅ Successfully processed: {file_path.name}")
                         
                     except Exception as e:
-                        logger.warning(f"⚠️ Failed to process file {file_path}: {e}")
+                        logger.warning(f"⚠️ Failed to process file {file_path.name}: {e}")
                         failed_count += 1
                         continue
             
