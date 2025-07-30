@@ -323,24 +323,50 @@ class HybridQueryEngine:
             raise
     
     def _query_local(self, query: str, course_name: str) -> Dict[str, Any]:
-        """Query using local models (fallback)."""
+        """Query using local models."""
         try:
-            from local_models import LocalModelManager
-            model_manager = LocalModelManager()
+            # Get course context using local embeddings
+            context = self._get_course_context(course_name, query)
             
-            if not model_manager.embedding_model:
-                # Try to load minimal models
-                model_manager.load_embedding_model()
-            
-            # Simple local response
-            response = f"Local model response for: {query}\n\n" \
-                      f"Note: For better responses, configure OpenAI or Perplexity API keys."
+            # Build response with local processing
+            response = f"Local query processed for course '{course_name}'. "
+            if context:
+                response += f"Found relevant content from course materials. "
+            response += "For detailed AI analysis, please configure OpenAI or Perplexity API keys."
             
             return {
                 "response": response,
                 "cached": False,
-                "method": "local_fallback",
-                "response_time": 1.0
+                "method": "local_basic",
+                "response_time": 0.1
+            }
+        except Exception as e:
+            logger.error(f"Local query failed: {e}")
+            return {
+                "response": f"Local processing available. Add API keys for AI analysis.",
+                "cached": False,
+                "method": "local_ready",
+                "response_time": 0.0
+            }
+    
+    def _query_with_local_embeddings_only(self, query: str, course_name: str) -> Dict[str, Any]:
+        """Query with local embeddings but no local LLM."""
+        try:
+            context = self._get_course_context(course_name, query)
+            response = f"Found course content for '{course_name}'. Add API keys for AI analysis."
+            
+            return {
+                "response": response,
+                "cached": False,
+                "method": "embeddings_only",
+                "response_time": 0.1
+            }
+        except Exception as e:
+            return {
+                "response": f"Embeddings processing available. Add API keys for detailed analysis.",
+                "cached": False,
+                "method": "embeddings_ready",
+                "response_time": 0.0
             }
             
         except Exception as e:

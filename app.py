@@ -371,7 +371,7 @@ class RealEstateAIApp:
                 st.warning("⚠️ Model manager not available - using hybrid mode")
                 # Continue without local models - use cloud APIs instead
                 st.session_state.models_loaded = True
-                st.session_state.selected_model = "cloud_api"
+                st.session_state.selected_model = "local_models"
                 return True
             
             # Show loading message based on model change
