@@ -1,0 +1,537 @@
+📚 Course Udemy - Apache Airflow The HandsOn Guide already indexed - skipping
+  - udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3 (DIR)
+📚 Course udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3 already indexed - skipping
+  - VCPE-20241208T200025Z-001 (DIR)
+📚 Course VCPE-20241208T200025Z-001 already indexed - skipping
+  - WE Launch 2022 (DIR)
+📁 Found course: WE Launch 2022 (52 files)
+  - WE Launch 2023 (DIR)
+📁 Found course: WE Launch 2023 (49 files)
+  - [Resource] Haas Quantitative Readiness (DIR)
+📁 Found course: [Resource] Haas Quantitative Readiness (14 files)
+✅ Total courses found: 33 (scanned 32 directories)
+✂️ After filtering ignored courses: 19 remaining
+INFO:course_rename_handler:Found 1 orphaned indexes
+INFO:course_rename_handler:Found 23 new course directories
+🔄 Starting course refresh...
+📁 Scanning directory: archived_courses
+📁 Raw courses: archived_courses
+📊 Indexed courses: indexed_courses
+📚 Indexed course: coursequery (1025 documents)
+📚 Indexed course: EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024) (49 documents)
+📚 Indexed course: EWMBA 202-LEC-31A & 32A - Financial Accounting (Spring 2024) (0 files, no metadata)
+📚 Indexed course: EWMBA 203-LEC-32B - Introduction to Finance (Spring 2024) (43 documents)
+📚 Indexed course: EWMBA 254-LEC-02F - Power and Politics in Organizations (Fall 2023) (42 documents)
+📚 Indexed course: EWMBA 258P-LEC-11F - The Science of Productivity and Performance (Spring 2025) (88 documents)
+📚 Indexed course: PHW223 2024 Strategy in Health Care Organizations (37 documents)
+📚 Indexed course: Udemy - Apache Airflow The HandsOn Guide (479 documents)
+📚 Indexed course: udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3 (150 documents)
+📚 Indexed course: VCPE-20241208T200025Z-001 (29 documents)
+📂 Directory contents:
+  - EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024) (DIR)
+📚 Course EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024) already indexed - skipping
+  - EW & MBA 291E-LEC-01F - Interpersonal Skills and Embodied Systems Leadership (Fall 2023) (DIR)
+📁 Found course: EW & MBA 291E-LEC-01F - Interpersonal Skills and Embodied Systems Leadership (Fall 2023) (46 files)
+  - EWMBA 200S-LEC-31B & 32B - Data and Decisions (Fall 2023) (DIR)
+📁 Found course: EWMBA 200S-LEC-31B & 32B - Data and Decisions (Fall 2023) (15 files)
+  - EWMBA 201B-LEC-31A & 32A - Macroeconomics in the Global Economy (Spring 2024) (DIR)
+📁 Found course: EWMBA 201B-LEC-31A & 32A - Macroeconomics in the Global Economy (Spring 2024) (72 files)
+  - EWMBA 201B_ Macroeconomics (WEEKEND) - Core Waiver Exam (DIR)
+📁 Found course: EWMBA 201B_ Macroeconomics (WEEKEND) - Core Waiver Exam (2 files)
+  - EWMBA 202-LEC-31A & 32A - Financial Accounting (Spring 2024) (DIR)
+📚 Course EWMBA 202-LEC-31A & 32A - Financial Accounting (Spring 2024) already indexed - skipping
+  - EWMBA 203-LEC-32B - Introduction to Finance (Spring 2024) (DIR)
+📚 Course EWMBA 203-LEC-32B - Introduction to Finance (Spring 2024) already indexed - skipping
+  - EWMBA 203_ Introduction to Finance (WEEKEND) - Core Waiver Exam (DIR)
+📁 Found course: EWMBA 203_ Introduction to Finance (WEEKEND) - Core Waiver Exam (1 files)
+  - EWMBA 205-LEC-31A & 32A - Leading People (Fall 2023) (DIR)
+📁 Found course: EWMBA 205-LEC-31A & 32A - Leading People (Fall 2023) (66 files)
+  - EWMBA 205D - Business Communication in Diverse Work Environments (Spring 2025) (DIR)
+📁 Found course: EWMBA 205D - Business Communication in Diverse Work Environments (Spring 2025) (34 files)
+  - EWMBA 207-LEC-32B - Ethics and Responsibility in Business (Spring 2024) (DIR)
+📁 Found course: EWMBA 207-LEC-32B - Ethics and Responsibility in Business (Spring 2024) (59 files)
+  - EWMBA 209-Sat - Strategic Leadership (Fall 2024) (DIR)
+📁 Found course: EWMBA 209-Sat - Strategic Leadership (Fall 2024) (84 files)
+  - EWMBA 252-LEC-001 - Negotiations and Conflict Resolution (Summer 2024) (DIR)
+📁 Found course: EWMBA 252-LEC-001 - Negotiations and Conflict Resolution (Summer 2024) (121 files)
+  - EWMBA 254-LEC-02F - Power and Politics in Organizations (Fall 2023) (DIR)
+📚 Course EWMBA 254-LEC-02F - Power and Politics in Organizations (Fall 2023) already indexed - skipping
+  - EWMBA 258P-LEC-11F - The Science of Productivity and Performance (Spring 2025) (DIR)
+📚 Course EWMBA 258P-LEC-11F - The Science of Productivity and Performance (Spring 2025) already indexed - skipping
+  - EWMBA D&D Pre-Term '22 (DIR)
+📁 Found course: EWMBA D&D Pre-Term '22 (5 files)
+  - EWMBA D&D Pre-Term '23 (DIR)
+📁 Found course: EWMBA D&D Pre-Term '23 (5 files)
+  - index (DIR)
+📁 Found course: index (0 files)
+  - Leadership Communication (Fall 2024) (DIR)
+📁 Found course: Leadership Communication (Fall 2024) (32 files)
+  - Marketing Core Oski (Fall 23) (DIR)
+📁 Found course: Marketing Core Oski (Fall 23) (48 files)
+  - metadata.json (FILE)
+  - NUS-Haas Bay Area Entrepreneurship, Investing & Innovation  (Spring 2024) (DIR)
+📁 Found course: NUS-Haas Bay Area Entrepreneurship, Investing & Innovation  (Spring 2024) (26 files)
+  - PHW223 2024 Strategy in Health Care Organizations (DIR)
+📚 Course PHW223 2024 Strategy in Health Care Organizations already indexed - skipping
+  - python_course (DIR)
+📁 Found course: python_course (2 files)
+  - SHAPE Student Training - UCB - 2025-2026 (DIR)
+📁 Found course: SHAPE Student Training - UCB - 2025-2026 (6 files)
+  - Teams@Haas - Weekend MBA 2023 (DIR)
+📁 Found course: Teams@Haas - Weekend MBA 2023 (13 files)
+  - test_course (DIR)
+📁 Found course: test_course (1 files)
+  - Udemy - Apache Airflow The HandsOn Guide (DIR)
+📚 Course Udemy - Apache Airflow The HandsOn Guide already indexed - skipping
+  - udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3 (DIR)
+📚 Course udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3 already indexed - skipping
+  - VCPE-20241208T200025Z-001 (DIR)
+📚 Course VCPE-20241208T200025Z-001 already indexed - skipping
+  - WE Launch 2022 (DIR)
+📁 Found course: WE Launch 2022 (52 files)
+  - WE Launch 2023 (DIR)
+📁 Found course: WE Launch 2023 (49 files)
+  - [Resource] Haas Quantitative Readiness (DIR)
+📁 Found course: [Resource] Haas Quantitative Readiness (14 files)
+✅ Total courses found: 33 (scanned 32 directories)
+✂️ After filtering ignored courses: 19 remaining
+💡 Running in pure offline mode with centralized directory config
+📁 Master directory: H:\Archive Classes\coursequery\archived_courses
+📁 Active directory: H:\Archive Classes\coursequery\archived_courses
+ERROR:__main__:Error getting comprehensive analytics: 'OfflineCourseManager' object has no attribute 'get_course_analytics'
+💡 Running in pure offline mode with centralized directory config
+📁 Master directory: H:\Archive Classes\coursequery\archived_courses
+📁 Active directory: H:\Archive Classes\coursequery\archived_courses
+🔒 FORCED to use local directories:
+📁 Raw docs: archived_courses
+📊 Indexed: indexed_courses
+💡 Running in pure offline mode with centralized directory config
+📁 Master directory: H:\Archive Classes\coursequery\archived_courses
+📁 Active directory: H:\Archive Classes\coursequery\archived_courses
+💡 Running in pure offline mode with centralized directory config
+📁 Master directory: H:\Archive Classes\coursequery\archived_courses
+📁 Active directory: H:\Archive Classes\coursequery\archived_courses
+INFO:hybrid_query_engine:✅ Whisper available for local transcription
+INFO:hybrid_query_engine:Available models: {'local_embeddings': True, 'local_llm': True, 'whisper': True, 'openai_api': False, 'perplexity_api': False}
+💡 Running in pure offline mode with centralized directory config
+📁 Master directory: H:\Archive Classes\coursequery\archived_courses
+📁 Active directory: H:\Archive Classes\coursequery\archived_courses
+INFO:offline_course_manager:📁 Offline course manager initialized
+INFO:offline_course_manager:📚 Raw docs: archived_courses
+INFO:offline_course_manager:📊 Indexed: indexed_courses
+INFO:course_ignore_manager:Loaded 14 ignored courses
+INFO:book_indexer:No book index found, starting fresh
+INFO:course_rename_handler:Found 1 orphaned indexes
+INFO:course_rename_handler:Found 23 new course directories
+🔄 Starting course refresh...
+📁 Scanning directory: archived_courses
+📁 Raw courses: archived_courses
+📊 Indexed courses: indexed_courses
+📚 Indexed course: coursequery (1025 documents)
+📚 Indexed course: EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024) (49 documents)
+📚 Indexed course: EWMBA 202-LEC-31A & 32A - Financial Accounting (Spring 2024) (0 files, no metadata)
+📚 Indexed course: EWMBA 203-LEC-32B - Introduction to Finance (Spring 2024) (43 documents)
+📚 Indexed course: EWMBA 254-LEC-02F - Power and Politics in Organizations (Fall 2023) (42 documents)
+📚 Indexed course: EWMBA 258P-LEC-11F - The Science of Productivity and Performance (Spring 2025) (88 documents)
+📚 Indexed course: PHW223 2024 Strategy in Health Care Organizations (37 documents)
+📚 Indexed course: Udemy - Apache Airflow The HandsOn Guide (479 documents)
+📚 Indexed course: udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3 (150 documents)
+📚 Indexed course: VCPE-20241208T200025Z-001 (29 documents)
+📂 Directory contents:
+  - EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024) (DIR)
+📚 Course EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024) already indexed - skipping
+  - EW & MBA 291E-LEC-01F - Interpersonal Skills and Embodied Systems Leadership (Fall 2023) (DIR)
+📁 Found course: EW & MBA 291E-LEC-01F - Interpersonal Skills and Embodied Systems Leadership (Fall 2023) (46 files)
+  - EWMBA 200S-LEC-31B & 32B - Data and Decisions (Fall 2023) (DIR)
+📁 Found course: EWMBA 200S-LEC-31B & 32B - Data and Decisions (Fall 2023) (15 files)
+  - EWMBA 201B-LEC-31A & 32A - Macroeconomics in the Global Economy (Spring 2024) (DIR)
+📁 Found course: EWMBA 201B-LEC-31A & 32A - Macroeconomics in the Global Economy (Spring 2024) (72 files)
+  - EWMBA 201B_ Macroeconomics (WEEKEND) - Core Waiver Exam (DIR)
+📁 Found course: EWMBA 201B_ Macroeconomics (WEEKEND) - Core Waiver Exam (2 files)
+  - EWMBA 202-LEC-31A & 32A - Financial Accounting (Spring 2024) (DIR)
+📚 Course EWMBA 202-LEC-31A & 32A - Financial Accounting (Spring 2024) already indexed - skipping
+  - EWMBA 203-LEC-32B - Introduction to Finance (Spring 2024) (DIR)
+📚 Course EWMBA 203-LEC-32B - Introduction to Finance (Spring 2024) already indexed - skipping
+  - EWMBA 203_ Introduction to Finance (WEEKEND) - Core Waiver Exam (DIR)
+📁 Found course: EWMBA 203_ Introduction to Finance (WEEKEND) - Core Waiver Exam (1 files)
+  - EWMBA 205-LEC-31A & 32A - Leading People (Fall 2023) (DIR)
+📁 Found course: EWMBA 205-LEC-31A & 32A - Leading People (Fall 2023) (66 files)
+  - EWMBA 205D - Business Communication in Diverse Work Environments (Spring 2025) (DIR)
+📁 Found course: EWMBA 205D - Business Communication in Diverse Work Environments (Spring 2025) (34 files)
+  - EWMBA 207-LEC-32B - Ethics and Responsibility in Business (Spring 2024) (DIR)
+📁 Found course: EWMBA 207-LEC-32B - Ethics and Responsibility in Business (Spring 2024) (59 files)
+  - EWMBA 209-Sat - Strategic Leadership (Fall 2024) (DIR)
+📁 Found course: EWMBA 209-Sat - Strategic Leadership (Fall 2024) (84 files)
+  - EWMBA 252-LEC-001 - Negotiations and Conflict Resolution (Summer 2024) (DIR)
+📁 Found course: EWMBA 252-LEC-001 - Negotiations and Conflict Resolution (Summer 2024) (121 files)
+  - EWMBA 254-LEC-02F - Power and Politics in Organizations (Fall 2023) (DIR)
+📚 Course EWMBA 254-LEC-02F - Power and Politics in Organizations (Fall 2023) already indexed - skipping
+  - EWMBA 258P-LEC-11F - The Science of Productivity and Performance (Spring 2025) (DIR)
+📚 Course EWMBA 258P-LEC-11F - The Science of Productivity and Performance (Spring 2025) already indexed - skipping
+  - EWMBA D&D Pre-Term '22 (DIR)
+📁 Found course: EWMBA D&D Pre-Term '22 (5 files)
+  - EWMBA D&D Pre-Term '23 (DIR)
+📁 Found course: EWMBA D&D Pre-Term '23 (5 files)
+  - index (DIR)
+📁 Found course: index (0 files)
+  - Leadership Communication (Fall 2024) (DIR)
+📁 Found course: Leadership Communication (Fall 2024) (32 files)
+  - Marketing Core Oski (Fall 23) (DIR)
+📁 Found course: Marketing Core Oski (Fall 23) (48 files)
+  - metadata.json (FILE)
+  - NUS-Haas Bay Area Entrepreneurship, Investing & Innovation  (Spring 2024) (DIR)
+📁 Found course: NUS-Haas Bay Area Entrepreneurship, Investing & Innovation  (Spring 2024) (26 files)
+  - PHW223 2024 Strategy in Health Care Organizations (DIR)
+📚 Course PHW223 2024 Strategy in Health Care Organizations already indexed - skipping
+  - python_course (DIR)
+📁 Found course: python_course (2 files)
+  - SHAPE Student Training - UCB - 2025-2026 (DIR)
+📁 Found course: SHAPE Student Training - UCB - 2025-2026 (6 files)
+  - Teams@Haas - Weekend MBA 2023 (DIR)
+📁 Found course: Teams@Haas - Weekend MBA 2023 (13 files)
+  - test_course (DIR)
+📁 Found course: test_course (1 files)
+  - Udemy - Apache Airflow The HandsOn Guide (DIR)
+📚 Course Udemy - Apache Airflow The HandsOn Guide already indexed - skipping
+  - udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3 (DIR)
+📚 Course udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3 already indexed - skipping
+  - VCPE-20241208T200025Z-001 (DIR)
+📚 Course VCPE-20241208T200025Z-001 already indexed - skipping
+  - WE Launch 2022 (DIR)
+📁 Found course: WE Launch 2022 (52 files)
+  - WE Launch 2023 (DIR)
+📁 Found course: WE Launch 2023 (49 files)
+  - [Resource] Haas Quantitative Readiness (DIR)
+📁 Found course: [Resource] Haas Quantitative Readiness (14 files)
+✅ Total courses found: 33 (scanned 32 directories)
+✂️ After filtering ignored courses: 19 remaining
+ERROR:__main__:Error getting comprehensive analytics: 'OfflineCourseManager' object has no attribute 'get_course_analytics'
+ERROR:__main__:Error getting comprehensive analytics: 'OfflineCourseManager' object has no attribute 'get_course_analytics'
+💡 Running in pure offline mode with centralized directory config
+📁 Master directory: H:\Archive Classes\coursequery\archived_courses
+📁 Active directory: H:\Archive Classes\coursequery\archived_courses
+🔒 FORCED to use local directories:
+📁 Raw docs: archived_courses
+📊 Indexed: indexed_courses
+💡 Running in pure offline mode with centralized directory config
+📁 Master directory: H:\Archive Classes\coursequery\archived_courses
+📁 Active directory: H:\Archive Classes\coursequery\archived_courses
+💡 Running in pure offline mode with centralized directory config
+📁 Master directory: H:\Archive Classes\coursequery\archived_courses
+📁 Active directory: H:\Archive Classes\coursequery\archived_courses
+INFO:hybrid_query_engine:✅ Whisper available for local transcription
+INFO:hybrid_query_engine:Available models: {'local_embeddings': True, 'local_llm': True, 'whisper': True, 'openai_api': False, 'perplexity_api': False}
+💡 Running in pure offline mode with centralized directory config
+📁 Master directory: H:\Archive Classes\coursequery\archived_courses
+📁 Active directory: H:\Archive Classes\coursequery\archived_courses
+INFO:offline_course_manager:📁 Offline course manager initialized
+INFO:offline_course_manager:📚 Raw docs: archived_courses
+INFO:offline_course_manager:📊 Indexed: indexed_courses
+INFO:course_ignore_manager:Loaded 14 ignored courses
+INFO:book_indexer:No book index found, starting fresh
+INFO:course_rename_handler:Found 1 orphaned indexes
+INFO:course_rename_handler:Found 23 new course directories
+🔄 Starting course refresh...
+📁 Scanning directory: archived_courses
+📁 Raw courses: archived_courses
+📊 Indexed courses: indexed_courses
+📚 Indexed course: coursequery (1025 documents)
+📚 Indexed course: EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024) (49 documents)
+📚 Indexed course: EWMBA 202-LEC-31A & 32A - Financial Accounting (Spring 2024) (0 files, no metadata)
+📚 Indexed course: EWMBA 203-LEC-32B - Introduction to Finance (Spring 2024) (43 documents)
+📚 Indexed course: EWMBA 254-LEC-02F - Power and Politics in Organizations (Fall 2023) (42 documents)
+📚 Indexed course: EWMBA 258P-LEC-11F - The Science of Productivity and Performance (Spring 2025) (88 documents)
+📚 Indexed course: PHW223 2024 Strategy in Health Care Organizations (37 documents)
+📚 Indexed course: Udemy - Apache Airflow The HandsOn Guide (479 documents)
+📚 Indexed course: udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3 (150 documents)
+📚 Indexed course: VCPE-20241208T200025Z-001 (29 documents)
+📂 Directory contents:
+  - EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024) (DIR)
+📚 Course EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024) already indexed - skipping
+  - EW & MBA 291E-LEC-01F - Interpersonal Skills and Embodied Systems Leadership (Fall 2023) (DIR)
+📁 Found course: EW & MBA 291E-LEC-01F - Interpersonal Skills and Embodied Systems Leadership (Fall 2023) (46 files)
+  - EWMBA 200S-LEC-31B & 32B - Data and Decisions (Fall 2023) (DIR)
+📁 Found course: EWMBA 200S-LEC-31B & 32B - Data and Decisions (Fall 2023) (15 files)
+  - EWMBA 201B-LEC-31A & 32A - Macroeconomics in the Global Economy (Spring 2024) (DIR)
+📁 Found course: EWMBA 201B-LEC-31A & 32A - Macroeconomics in the Global Economy (Spring 2024) (72 files)
+  - EWMBA 201B_ Macroeconomics (WEEKEND) - Core Waiver Exam (DIR)
+📁 Found course: EWMBA 201B_ Macroeconomics (WEEKEND) - Core Waiver Exam (2 files)
+  - EWMBA 202-LEC-31A & 32A - Financial Accounting (Spring 2024) (DIR)
+📚 Course EWMBA 202-LEC-31A & 32A - Financial Accounting (Spring 2024) already indexed - skipping
+  - EWMBA 203-LEC-32B - Introduction to Finance (Spring 2024) (DIR)
+📚 Course EWMBA 203-LEC-32B - Introduction to Finance (Spring 2024) already indexed - skipping
+  - EWMBA 203_ Introduction to Finance (WEEKEND) - Core Waiver Exam (DIR)
+📁 Found course: EWMBA 203_ Introduction to Finance (WEEKEND) - Core Waiver Exam (1 files)
+  - EWMBA 205-LEC-31A & 32A - Leading People (Fall 2023) (DIR)
+📁 Found course: EWMBA 205-LEC-31A & 32A - Leading People (Fall 2023) (66 files)
+  - EWMBA 205D - Business Communication in Diverse Work Environments (Spring 2025) (DIR)
+📁 Found course: EWMBA 205D - Business Communication in Diverse Work Environments (Spring 2025) (34 files)
+  - EWMBA 207-LEC-32B - Ethics and Responsibility in Business (Spring 2024) (DIR)
+📁 Found course: EWMBA 207-LEC-32B - Ethics and Responsibility in Business (Spring 2024) (59 files)
+  - EWMBA 209-Sat - Strategic Leadership (Fall 2024) (DIR)
+📁 Found course: EWMBA 209-Sat - Strategic Leadership (Fall 2024) (84 files)
+  - EWMBA 252-LEC-001 - Negotiations and Conflict Resolution (Summer 2024) (DIR)
+📁 Found course: EWMBA 252-LEC-001 - Negotiations and Conflict Resolution (Summer 2024) (121 files)
+  - EWMBA 254-LEC-02F - Power and Politics in Organizations (Fall 2023) (DIR)
+📚 Course EWMBA 254-LEC-02F - Power and Politics in Organizations (Fall 2023) already indexed - skipping
+  - EWMBA 258P-LEC-11F - The Science of Productivity and Performance (Spring 2025) (DIR)
+📚 Course EWMBA 258P-LEC-11F - The Science of Productivity and Performance (Spring 2025) already indexed - skipping
+  - EWMBA D&D Pre-Term '22 (DIR)
+📁 Found course: EWMBA D&D Pre-Term '22 (5 files)
+  - EWMBA D&D Pre-Term '23 (DIR)
+📁 Found course: EWMBA D&D Pre-Term '23 (5 files)
+  - index (DIR)
+📁 Found course: index (0 files)
+  - Leadership Communication (Fall 2024) (DIR)
+📁 Found course: Leadership Communication (Fall 2024) (32 files)
+  - Marketing Core Oski (Fall 23) (DIR)
+📁 Found course: Marketing Core Oski (Fall 23) (48 files)
+  - metadata.json (FILE)
+  - NUS-Haas Bay Area Entrepreneurship, Investing & Innovation  (Spring 2024) (DIR)
+📁 Found course: NUS-Haas Bay Area Entrepreneurship, Investing & Innovation  (Spring 2024) (26 files)
+  - PHW223 2024 Strategy in Health Care Organizations (DIR)
+📚 Course PHW223 2024 Strategy in Health Care Organizations already indexed - skipping
+  - python_course (DIR)
+📁 Found course: python_course (2 files)
+  - SHAPE Student Training - UCB - 2025-2026 (DIR)
+📁 Found course: SHAPE Student Training - UCB - 2025-2026 (6 files)
+  - Teams@Haas - Weekend MBA 2023 (DIR)
+📁 Found course: Teams@Haas - Weekend MBA 2023 (13 files)
+  - test_course (DIR)
+📁 Found course: test_course (1 files)
+  - Udemy - Apache Airflow The HandsOn Guide (DIR)
+📚 Course Udemy - Apache Airflow The HandsOn Guide already indexed - skipping
+  - udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3 (DIR)
+📚 Course udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3 already indexed - skipping
+  - VCPE-20241208T200025Z-001 (DIR)
+📚 Course VCPE-20241208T200025Z-001 already indexed - skipping
+  - WE Launch 2022 (DIR)
+📁 Found course: WE Launch 2022 (52 files)
+  - WE Launch 2023 (DIR)
+📁 Found course: WE Launch 2023 (49 files)
+  - [Resource] Haas Quantitative Readiness (DIR)
+📁 Found course: [Resource] Haas Quantitative Readiness (14 files)
+✅ Total courses found: 33 (scanned 32 directories)
+✂️ After filtering ignored courses: 19 remaining
+ERROR:__main__:Error getting comprehensive analytics: 'OfflineCourseManager' object has no attribute 'get_course_analytics'
+ERROR:__main__:Error getting comprehensive analytics: 'OfflineCourseManager' object has no attribute 'get_course_analytics'
+💡 Running in pure offline mode with centralized directory config
+📁 Master directory: H:\Archive Classes\coursequery\archived_courses
+📁 Active directory: H:\Archive Classes\coursequery\archived_courses
+🔒 FORCED to use local directories:
+📁 Raw docs: archived_courses
+📊 Indexed: indexed_courses
+💡 Running in pure offline mode with centralized directory config
+📁 Master directory: H:\Archive Classes\coursequery\archived_courses
+📁 Active directory: H:\Archive Classes\coursequery\archived_courses
+💡 Running in pure offline mode with centralized directory config
+📁 Master directory: H:\Archive Classes\coursequery\archived_courses
+📁 Active directory: H:\Archive Classes\coursequery\archived_courses
+INFO:hybrid_query_engine:✅ Whisper available for local transcription
+INFO:hybrid_query_engine:Available models: {'local_embeddings': True, 'local_llm': True, 'whisper': True, 'openai_api': False, 'perplexity_api': False}
+💡 Running in pure offline mode with centralized directory config
+📁 Master directory: H:\Archive Classes\coursequery\archived_courses
+📁 Active directory: H:\Archive Classes\coursequery\archived_courses
+INFO:offline_course_manager:📁 Offline course manager initialized
+INFO:offline_course_manager:📚 Raw docs: archived_courses
+INFO:offline_course_manager:📊 Indexed: indexed_courses
+INFO:course_ignore_manager:Loaded 14 ignored courses
+INFO:book_indexer:No book index found, starting fresh
+INFO:course_rename_handler:Found 1 orphaned indexes
+INFO:course_rename_handler:Found 23 new course directories
+🔄 Starting course refresh...
+📁 Scanning directory: archived_courses
+📁 Raw courses: archived_courses
+📊 Indexed courses: indexed_courses
+📚 Indexed course: coursequery (1025 documents)
+📚 Indexed course: EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024) (49 documents)
+📚 Indexed course: EWMBA 202-LEC-31A & 32A - Financial Accounting (Spring 2024) (0 files, no metadata)
+📚 Indexed course: EWMBA 203-LEC-32B - Introduction to Finance (Spring 2024) (43 documents)
+📚 Indexed course: EWMBA 254-LEC-02F - Power and Politics in Organizations (Fall 2023) (42 documents)
+📚 Indexed course: EWMBA 258P-LEC-11F - The Science of Productivity and Performance (Spring 2025) (88 documents)
+📚 Indexed course: PHW223 2024 Strategy in Health Care Organizations (37 documents)
+📚 Indexed course: Udemy - Apache Airflow The HandsOn Guide (479 documents)
+📚 Indexed course: udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3 (150 documents)
+📚 Indexed course: VCPE-20241208T200025Z-001 (29 documents)
+📂 Directory contents:
+  - EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024) (DIR)
+📚 Course EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024) already indexed - skipping
+  - EW & MBA 291E-LEC-01F - Interpersonal Skills and Embodied Systems Leadership (Fall 2023) (DIR)
+📁 Found course: EW & MBA 291E-LEC-01F - Interpersonal Skills and Embodied Systems Leadership (Fall 2023) (46 files)
+  - EWMBA 200S-LEC-31B & 32B - Data and Decisions (Fall 2023) (DIR)
+📁 Found course: EWMBA 200S-LEC-31B & 32B - Data and Decisions (Fall 2023) (15 files)
+  - EWMBA 201B-LEC-31A & 32A - Macroeconomics in the Global Economy (Spring 2024) (DIR)
+📁 Found course: EWMBA 201B-LEC-31A & 32A - Macroeconomics in the Global Economy (Spring 2024) (72 files)
+  - EWMBA 201B_ Macroeconomics (WEEKEND) - Core Waiver Exam (DIR)
+📁 Found course: EWMBA 201B_ Macroeconomics (WEEKEND) - Core Waiver Exam (2 files)
+  - EWMBA 202-LEC-31A & 32A - Financial Accounting (Spring 2024) (DIR)
+📚 Course EWMBA 202-LEC-31A & 32A - Financial Accounting (Spring 2024) already indexed - skipping
+  - EWMBA 203-LEC-32B - Introduction to Finance (Spring 2024) (DIR)
+📚 Course EWMBA 203-LEC-32B - Introduction to Finance (Spring 2024) already indexed - skipping
+  - EWMBA 203_ Introduction to Finance (WEEKEND) - Core Waiver Exam (DIR)
+📁 Found course: EWMBA 203_ Introduction to Finance (WEEKEND) - Core Waiver Exam (1 files)
+  - EWMBA 205-LEC-31A & 32A - Leading People (Fall 2023) (DIR)
+📁 Found course: EWMBA 205-LEC-31A & 32A - Leading People (Fall 2023) (66 files)
+  - EWMBA 205D - Business Communication in Diverse Work Environments (Spring 2025) (DIR)
+📁 Found course: EWMBA 205D - Business Communication in Diverse Work Environments (Spring 2025) (34 files)
+  - EWMBA 207-LEC-32B - Ethics and Responsibility in Business (Spring 2024) (DIR)
+📁 Found course: EWMBA 207-LEC-32B - Ethics and Responsibility in Business (Spring 2024) (59 files)
+  - EWMBA 209-Sat - Strategic Leadership (Fall 2024) (DIR)
+📁 Found course: EWMBA 209-Sat - Strategic Leadership (Fall 2024) (84 files)
+  - EWMBA 252-LEC-001 - Negotiations and Conflict Resolution (Summer 2024) (DIR)
+📁 Found course: EWMBA 252-LEC-001 - Negotiations and Conflict Resolution (Summer 2024) (121 files)
+  - EWMBA 254-LEC-02F - Power and Politics in Organizations (Fall 2023) (DIR)
+📚 Course EWMBA 254-LEC-02F - Power and Politics in Organizations (Fall 2023) already indexed - skipping
+  - EWMBA 258P-LEC-11F - The Science of Productivity and Performance (Spring 2025) (DIR)
+📚 Course EWMBA 258P-LEC-11F - The Science of Productivity and Performance (Spring 2025) already indexed - skipping
+  - EWMBA D&D Pre-Term '22 (DIR)
+📁 Found course: EWMBA D&D Pre-Term '22 (5 files)
+  - EWMBA D&D Pre-Term '23 (DIR)
+📁 Found course: EWMBA D&D Pre-Term '23 (5 files)
+  - index (DIR)
+📁 Found course: index (0 files)
+  - Leadership Communication (Fall 2024) (DIR)
+📁 Found course: Leadership Communication (Fall 2024) (32 files)
+  - Marketing Core Oski (Fall 23) (DIR)
+📁 Found course: Marketing Core Oski (Fall 23) (48 files)
+  - metadata.json (FILE)
+  - NUS-Haas Bay Area Entrepreneurship, Investing & Innovation  (Spring 2024) (DIR)
+📁 Found course: NUS-Haas Bay Area Entrepreneurship, Investing & Innovation  (Spring 2024) (26 files)
+  - PHW223 2024 Strategy in Health Care Organizations (DIR)
+📚 Course PHW223 2024 Strategy in Health Care Organizations already indexed - skipping
+  - python_course (DIR)
+📁 Found course: python_course (2 files)
+  - SHAPE Student Training - UCB - 2025-2026 (DIR)
+📁 Found course: SHAPE Student Training - UCB - 2025-2026 (6 files)
+  - Teams@Haas - Weekend MBA 2023 (DIR)
+📁 Found course: Teams@Haas - Weekend MBA 2023 (13 files)
+  - test_course (DIR)
+📁 Found course: test_course (1 files)
+  - Udemy - Apache Airflow The HandsOn Guide (DIR)
+📚 Course Udemy - Apache Airflow The HandsOn Guide already indexed - skipping
+  - udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3 (DIR)
+📚 Course udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3 already indexed - skipping
+  - VCPE-20241208T200025Z-001 (DIR)
+📚 Course VCPE-20241208T200025Z-001 already indexed - skipping
+  - WE Launch 2022 (DIR)
+📁 Found course: WE Launch 2022 (52 files)
+  - WE Launch 2023 (DIR)
+📁 Found course: WE Launch 2023 (49 files)
+  - [Resource] Haas Quantitative Readiness (DIR)
+📁 Found course: [Resource] Haas Quantitative Readiness (14 files)
+✅ Total courses found: 33 (scanned 32 directories)
+✂️ After filtering ignored courses: 19 remaining
+INFO:transcription_manager:Loading Whisper base model on cuda...
+INFO:transcription_manager:🚀 RTX 3060 detected - optimizing Whisper for GPU
+INFO:transcription_manager:RTX 3060 VRAM: 12.0GB available / 12.0GB total
+INFO:transcription_manager:✅ Whisper base loaded successfully on cuda
+INFO:__main__:File validation passed: 1 - Prerequisites.mp4
+INFO:__main__:Loading Whisper model for RTX 3060...
+INFO:__main__:Transcribing: 1 - Prerequisites.mp4
+INFO:transcription_manager:🔍 Resolving path: archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\1 - Prerequisites.mp4
+INFO:transcription_manager:📁 Current working directory: H:\Archive Classes\coursequery
+INFO:transcription_manager:📂 Original path exists: True
+INFO:transcription_manager:📄 Original path is file: True
+INFO:transcription_manager:🧪 Testing absolute: H:\Archive Classes\coursequery\archived_courses\udem y The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\1 - Prerequisites.mp4
+INFO:transcription_manager:✅ absolute strategy successful: H:\Archive Classes\coursequery\archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\1 - Prerequisites.mp4
+INFO:transcription_manager:🎵 Transcribing with Whisper base...
+INFO:transcription_manager:📂 Using resolved path: H:\Archive Classes\coursequery\archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\1 - Prerequisites.mp4
+INFO:transcription_manager:📊 File size: 8.0 MB
+INFO:transcription_manager:🎯 Formatting path for Whisper: H:\Archive Classes\coursequery\archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\1 - Prerequisites.mp4
+INFO:transcription_manager:🧪 Testing Whisper format raw_absolute: H:\Archive Classes\coursequery\ar chived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\1 - Prerequisites.mp4
+INFO:transcription_manager:✅ Whisper format raw_absolute accessible: H:\Archive Classes\coursequery\archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\1 - Prerequisites.mp4
+INFO:transcription_manager:🎯 Final Whisper path: H:\Archive Classes\coursequery\archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\1 - Prerequisites.mp4
+ERROR:transcription_manager:🚨 Transcription failed for archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\1 - Prerequisites.mp4: [WinError 2] The system cannot find the file specified
+ERROR:transcription_manager:🔧 Error type: FileNotFoundError
+ERROR:transcription_manager:📁 Current working directory: H:\Archive Classes\coursequery
+ERROR:transcription_manager:🔍 File access error - investigating...
+ERROR:transcription_manager:🔤 UTF-8 encoded path: archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\1 - Prerequisites.mp4
+ERROR:__main__:🚨 Enhanced transcription failed for archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\1 - Prerequisites.mp4: [WinError 2] The system cannot find the file specified
+ERROR:__main__:🔧 Error type: FileNotFoundError
+ERROR:__main__:📁 Current working directory: H:\Archive Classes\coursequery
+INFO:transcription_manager:Loading Whisper base model on cuda...
+INFO:transcription_manager:🚀 RTX 3060 detected - optimizing Whisper for GPU
+INFO:transcription_manager:RTX 3060 VRAM: 12.0GB available / 12.0GB total
+INFO:transcription_manager:✅ Whisper base loaded successfully on cuda
+INFO:__main__:File validation passed: 2 - Course Objectives.mp4
+INFO:__main__:Loading Whisper model for RTX 3060...
+INFO:__main__:Transcribing: 2 - Course Objectives.mp4
+INFO:transcription_manager:🔍 Resolving path: archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\2 - Course Objectives.mp4
+INFO:transcription_manager:📁 Current working directory: H:\Archive Classes\coursequery
+INFO:transcription_manager:📂 Original path exists: True
+INFO:transcription_manager:📄 Original path is file: True
+INFO:transcription_manager:🧪 Testing absolute: H:\Archive Classes\coursequery\archived_courses\udem y The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\2 - Course Objectives.mp4
+INFO:transcription_manager:✅ absolute strategy successful: H:\Archive Classes\coursequery\archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\2 - Course Objectives.mp4
+INFO:transcription_manager:🎵 Transcribing with Whisper base...
+INFO:transcription_manager:📂 Using resolved path: H:\Archive Classes\coursequery\archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\2 - Course Objectives.mp4
+INFO:transcription_manager:📊 File size: 13.8 MB
+INFO:transcription_manager:🎯 Formatting path for Whisper: H:\Archive Classes\coursequery\archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\2 - Course Objectives.mp4
+INFO:transcription_manager:🧪 Testing Whisper format raw_absolute: H:\Archive Classes\coursequery\ar chived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\2 - Course Objectives.mp4
+INFO:transcription_manager:✅ Whisper format raw_absolute accessible: H:\Archive Classes\coursequery\archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\2 - Course Objectives.mp4
+INFO:transcription_manager:🎯 Final Whisper path: H:\Archive Classes\coursequery\archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\2 - Course Objectives.mp4
+ERROR:transcription_manager:🚨 Transcription failed for archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\2 - Course Objectives.mp4: [WinError 2] The system cannot find the file specified
+ERROR:transcription_manager:🔧 Error type: FileNotFoundError
+ERROR:transcription_manager:📁 Current working directory: H:\Archive Classes\coursequery
+ERROR:transcription_manager:🔍 File access error - investigating...
+ERROR:transcription_manager:🔤 UTF-8 encoded path: archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\2 - Course Objectives.mp4
+ERROR:__main__:🚨 Enhanced transcription failed for archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\2 - Course Objectives.mp4: [WinError 2] The system cannot find the file specified
+ERROR:__main__:🔧 Error type: FileNotFoundError
+ERROR:__main__:📁 Current working directory: H:\Archive Classes\coursequery
+INFO:transcription_manager:Loading Whisper base model on cuda...
+INFO:transcription_manager:🚀 RTX 3060 detected - optimizing Whisper for GPU
+INFO:transcription_manager:RTX 3060 VRAM: 12.0GB available / 12.0GB total
+INFO:transcription_manager:✅ Whisper base loaded successfully on cuda
+INFO:__main__:File validation passed: 3 - Who I am.mp4
+INFO:__main__:Loading Whisper model for RTX 3060...
+INFO:__main__:Transcribing: 3 - Who I am.mp4
+INFO:transcription_manager:🔍 Resolving path: archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\3 - Who I am.mp4
+INFO:transcription_manager:📁 Current working directory: H:\Archive Classes\coursequery
+INFO:transcription_manager:📂 Original path exists: True
+INFO:transcription_manager:📄 Original path is file: True
+INFO:transcription_manager:🧪 Testing absolute: H:\Archive Classes\coursequery\archived_courses\udem y The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\3 - Who I am.mp4
+INFO:transcription_manager:✅ absolute strategy successful: H:\Archive Classes\coursequery\archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\3 - Who I am.mp4
+INFO:transcription_manager:🎵 Transcribing with Whisper base...
+INFO:transcription_manager:📂 Using resolved path: H:\Archive Classes\coursequery\archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\3 - Who I am.mp4
+INFO:transcription_manager:📊 File size: 7.2 MB
+INFO:transcription_manager:🎯 Formatting path for Whisper: H:\Archive Classes\coursequery\archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\3 - Who I am.mp4
+INFO:transcription_manager:🧪 Testing Whisper format raw_absolute: H:\Archive Classes\coursequery\ar chived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\3 - Who I am.mp4
+INFO:transcription_manager:✅ Whisper format raw_absolute accessible: H:\Archive Classes\coursequery\archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\3 - Who I am.mp4
+INFO:transcription_manager:🎯 Final Whisper path: H:\Archive Classes\coursequery\archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\3 - Who I am.mp4
+ERROR:transcription_manager:🚨 Transcription failed for archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\3 - Who I am.mp4: [WinError 2] The system cannot find the file specified
+ERROR:transcription_manager:🔧 Error type: FileNotFoundError
+ERROR:transcription_manager:📁 Current working directory: H:\Archive Classes\coursequery
+ERROR:transcription_manager:🔍 File access error - investigating...
+ERROR:transcription_manager:🔤 UTF-8 encoded path: archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\3 - Who I am.mp4
+ERROR:__main__:🚨 Enhanced transcription failed for archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\3 - Who I am.mp4: [WinError 2] The system cannot find the file specified
+ERROR:__main__:🔧 Error type: FileNotFoundError
+ERROR:__main__:📁 Current working directory: H:\Archive Classes\coursequery
+INFO:transcription_manager:Loading Whisper base model on cuda...
+INFO:transcription_manager:🚀 RTX 3060 detected - optimizing Whisper for GPU
+INFO:transcription_manager:RTX 3060 VRAM: 12.0GB available / 12.0GB total
+INFO:transcription_manager:✅ Whisper base loaded successfully on cuda
+INFO:__main__:File validation passed: 4 - Set up your Development Environment.mp4
+INFO:__main__:Loading Whisper model for RTX 3060...
+INFO:__main__:Transcribing: 4 - Set up your Development Environment.mp4
+INFO:transcription_manager:🔍 Resolving path: archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\4 - Set up your Development Environment.mp4
+INFO:transcription_manager:📁 Current working directory: H:\Archive Classes\coursequery
+INFO:transcription_manager:📂 Original path exists: True
+INFO:transcription_manager:📄 Original path is file: True
+INFO:transcription_manager:🧪 Testing absolute: H:\Archive Classes\coursequery\archived_courses\udem y The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\4 - Set up your Development Environment.mp4
+INFO:transcription_manager:✅ absolute strategy successful: H:\Archive Classes\coursequery\archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\4 - Set up your Development Environment.mp4
+INFO:transcription_manager:🎵 Transcribing with Whisper base...
+INFO:transcription_manager:📂 Using resolved path: H:\Archive Classes\coursequery\archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\4 - Set up your Development Environment.mp4
+INFO:transcription_manager:📊 File size: 16.1 MB
+INFO:transcription_manager:🎯 Formatting path for Whisper: H:\Archive Classes\coursequery\archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\4 - Set up your Development Environment.mp4
+INFO:transcription_manager:🧪 Testing Whisper format raw_absolute: H:\Archive Classes\coursequery\ar chived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\4 - Set up your Development Environment.mp4
+INFO:transcription_manager:✅ Whisper format raw_absolute accessible: H:\Archive Classes\coursequery\archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\4 - Set up your Development Environment.mp4
+INFO:transcription_manager:🎯 Final Whisper path: H:\Archive Classes\coursequery\archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\4 - Set up your Development Environment.mp4
+ERROR:transcription_manager:🚨 Transcription failed for archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\4 - Set up your Development Environment.mp4: [WinError 2] The system cannot find the file specified
+ERROR:transcription_manager:🔧 Error type: FileNotFoundError
+ERROR:transcription_manager:📁 Current working directory: H:\Archive Classes\coursequery
+ERROR:transcription_manager:🔍 File access error - investigating...
+ERROR:transcription_manager:🔤 UTF-8 encoded path: archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\4 - Set up your Development Environment.mp4
+ERROR:__main__:🚨 Enhanced transcription failed for archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\1 - Course Introduction\4 - Set up your Development Environment.mp4: [WinError 2] The system cannot find the file specified
+ERROR:__main__:🔧 Error type: FileNotFoundError
+ERROR:__main__:📁 Current working directory: H:\Archive Classes\coursequery
+INFO:transcription_manager:Loading Whisper base model on cuda...
+INFO:transcription_manager:🚀 RTX 3060 detected - optimizing Whisper for GPU
