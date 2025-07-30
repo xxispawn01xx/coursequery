@@ -174,6 +174,7 @@ When you "index a course," the system processes all documents in that course fol
 - **Multi-Level Path Cleaning**: Automatic detection and correction of duplicate paths at search, validation, and final transcription stages
 - **Physical Path Validation**: System now correctly handles courses with legitimate nested duplicate directory structures
 - **Whisper Integration Success**: File validation passes and Whisper model loads successfully on RTX 3060 for actual transcription
+- **Windows Path Compatibility**: Enhanced Whisper path handling with multiple format fallbacks for robust file access
 
 ### July 30, 2025 - Centralized Directory Configuration & Offline Mode Fixes
 - **Single Source Directory Management**: Created `directory_config.py` with centralized MASTER_COURSE_DIRECTORY variable

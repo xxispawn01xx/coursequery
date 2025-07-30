@@ -3112,11 +3112,35 @@ class RealEstateAIApp:
             logger.info(f"Using validated path for Whisper: {transcribe_path}")
             logger.info(f"File size: {Path(transcribe_path).stat().st_size / (1024*1024):.1f} MB")
             
-            result = model.transcribe(
-                transcribe_path,
-                fp16=True,  # Use FP16 for RTX 3060 efficiency
-                verbose=False
-            )
+            # Convert Windows path for Whisper compatibility
+            whisper_path = transcribe_path.replace('\\', '/')
+            logger.info(f"Converting path for Whisper: {whisper_path}")
+            
+            try:
+                result = model.transcribe(
+                    whisper_path,
+                    fp16=True,  # Use FP16 for RTX 3060 efficiency
+                    verbose=False
+                )
+            except Exception as e:
+                logger.warning(f"Forward slash path failed: {e}")
+                # Try with raw string path
+                try:
+                    result = model.transcribe(
+                        rf"{transcribe_path}",
+                        fp16=True,
+                        verbose=False
+                    )
+                    logger.info("Raw string path successful")
+                except Exception as e2:
+                    logger.error(f"Both path formats failed: {e2}")
+                    # Try with pathlib Path object
+                    result = model.transcribe(
+                        Path(transcribe_path),
+                        fp16=True,
+                        verbose=False
+                    )
+                    logger.info("Path object successful")
             transcription = result["text"]
             
             # Save transcription

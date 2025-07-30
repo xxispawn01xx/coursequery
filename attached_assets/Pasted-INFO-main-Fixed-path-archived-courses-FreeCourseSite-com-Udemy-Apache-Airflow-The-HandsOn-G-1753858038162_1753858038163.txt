@@ -1,0 +1,27 @@
+INFO:__main__:Fixed path: archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\2 - The basics of Apache Airflow\6 - Why Airflow.mp4
+INFO:__main__:Updated media_file to: archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\2 - The basics of Apache Airflow\6 - Why Airflow.mp4
+ERROR:__main__:Media file not found: archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\2 - The basics of Apache Airflow\6 - Why Airflow.mp4
+ERROR:__main__:Absolute path attempted: H:\Archive Classes\coursequery\archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\2 - The basics of Apache Airflow\6 - Why Airflow.mp4
+ERROR:__main__:Parent directory exists: False
+INFO:__main__:Searching for file: 6 - Why Airflow.mp4
+💡 Running in pure offline mode with centralized directory config
+📁 Master directory: H:\Archive Classes\coursequery\archived_courses
+📁 Active directory: H:\Archive Classes\coursequery\archived_courses
+INFO:__main__:Found clean file at: H:\Archive Classes\coursequery\archived_courses\The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\2 - Getting Started with Airflow\6 - Why Airflow.mp4
+INFO:__main__:File validation passed: 6 - Why Airflow.mp4
+INFO:__main__:Loading Whisper model for RTX 3060...
+INFO:__main__:Transcribing: 6 - Why Airflow.mp4
+INFO:__main__:Using validated path for Whisper: H:\Archive Classes\coursequery\archived_courses\The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\2 - Getting Started with Airflow\6 - Why Airflow.mp4
+INFO:__main__:File size: 6.5 MB
+ERROR:__main__:Local transcription failed for H:\Archive Classes\coursequery\archived_courses\The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\2 - Getting Started with Airflow\6 - Why Airflow.mp4: [WinError 2] The system cannot find the file specified
+WARNING:__main__:Detected duplicate directory: [FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide
+INFO:__main__:Fixed path: archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\2 - The basics of Apache Airflow\7 - What is Airflow.mp4
+INFO:__main__:Updated media_file to: archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\2 - The basics of Apache Airflow\7 - What is Airflow.mp4
+ERROR:__main__:Media file not found: archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\2 - The basics of Apache Airflow\7 - What is Airflow.mp4
+ERROR:__main__:Absolute path attempted: H:\Archive Classes\coursequery\archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\2 - The basics of Apache Airflow\7 - What is Airflow.mp4
+ERROR:__main__:Parent directory exists: False
+INFO:__main__:Searching for file: 7 - What is Airflow.mp4
+💡 Running in pure offline mode with centralized directory config
+📁 Master directory: H:\Archive Classes\coursequery\archived_courses
+📁 Active directory: H:\Archive Classes\coursequery\archived_courses
+INFO:__main__:Found clean file at: H:\Archive Classes\coursequery\archived_courses\The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\2 - Getting Started with Airflow\7 - What is Airf
