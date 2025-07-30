@@ -24,10 +24,19 @@ class Config:
     
     def setup_directories(self):
         """Create necessary directories for offline usage."""
-        # Use local archived_courses directory directly (per user requirement)
-        self.raw_docs_dir = self.base_dir / "archived_courses"
-        print(f"📁 Using local course directory: {self.raw_docs_dir}")
-        print("💡 Course materials located in archived_courses/ directory")
+        # PURE OFFLINE: Check if running locally with H:\ access
+        h_drive_path = Path(r"H:\Archive Classes\coursequery\archived_courses")
+        
+        if h_drive_path.exists():
+            # Local system with actual course directory
+            self.raw_docs_dir = h_drive_path
+            print(f"📁 Using local H:\ course directory: {self.raw_docs_dir}")
+        else:
+            # Pure offline fallback directory
+            self.raw_docs_dir = self.base_dir / "archived_courses"
+            print(f"📁 Using offline directory: {self.raw_docs_dir}")
+        
+        print("💡 Running in pure offline mode")
         
         # Always use local directories for processed data
         self.indexed_courses_dir = self.base_dir / "indexed_courses"

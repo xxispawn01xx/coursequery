@@ -380,68 +380,91 @@ class RealEstateAIApp:
         return True
 
     def refresh_available_courses(self):
-        """Refresh the list of available courses with direct folder detection."""
+        """Refresh the list of available courses - works both locally and on Replit."""
         print("🔄 Starting course refresh...")
         
-        # Clear cached session state to force frontend refresh
-        for key in ['available_courses', 'selected_course', 'course_list']:
-            if key in st.session_state:
-                del st.session_state[key]
+        # Clear ALL cached session state to force complete refresh
+        st.session_state.clear()
         
         courses = []
         
-        # Force use of local directories (ignore any H:\ paths)
-        app_dir = Path(__file__).parent
-        raw_docs_path = app_dir / "archived_courses"
-        indexed_path = app_dir / "indexed_courses"
+        # OFFLINE PATH DETECTION: Use the configured local path
+        raw_docs_path = Path(self.config.raw_docs_dir)
+        print(f"📁 Using configured path: {raw_docs_path}")
         
-        raw_docs_exists = raw_docs_path.exists()
-        indexed_exists = indexed_path.exists()
+        if not raw_docs_path.exists():
+            print(f"❌ Course directory not found: {raw_docs_path}")
+            # Create local directory as fallback for pure offline mode
+            raw_docs_path = Path(__file__).parent / "archived_courses"
+            raw_docs_path.mkdir(exist_ok=True)
+            print(f"📁 Created local fallback: {raw_docs_path}")
         
-        print(f"📁 Using paths - raw: {raw_docs_path}, indexed: {indexed_path}")
-        print(f"📁 Directories exist - archived_courses: {raw_docs_exists}, indexed: {indexed_exists}")
+        # Always use local indexed_courses directory for processed courses
+        indexed_path = Path(__file__).parent / "indexed_courses"
+        indexed_path.mkdir(exist_ok=True)
+        
+        print(f"📁 Raw courses: {raw_docs_path}")
+        print(f"📊 Indexed courses: {indexed_path}")
         
         # Get already indexed courses
         indexed_courses = set()
-        if indexed_exists:
-            for item in indexed_path.iterdir():
-                if item.is_dir():
-                    indexed_courses.add(item.name)
-                    courses.append({
-                        'name': item.name,
-                        'status': 'indexed',
-                        'document_count': len(list(item.rglob('*.pdf'))) + len(list(item.rglob('*.docx'))),
-                        'last_indexed': 'Available'
-                    })
-                    print(f"📚 Found indexed course: {item.name}")
+        for item in indexed_path.iterdir():
+            if item.is_dir():
+                indexed_courses.add(item.name)
+                # Count actual indexed files
+                doc_count = len(list(item.rglob('*.json'))) + len(list(item.rglob('*.pkl')))
+                courses.append({
+                    'name': item.name,
+                    'status': 'indexed',
+                    'document_count': doc_count,
+                    'last_indexed': 'Ready for queries'
+                })
+                print(f"📚 Indexed course: {item.name} ({doc_count} files)")
         
-        # Get archived courses (ready for processing)  
-        if raw_docs_exists:
-            print(f"📂 Scanning {raw_docs_path}...")
+        # Get courses from your actual directory (H:\ or local)
+        print(f"📂 Scanning {raw_docs_path} for courses...")
+        course_count = 0
+        
+        try:
             for item in raw_docs_path.iterdir():
-                if item.is_dir() and item.name not in indexed_courses:
-                    # Count supported files
-                    file_count = 0
-                    for file_path in item.rglob('*'):
-                        if file_path.is_file():
-                            ext = file_path.suffix.lower()
-                            if ext in ['.pdf', '.docx', '.pptx', '.epub', '.mp4', '.avi', '.mov', '.mp3', '.wav']:
-                                file_count += 1
+                if item.is_dir():
+                    course_count += 1
+                    course_name = item.name
                     
-                    if file_count > 0:  # Only add courses with supported files
+                    # Count supported files in this course
+                    file_count = 0
+                    supported_extensions = ['.pdf', '.docx', '.pptx', '.epub', '.mp4', '.avi', '.mov', '.mp3', '.wav']
+                    
+                    for file_path in item.rglob('*'):
+                        if file_path.is_file() and file_path.suffix.lower() in supported_extensions:
+                            file_count += 1
+                    
+                    # Add course (indexed or ready to process)
+                    if course_name in indexed_courses:
+                        # Already added above with indexed status
+                        continue
+                    else:
+                        # Ready to process
                         courses.append({
-                            'name': item.name,
+                            'name': course_name,
                             'status': 'raw',
                             'document_count': file_count,
-                            'last_indexed': 'Not processed'
+                            'last_indexed': 'Ready to process'
                         })
-                        print(f"📁 Found archived course: {item.name} ({file_count} files)")
+                    
+                    print(f"📁 Course: {course_name} ({file_count} files)")
         
-        print(f"✅ Total courses found: {len(courses)}")
+        except Exception as e:
+            print(f"❌ Error scanning directory: {e}")
         
-        # Store in session state and force rerun to update UI
+        print(f"✅ Total courses found: {len(courses)} (scanned {course_count} directories)")
+        
+        # Force complete UI refresh
         st.session_state.available_courses = courses
-        st.session_state.courses_refreshed = True
+        st.session_state.force_refresh = True
+        
+        # Immediate rerun to update display
+        st.rerun()
         
         return courses
 
