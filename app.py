@@ -2838,12 +2838,14 @@ class RealEstateAIApp:
             
             for course in available_courses:
                 original_name = course['name']
+                # Use the correct field name from course data structure
+                file_count = course.get('document_count', course.get('file_count', 0))
                 # Shorten very long course names for display
                 if len(original_name) > 50:
                     short_name = original_name[:47] + "..."
-                    display_name = f"{short_name} ({course.get('file_count', 0)} files)"
+                    display_name = f"{short_name} ({file_count} files)"
                 else:
-                    display_name = f"{original_name} ({course.get('file_count', 0)} files)"
+                    display_name = f"{original_name} ({file_count} files)"
                 
                 course_options.append(display_name)
                 course_mapping[display_name] = original_name
