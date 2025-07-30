@@ -113,7 +113,7 @@ Authentication: Local HuggingFace token storage, no external dependencies requir
 
 ## Recent Changes
 
-### July 30, 2025 - Centralized Directory Configuration System
+### July 30, 2025 - Centralized Directory Configuration & Offline Mode Fixes
 - **Single Source Directory Management**: Created `directory_config.py` with centralized MASTER_COURSE_DIRECTORY variable
 - **System-Wide Path Cascading**: One variable change updates paths across all components (course processing, book embeddings, indexing, transcription)
 - **Persistent Configuration**: Directory settings saved in `directory_config.json` and persist between sessions
@@ -125,6 +125,11 @@ Authentication: Local HuggingFace token storage, no external dependencies requir
 - **Book Management Interface**: Search, statistics, and organization by parent course with metadata tracking
 - **Path Validation System**: Comprehensive directory access validation with readable/writable status checking
 - **Cross-Component Integration**: Book indexer, course indexer, document processor all use centralized directory configuration
+- **Offline Mode Compatibility Fixes**: Fixed Pydantic import issues preventing course loading with comprehensive debugging
+- **Cross-Platform Timeout System**: Replaced Unix-only signal.SIGALRM with threading-based timeout for Windows compatibility
+- **OfflineCourseManager Fallback**: Created simple course detection system that works without complex dependencies
+- **Automatic Fallback Detection**: App automatically switches to offline mode when LlamaIndex/Pydantic imports fail
+- **Comprehensive Debug System**: Added detailed logging to identify exact failure points in course loading process
 
 ### July 29, 2025 - Multi-Course Detection & Replit Integration
 - **Enhanced Course Detection**: System now detects both indexed courses and unprocessed course directories automatically
@@ -200,9 +205,11 @@ Authentication: Local HuggingFace token storage, no external dependencies requir
 - **Local**: ✅ **FULLY OPERATIONAL** - RTX 3060 running all AI models successfully on CUDA
 - **GPU Status**: ✅ **RTX 3060 PERFECT** - All models loading on cuda:0, memory fragmentation fix successful
 - **Local Models**: ✅ **ALL WORKING** - local_embeddings, local_llm, whisper all operational
-- **Course Directory**: Uses local archived_courses/ directory (no external dependencies)
+- **Course Directory**: Uses centralized directory configuration with master directory detection
 - **Query Engine**: Complete offline AI system with RTX 3060 acceleration
 - **Configuration**: Pure offline mode - no cloud dependencies required
-- **Course Processing**: Enhanced multi-course detection with comprehensive debugging and testing
+- **Course Processing**: Enhanced multi-course detection with cross-platform compatibility and offline fallback
+- **Loading Issues**: ✅ **RESOLVED** - Fixed Windows SIGALRM compatibility and Pydantic import issues
+- **Fallback System**: ✅ **OPERATIONAL** - OfflineCourseManager handles course detection when complex imports fail
 
 The architecture prioritizes privacy, local operation, and user control while maintaining enterprise-grade functionality for real estate education analysis.

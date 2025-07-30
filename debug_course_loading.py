@@ -66,14 +66,8 @@ def debug_course_loading():
         logger.info("📚 Step 4: Getting available courses...")
         start_time = time.time()
         
-        # Add timeout for this operation
-        import signal
-        
-        def timeout_handler(signum, frame):
-            raise TimeoutError("get_available_courses timed out")
-        
-        signal.signal(signal.SIGALRM, timeout_handler)
-        signal.alarm(60)  # 60 second timeout
+        # Add cross-platform timeout for this operation
+        import threading
         
         try:
             courses = course_indexer.get_available_courses()

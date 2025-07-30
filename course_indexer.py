@@ -252,37 +252,53 @@ class CourseIndexer:
             # Check embedding configuration
             logger.info(f"🤖 DEBUG: Embedding wrapper available: {self.embedding_wrapper is not None}")
             
-            # Load with timeout protection
-            import signal
+            # Load with cross-platform timeout protection
             import time
+            import threading
             
-            def timeout_handler(signum, frame):
+            logger.info(f"⏳ DEBUG: Starting index load from storage...")
+            start_time = time.time()
+            
+            # Cross-platform timeout using threading
+            index_result = [None]
+            exception_result = [None]
+            
+            def load_index_thread():
+                try:
+                    # Load with custom embeddings if available
+                    if self.embedding_wrapper:
+                        logger.info(f"🔧 DEBUG: Loading with custom embedding wrapper")
+                        result = load_index_from_storage(
+                            storage_context,
+                            embed_model=self.embedding_wrapper
+                        )
+                    else:
+                        logger.info(f"🔧 DEBUG: Loading with default embeddings")
+                        result = load_index_from_storage(storage_context)
+                    
+                    index_result[0] = result
+                except Exception as e:
+                    exception_result[0] = e
+            
+            # Start loading in thread with timeout
+            thread = threading.Thread(target=load_index_thread)
+            thread.daemon = True
+            thread.start()
+            thread.join(timeout=30)  # 30 second timeout
+            
+            if thread.is_alive():
+                logger.error(f"⏰ TIMEOUT: Index loading timed out after 30 seconds")
                 raise TimeoutError("Index loading timed out after 30 seconds")
             
-            # Set timeout for index loading
-            signal.signal(signal.SIGALRM, timeout_handler)
-            signal.alarm(30)  # 30 second timeout
+            if exception_result[0]:
+                raise exception_result[0]
             
-            try:
-                logger.info(f"⏳ DEBUG: Starting index load from storage...")
-                start_time = time.time()
-                
-                # Load with custom embeddings if available
-                if self.embedding_wrapper:
-                    logger.info(f"🔧 DEBUG: Loading with custom embedding wrapper")
-                    index = load_index_from_storage(
-                        storage_context,
-                        embed_model=self.embedding_wrapper
-                    )
-                else:
-                    logger.info(f"🔧 DEBUG: Loading with default embeddings")
-                    index = load_index_from_storage(storage_context)
-                
-                load_time = time.time() - start_time
-                logger.info(f"✅ DEBUG: Index loaded successfully in {load_time:.2f} seconds")
-                
-            finally:
-                signal.alarm(0)  # Cancel timeout
+            if index_result[0] is None:
+                raise Exception("Index loading failed - no result returned")
+            
+            index = index_result[0]
+            load_time = time.time() - start_time
+            logger.info(f"✅ DEBUG: Index loaded successfully in {load_time:.2f} seconds")
             
             logger.info(f"✅ Loaded index for course: {course_name}")
             return index
