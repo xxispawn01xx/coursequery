@@ -31,6 +31,9 @@ class WhisperTranscriptionManager:
         
         # Setup FFmpeg path for Windows compatibility
         self._setup_ffmpeg_environment()
+        
+        # Audio processing method (can be configured)
+        self.audio_method = "Auto-detect (Try FFmpeg first, fallback to alternatives)"
     
     def _setup_ffmpeg_environment(self):
         """Setup FFmpeg environment for Windows compatibility."""
@@ -172,10 +175,36 @@ class WhisperTranscriptionManager:
             # Perform transcription with FFmpeg fallback handling
             logger.info(f"🔄 Starting Whisper transcription on {self.device}...")
             
-            try:
-                result = self.whisper_model.transcribe(str(audio_file), **options)
-            except FileNotFoundError as ffmpeg_error:
-                if "ffmpeg" in str(ffmpeg_error).lower() or "WinError 2" in str(ffmpeg_error):
+            # Check audio processing method and handle accordingly
+            if self.audio_method == "Force FFmpeg (Fastest, requires FFmpeg installation)":
+                # Force FFmpeg usage
+                try:
+                    result = self.whisper_model.transcribe(str(audio_file), **options)
+                except FileNotFoundError as ffmpeg_error:
+                    if "ffmpeg" in str(ffmpeg_error).lower() or "WinError 2" in str(ffmpeg_error):
+                        logger.error("❌ FFmpeg not found but Force FFmpeg mode selected")
+                        raise Exception("FFmpeg not found. Please install FFmpeg or change audio processing method.")
+                    else:
+                        raise ffmpeg_error
+            
+            elif self.audio_method == "Use librosa (Python library, slower but reliable)":
+                # Force librosa usage
+                result = self._transcribe_with_librosa(audio_file, options)
+                
+            elif self.audio_method == "Use moviepy (Good for videos, moderate speed)":
+                # Force moviepy usage
+                result = self._transcribe_with_moviepy(audio_file, options)
+                
+            elif self.audio_method == "Use pydub (Universal, slowest but most compatible)":
+                # Force pydub usage
+                result = self._transcribe_with_pydub(audio_file, options)
+                
+            else:
+                # Auto-detect mode - try FFmpeg first, fallback to alternatives
+                try:
+                    result = self.whisper_model.transcribe(str(audio_file), **options)
+                except FileNotFoundError as ffmpeg_error:
+                    if "ffmpeg" in str(ffmpeg_error).lower() or "WinError 2" in str(ffmpeg_error):
                     logger.error("❌ FFmpeg not found or not accessible")
                     logger.info("🔧 Attempting direct audio loading with multiple fallbacks...")
                     
@@ -259,8 +288,8 @@ class WhisperTranscriptionManager:
                         logger.info("💡 Install one of: librosa, moviepy, or pydub for audio processing")
                         logger.info("💡 Or install FFmpeg: https://ffmpeg.org/download.html")
                         raise Exception("FFmpeg not found and no alternative audio libraries available. Install FFmpeg, librosa, moviepy, or pydub.")
-                else:
-                    raise ffmpeg_error
+                    else:
+                        raise ffmpeg_error
             
             # Clean up GPU memory
             if self.device == "cuda" and TORCH_AVAILABLE:
@@ -626,6 +655,74 @@ class WhisperTranscriptionManager:
         """Clean up orphaned transcription files."""
         # For offline mode, this is a no-op
         pass
+    
+    def _transcribe_with_librosa(self, audio_file, options):
+        """Transcribe using librosa for audio loading."""
+        try:
+            import librosa
+            import numpy as np
+            
+            logger.info("🎵 Using librosa for audio processing...")
+            audio_data, sr = librosa.load(str(audio_file), sr=16000)
+            audio_array = np.array(audio_data, dtype=np.float32)
+            logger.info(f"✅ Librosa loading successful: {len(audio_array)} samples at {sr}Hz")
+            
+            return self.whisper_model.transcribe(audio_array, **options)
+            
+        except ImportError:
+            raise Exception("librosa not installed. Install with: pip install librosa")
+        except Exception as e:
+            raise Exception(f"Librosa audio processing failed: {e}")
+    
+    def _transcribe_with_moviepy(self, audio_file, options):
+        """Transcribe using moviepy for audio extraction."""
+        try:
+            from moviepy.editor import VideoFileClip
+            import numpy as np
+            
+            logger.info("🎬 Using moviepy for audio processing...")
+            with VideoFileClip(str(audio_file)) as video:
+                audio = video.audio
+                if audio is not None:
+                    audio_array = audio.to_soundarray(fps=16000)
+                    if len(audio_array.shape) > 1:
+                        audio_array = audio_array.mean(axis=1)  # Convert to mono
+                    audio_array = audio_array.astype(np.float32)
+                    logger.info(f"✅ Moviepy loading successful: {len(audio_array)} samples")
+                    
+                    return self.whisper_model.transcribe(audio_array, **options)
+                else:
+                    raise Exception("No audio track found in video")
+                    
+        except ImportError:
+            raise Exception("moviepy not installed. Install with: pip install moviepy")
+        except Exception as e:
+            raise Exception(f"Moviepy audio processing failed: {e}")
+    
+    def _transcribe_with_pydub(self, audio_file, options):
+        """Transcribe using pydub for audio processing."""
+        try:
+            from pydub import AudioSegment
+            import numpy as np
+            
+            logger.info("🔊 Using pydub for audio processing...")
+            audio = AudioSegment.from_file(str(audio_file))
+            
+            # Convert to mono and 16kHz
+            audio = audio.set_channels(1).set_frame_rate(16000)
+            
+            # Convert to numpy array
+            audio_array = np.array(audio.get_array_of_samples(), dtype=np.float32)
+            audio_array = audio_array / 32768.0  # Normalize to [-1, 1]
+            
+            logger.info(f"✅ Pydub loading successful: {len(audio_array)} samples")
+            
+            return self.whisper_model.transcribe(audio_array, **options)
+            
+        except ImportError:
+            raise Exception("pydub not installed. Install with: pip install pydub")
+        except Exception as e:
+            raise Exception(f"Pydub audio processing failed: {e}")
 
 # Alias for backward compatibility
 TranscriptionManager = WhisperTranscriptionManager

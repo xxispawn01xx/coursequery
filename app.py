@@ -2953,6 +2953,39 @@ class RealEstateAIApp:
             help="Local Whisper uses your GPU and saves money. API requires OpenAI key but works without GPU."
         )
         
+        # FFmpeg configuration for local transcription
+        if "Local Whisper" in transcription_method:
+            st.subheader("🔧 Audio Processing Configuration")
+            
+            col1, col2 = st.columns([2, 1])
+            with col1:
+                ffmpeg_path = st.text_input(
+                    "FFmpeg Directory Path (Optional)",
+                    placeholder="C:\\ffmpeg\\bin or leave empty for auto-detection",
+                    help="Specify FFmpeg directory if transcription fails with 'file not found' errors"
+                )
+            
+            with col2:
+                if st.button("🔍 Test FFmpeg", key="test_ffmpeg_btn"):
+                    self.test_ffmpeg_setup(ffmpeg_path)
+            
+            # Audio processing method selection
+            audio_method = st.selectbox(
+                "Audio Processing Method",
+                [
+                    "Auto-detect (Try FFmpeg first, fallback to alternatives)",
+                    "Force FFmpeg (Fastest, requires FFmpeg installation)",
+                    "Use librosa (Python library, slower but reliable)",
+                    "Use moviepy (Good for videos, moderate speed)",
+                    "Use pydub (Universal, slowest but most compatible)"
+                ],
+                help="Choose how to process audio from video files"
+            )
+            
+            # Store configuration in session state
+            st.session_state.ffmpeg_path = ffmpeg_path
+            st.session_state.audio_method = audio_method
+        
         # File type selection
         st.subheader("🎬 File Types to Process")
         file_types = st.multiselect(
@@ -3005,10 +3038,14 @@ class RealEstateAIApp:
         # Start bulk transcription
         if media_directory and course_name and file_types:
             if st.button("🚀 Start Bulk Transcription", type="primary", key="start_bulk_transcription_btn"):
+                # Get configuration from session state
+                ffmpeg_path = getattr(st.session_state, 'ffmpeg_path', '')
+                audio_method = getattr(st.session_state, 'audio_method', 'Auto-detect (Try FFmpeg first, fallback to alternatives)')
+                
                 self.start_bulk_transcription(
                     media_directory, course_name, file_types, tm,
                     transcription_method, preserve_structure, skip_existing, 
-                    batch_size, show_progress
+                    batch_size, show_progress, ffmpeg_path, audio_method
                 )
         elif not media_directory or not course_name:
             st.info("Please complete course selection or manual input to start transcription.")
@@ -3121,7 +3158,8 @@ class RealEstateAIApp:
     
     def start_bulk_transcription(self, directory: str, course_name: str, file_types: list, 
                                tm, method: str, preserve_structure: bool,
-                               skip_existing: bool, batch_size: int, show_progress: bool):
+                               skip_existing: bool, batch_size: int, show_progress: bool,
+                               ffmpeg_path: str = '', audio_method: str = 'Auto-detect (Try FFmpeg first, fallback to alternatives)'):
         """Start the bulk transcription process."""
         try:
             from pathlib import Path
@@ -3236,15 +3274,27 @@ class RealEstateAIApp:
         except Exception as e:
             st.error(f"Error during bulk transcription: {e}")
     
-    def transcribe_file_local(self, media_file, course_name: str, tm) -> bool:
+    def transcribe_file_local(self, media_file, course_name: str, tm, ffmpeg_path: str = '', audio_method: str = 'Auto-detect (Try FFmpeg first, fallback to alternatives)') -> bool:
         """Transcribe a single file using enhanced Whisper transcription manager."""
         try:
             from transcription_manager import WhisperTranscriptionManager
             from pathlib import Path
             import os
             
-            # Initialize enhanced Whisper transcription manager
+            # Initialize enhanced Whisper transcription manager with configuration
             whisper_manager = WhisperTranscriptionManager()
+            
+            # Configure FFmpeg path if provided
+            if ffmpeg_path:
+                import os
+                if os.path.exists(ffmpeg_path):
+                    current_path = os.environ.get('PATH', '')
+                    if ffmpeg_path not in current_path:
+                        os.environ['PATH'] = ffmpeg_path + os.pathsep + current_path
+                        logger.info(f"✅ Added custom FFmpeg path: {ffmpeg_path}")
+            
+            # Configure audio processing method
+            whisper_manager.audio_method = audio_method
             
             media_path = Path(media_file)
             logger.info(f"🎯 Processing: {media_path.name}")
@@ -3308,6 +3358,112 @@ class RealEstateAIApp:
             import traceback
             logger.error(f"🔍 Full traceback: {traceback.format_exc()}")
             return False
+    
+    def test_ffmpeg_setup(self, ffmpeg_path: str = ''):
+        """Test FFmpeg setup and show results to user."""
+        try:
+            import subprocess
+            import os
+            
+            # If custom path provided, temporarily add to PATH
+            original_path = None
+            if ffmpeg_path and os.path.exists(ffmpeg_path):
+                original_path = os.environ.get('PATH', '')
+                os.environ['PATH'] = ffmpeg_path + os.pathsep + original_path
+                st.info(f"Testing with custom FFmpeg path: {ffmpeg_path}")
+            
+            # Test FFmpeg availability
+            try:
+                result = subprocess.run(['ffmpeg', '-version'], 
+                                      capture_output=True, 
+                                      text=True, 
+                                      timeout=10)
+                if result.returncode == 0:
+                    st.success("✅ FFmpeg is available and working!")
+                    
+                    # Show version info
+                    version_lines = result.stdout.split('\n')[:3]
+                    st.code('\n'.join(version_lines))
+                    
+                    # Test audio processing capabilities
+                    st.info("🔧 Testing audio processing capabilities...")
+                    
+                    # Check for common audio codecs
+                    codec_result = subprocess.run(['ffmpeg', '-codecs'], 
+                                                capture_output=True, 
+                                                text=True, 
+                                                timeout=10)
+                    
+                    if 'mp3' in codec_result.stdout.lower():
+                        st.success("✅ MP3 codec support detected")
+                    if 'aac' in codec_result.stdout.lower():
+                        st.success("✅ AAC codec support detected")
+                    if 'wav' in codec_result.stdout.lower():
+                        st.success("✅ WAV codec support detected")
+                        
+                else:
+                    st.error(f"❌ FFmpeg command failed with return code: {result.returncode}")
+                    st.error(f"Error output: {result.stderr}")
+                    
+            except FileNotFoundError:
+                st.error("❌ FFmpeg not found in system PATH")
+                self._show_ffmpeg_installation_help()
+                
+            except subprocess.TimeoutExpired:
+                st.error("❌ FFmpeg command timed out")
+                
+            finally:
+                # Restore original PATH if modified
+                if original_path is not None:
+                    os.environ['PATH'] = original_path
+                    
+        except Exception as e:
+            st.error(f"❌ Error testing FFmpeg: {e}")
+            self._show_ffmpeg_installation_help()
+    
+    def _show_ffmpeg_installation_help(self):
+        """Show FFmpeg installation instructions."""
+        st.info("💡 FFmpeg Installation Instructions:")
+        
+        with st.expander("🔧 How to Install FFmpeg on Windows"):
+            st.markdown("""
+            **Method 1: Download from Official Site**
+            1. Go to https://ffmpeg.org/download.html#build-windows
+            2. Download the "release" build (not git or nightly)
+            3. Extract to `C:\\ffmpeg\\`
+            4. Add `C:\\ffmpeg\\bin` to your system PATH
+            5. Restart your command prompt/IDE
+            
+            **Method 2: Using Chocolatey (if installed)**
+            ```
+            choco install ffmpeg
+            ```
+            
+            **Method 3: Using Scoop (if installed)**
+            ```
+            scoop install ffmpeg
+            ```
+            
+            **Testing Installation:**
+            Open Command Prompt and run:
+            ```
+            ffmpeg -version
+            ```
+            
+            **Alternative Audio Processing:**
+            If FFmpeg installation is problematic, you can use:
+            - librosa: `pip install librosa`
+            - moviepy: `pip install moviepy`
+            - pydub: `pip install pydub`
+            """)
+        
+        st.warning("⚠️ Without FFmpeg or alternative libraries, video transcription will fail.")
+        st.info("""
+        **Recommended Setup for Your RTX 3060:**
+        1. Install FFmpeg for fastest processing
+        2. Keep librosa as backup: `pip install librosa`
+        3. Use "Auto-detect" method for best compatibility
+        """)
     
     def _get_short_path(self, path_str):
         """Get Windows short path (8.3 format) to avoid special character issues."""
