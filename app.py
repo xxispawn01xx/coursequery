@@ -499,8 +499,9 @@ class RealEstateAIApp:
         
         # Manual path input
         with st.sidebar.expander("📝 Set Custom Directory Path"):
-            st.text("Copy this path:")
-            st.code("H:\\Archive Classes\\coursequery\\archived_courses", language=None)
+            st.text("Current Master Directory:")
+            st.code(self.config.MASTER_COURSE_DIRECTORY, language=None)
+            st.info("💡 This path cascades throughout the entire system")
             
             custom_path = st.text_input(
                 "Enter full directory path:",
@@ -510,20 +511,20 @@ class RealEstateAIApp:
                 key="custom_path_input"
             )
             
-            if st.button("📂 Update Directory Path", key="update_path_btn"):
+            if st.button("📂 Update Master Directory", key="update_path_btn"):
                 try:
-                    path_obj = Path(custom_path)
-                    if path_obj.exists() and path_obj.is_dir():
-                        # Update config
-                        self.config.raw_docs_dir = path_obj
-                        st.success(f"✅ Directory updated: {path_obj}")
+                    from directory_config import update_master_directory
+                    
+                    if update_master_directory(custom_path):
+                        st.success(f"✅ Master directory updated system-wide: {custom_path}")
+                        st.info("🔄 All components now use the new directory")
                         # Clear cache and refresh
                         st.session_state.clear()
                         st.rerun()
                     else:
-                        st.error(f"❌ Directory not found: {custom_path}")
+                        st.error(f"❌ Failed to update directory: {custom_path}")
                 except Exception as e:
-                    st.error(f"❌ Invalid path: {e}")
+                    st.error(f"❌ Error updating directory: {e}")
         
         # File uploader for courses
         st.sidebar.subheader("📁 Upload Course Directory")
@@ -2178,7 +2179,7 @@ class RealEstateAIApp:
         # Use manual path input for offline operation
         directory_path = st.text_input(
             "Directory Path",
-            placeholder="e.g., H:\\Archive Classes\\coursequery\\archived_courses\\EWMBA 252",
+            placeholder=f"e.g., {self.config.MASTER_COURSE_DIRECTORY}\\EWMBA 252",
             help="Enter the full path to a course directory containing books/ebooks"
         )
         

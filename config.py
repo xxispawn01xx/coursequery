@@ -24,31 +24,28 @@ class Config:
     
     def setup_directories(self):
         """Create necessary directories for offline usage."""
-        # PURE OFFLINE: Check if running locally with H:\ access
-        h_drive_path = Path(r"H:\Archive Classes\coursequery\archived_courses")
+        # Import centralized directory configuration
+        from directory_config import get_directory_config
         
-        if h_drive_path.exists():
-            # Local system with actual course directory
-            self.raw_docs_dir = h_drive_path
-            print(f"📁 Using local H:\ course directory: {self.raw_docs_dir}")
-        else:
-            # Pure offline fallback directory
-            self.raw_docs_dir = self.base_dir / "archived_courses"
-            print(f"📁 Using offline directory: {self.raw_docs_dir}")
+        # Get global directory configuration
+        dir_config = get_directory_config()
         
-        print("💡 Running in pure offline mode")
+        # Use centralized directory paths
+        self.MASTER_COURSE_DIRECTORY = dir_config.MASTER_COURSE_DIRECTORY
+        self.raw_docs_dir = dir_config.raw_docs_dir
         
-        # Always use local directories for processed data
-        self.indexed_courses_dir = self.base_dir / "indexed_courses"
-        self.models_dir = self.base_dir / "models"
-        self.temp_dir = self.base_dir / "temp"
+        print("💡 Running in pure offline mode with centralized directory config")
+        print(f"📁 Master directory: {self.MASTER_COURSE_DIRECTORY}")
+        print(f"📁 Active directory: {self.raw_docs_dir}")
         
-        # Create processing directories
-        for directory in [self.indexed_courses_dir, self.models_dir, self.temp_dir]:
-            directory.mkdir(exist_ok=True)
+        # Use centralized directory paths for processed data
+        self.indexed_courses_dir = dir_config.indexed_courses_dir
+        self.models_dir = dir_config.models_dir
+        self.temp_dir = dir_config.temp_dir
+        self.book_embeddings_dir = dir_config.book_embeddings_dir
+        self.cache_dir = dir_config.cache_dir
         
-        # Create archived_courses directory
-        self.raw_docs_dir.mkdir(exist_ok=True)
+        # Directories are already created by directory_config manager
         
         # Create GGUF models subdirectory
         gguf_dir = self.models_dir / "gguf"
