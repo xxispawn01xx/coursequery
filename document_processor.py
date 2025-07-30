@@ -364,7 +364,19 @@ class DocumentProcessor:
             raise
     
     def _process_audio_video(self, file_path: Path) -> str:
-        """Transcribe audio/video files using Whisper."""
+        """Transcribe audio/video files using Whisper with robust error handling."""
+        # Check if file actually exists and is accessible
+        if not file_path.exists():
+            logger.error(f"Audio/video file not found: {file_path}")
+            return f"[Audio/Video content from {file_path.name} - File not found]"
+        
+        # Check if file is accessible
+        try:
+            file_path.stat()
+        except (OSError, PermissionError) as e:
+            logger.error(f"Audio/video file not accessible: {file_path} - {e}")
+            return f"[Audio/Video content from {file_path.name} - File not accessible: {e}]"
+        
         try:
             # Load Whisper model if not already loaded
             if self.whisper_model is None:
@@ -372,7 +384,7 @@ class DocumentProcessor:
             
             logger.info(f"Transcribing audio/video file: {file_path.name}")
             
-            # Use Whisper to transcribe
+            # Use Whisper to transcribe with additional error checking
             result = self.whisper_model.transcribe(str(file_path))
             
             # Format the transcription with timestamps if available
@@ -391,9 +403,15 @@ class DocumentProcessor:
             logger.info(f"Transcription completed: {len(transcription)} characters")
             return transcription
             
+        except FileNotFoundError as e:
+            logger.error(f"File not found during transcription {file_path}: {e}")
+            return f"[Audio/Video content from {file_path.name} - File not found during processing]"
+        except PermissionError as e:
+            logger.error(f"Permission denied accessing {file_path}: {e}")
+            return f"[Audio/Video content from {file_path.name} - Permission denied]"
         except Exception as e:
             logger.error(f"Error transcribing {file_path}: {e}")
-            raise
+            return f"[Audio/Video content from {file_path.name} - Transcription failed: {e}]"
     
     def _format_timestamp(self, seconds: float) -> str:
         """Format seconds into MM:SS format."""

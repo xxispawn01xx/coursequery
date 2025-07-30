@@ -537,15 +537,41 @@ class CourseIndexer:
             from document_processor import DocumentProcessor
             doc_processor = DocumentProcessor()
             
-            # Process all files in the course directory
+            # Process all files in the course directory with robust error handling
             documents = []
-            for file_path in course_raw_dir.iterdir():
+            processed_count = 0
+            failed_count = 0
+            
+            for file_path in course_raw_dir.rglob('*'):  # Use rglob for recursive search
                 if file_path.is_file() and doc_processor.is_supported_format(file_path):
-                    # Assume syllabus files contain 'syllabus' in the name
-                    is_syllabus = 'syllabus' in file_path.name.lower()
-                    
-                    processed_doc = doc_processor.process_file(file_path, is_syllabus)
-                    documents.append(processed_doc)
+                    try:
+                        # Check if file exists and is accessible before processing
+                        if not file_path.exists():
+                            logger.warning(f"⚠️ File not found during re-indexing: {file_path}")
+                            failed_count += 1
+                            continue
+                        
+                        # Test file accessibility
+                        try:
+                            file_path.stat()
+                        except (OSError, PermissionError) as access_error:
+                            logger.warning(f"⚠️ File not accessible during re-indexing: {file_path} - {access_error}")
+                            failed_count += 1
+                            continue
+                        
+                        # Assume syllabus files contain 'syllabus' in the name
+                        is_syllabus = 'syllabus' in file_path.name.lower()
+                        
+                        processed_doc = doc_processor.process_file(file_path, is_syllabus)
+                        documents.append(processed_doc)
+                        processed_count += 1
+                        
+                    except Exception as e:
+                        logger.warning(f"⚠️ Failed to process file {file_path}: {e}")
+                        failed_count += 1
+                        continue
+            
+            logger.info(f"📊 Re-indexing summary: {processed_count} processed, {failed_count} failed")
             
             if documents:
                 # Remove existing index
@@ -556,9 +582,13 @@ class CourseIndexer:
                 
                 # Re-index
                 self.index_course_documents(course_name, documents)
-                logger.info(f"Successfully re-indexed course: {course_name}")
+                logger.info(f"✅ Successfully re-indexed course: {course_name} ({processed_count} documents)")
+                
+                if failed_count > 0:
+                    logger.info(f"⚠️ Note: {failed_count} files could not be processed due to access issues")
+                    
             else:
-                raise ValueError(f"No processable documents found for course: {course_name}")
+                raise ValueError(f"No processable documents found for course: {course_name} (all {failed_count} files failed)")
             
         except Exception as e:
             logger.error(f"Error re-indexing course {course_name}: {e}")

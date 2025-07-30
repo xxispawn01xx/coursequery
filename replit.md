@@ -130,6 +130,9 @@ Authentication: Local HuggingFace token storage, no external dependencies requir
 - **OfflineCourseManager Fallback**: Created simple course detection system that works without complex dependencies
 - **Automatic Fallback Detection**: App automatically switches to offline mode when LlamaIndex/Pydantic imports fail
 - **Comprehensive Debug System**: Added detailed logging to identify exact failure points in course loading process
+- **Robust File Handling**: Added file existence checking and accessibility validation for missing/inaccessible course files
+- **Graceful Re-indexing**: Re-indexing now continues with available files even when some files are missing or inaccessible
+- **Enhanced Error Reporting**: Detailed summaries show exactly which files processed successfully vs failed with specific reasons
 
 ### July 29, 2025 - Multi-Course Detection & Replit Integration
 - **Enhanced Course Detection**: System now detects both indexed courses and unprocessed course directories automatically
