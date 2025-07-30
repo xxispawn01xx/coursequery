@@ -1,0 +1,312 @@
+INFO:local_models:✅ Successfully loaded DistilGPT-2 (Small, Safe for RTX 3060) with RTX 3060 optimizations!
+INFO:local_models:Loading embedding model...
+INFO:local_models:Loading embedding model from cache: H:\Archive Classes\coursequery\models - ⬇️  First download (may take several minutes)
+ERROR:local_models:Failed to load embedding model: cannot access local variable 'torch' where it is not associated with a value
+WARNING:local_models:Continuing without embedding model - Q&A will be limited
+WARNING:local_models:Embedding model failed to load - Q&A functionality will be limited
+INFO:local_models:✅ All models loaded successfully (mistral) - Total time: 1.09s
+INFO:__main__:Model manager loaded successfully with mistral
+📁 Using local H:\ course directory: H:\Archive Classes\coursequery\archived_courses
+💡 Running in pure offline mode
+📁 Using local H:\ course directory: H:\Archive Classes\coursequery\archived_courses
+💡 Running in pure offline mode
+WARNING:course_indexer:HuggingFaceLLM not available, using manual generation
+INFO:__main__:Query engine initialized successfully
+INFO:__main__:Models and query engine loaded successfully with mistral
+🔄 Starting course refresh...
+📁 Scanning directory: archived_courses
+📁 Raw courses: archived_courses
+📊 Indexed courses: indexed_courses
+📚 Indexed course: coursequery (6 files)
+📂 Directory contents:
+  - course_1516370 (DIR)
+📁 Found course: course_1516370 (0 files)
+  - course_1516374 (DIR)
+📁 Found course: course_1516374 (0 files)
+  - course_1516377 (DIR)
+📁 Found course: course_1516377 (0 files)
+  - course_1525959 (DIR)
+📁 Found course: course_1525959 (0 files)
+  - course_1525962 (DIR)
+📁 Found course: course_1525962 (0 files)
+  - course_1525965 (DIR)
+📁 Found course: course_1525965 (0 files)
+  - course_1529943 (DIR)
+📁 Found course: course_1529943 (0 files)
+  - course_1535278 (DIR)
+📁 Found course: course_1535278 (0 files)
+  - course_1536363 (DIR)
+📁 Found course: course_1536363 (0 files)
+  - course_1536463 (DIR)
+📁 Found course: course_1536463 (0 files)
+  - EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024) (DIR)
+📁 Found course: EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024) (49 files)
+  - EW & MBA 291E-LEC-01F - Interpersonal Skills and Embodied Systems Leadership (Fall 2023) (DIR)
+📁 Found course: EW & MBA 291E-LEC-01F - Interpersonal Skills and Embodied Systems Leadership (Fall 2023) (46 files)
+  - EWMBA 200S-LEC-31B & 32B - Data and Decisions (Fall 2023) (DIR)
+📁 Found course: EWMBA 200S-LEC-31B & 32B - Data and Decisions (Fall 2023) (15 files)
+  - EWMBA 201B-LEC-31A & 32A - Macroeconomics in the Global Economy (Spring 2024) (DIR)
+📁 Found course: EWMBA 201B-LEC-31A & 32A - Macroeconomics in the Global Economy (Spring 2024) (72 files)
+  - EWMBA 201B_ Macroeconomics (WEEKEND) - Core Waiver Exam (DIR)
+📁 Found course: EWMBA 201B_ Macroeconomics (WEEKEND) - Core Waiver Exam (2 files)
+  - EWMBA 202-LEC-31A & 32A - Financial Accounting (Spring 2024) (DIR)
+📁 Found course: EWMBA 202-LEC-31A & 32A - Financial Accounting (Spring 2024) (15 files)
+  - EWMBA 203-LEC-32B - Introduction to Finance (Spring 2024) (DIR)
+📁 Found course: EWMBA 203-LEC-32B - Introduction to Finance (Spring 2024) (43 files)
+  - EWMBA 203_ Introduction to Finance (WEEKEND) - Core Waiver Exam (DIR)
+📁 Found course: EWMBA 203_ Introduction to Finance (WEEKEND) - Core Waiver Exam (1 files)
+  - EWMBA 205-LEC-31A & 32A - Leading People (Fall 2023) (DIR)
+📁 Found course: EWMBA 205-LEC-31A & 32A - Leading People (Fall 2023) (66 files)
+  - EWMBA 205D - Business Communication in Diverse Work Environments (Spring 2025) (DIR)
+📁 Found course: EWMBA 205D - Business Communication in Diverse Work Environments (Spring 2025) (34 files)
+  - EWMBA 207-LEC-32B - Ethics and Responsibility in Business (Spring 2024) (DIR)
+📁 Found course: EWMBA 207-LEC-32B - Ethics and Responsibility in Business (Spring 2024) (59 files)
+  - EWMBA 209-Sat - Strategic Leadership (Fall 2024) (DIR)
+📁 Found course: EWMBA 209-Sat - Strategic Leadership (Fall 2024) (84 files)
+  - EWMBA 252-LEC-001 - Negotiations and Conflict Resolution (Summer 2024) (DIR)
+📁 Found course: EWMBA 252-LEC-001 - Negotiations and Conflict Resolution (Summer 2024) (121 files)
+  - EWMBA 254-LEC-02F - Power and Politics in Organizations (Fall 2023) (DIR)
+📁 Found course: EWMBA 254-LEC-02F - Power and Politics in Organizations (Fall 2023) (42 files)
+  - EWMBA 258P-LEC-11F - The Science of Productivity and Performance (Spring 2025) (DIR)
+📁 Found course: EWMBA 258P-LEC-11F - The Science of Productivity and Performance (Spring 2025) (88 files)
+  - EWMBA D&D Pre-Term '22 (DIR)
+📁 Found course: EWMBA D&D Pre-Term '22 (5 files)
+  - EWMBA D&D Pre-Term '23 (DIR)
+📁 Found course: EWMBA D&D Pre-Term '23 (5 files)
+  - index (DIR)
+📁 Found course: index (0 files)
+  - Leadership Communication (Fall 2024) (DIR)
+📁 Found course: Leadership Communication (Fall 2024) (32 files)
+  - Marketing Core Oski (Fall 23) (DIR)
+📁 Found course: Marketing Core Oski (Fall 23) (48 files)
+  - metadata.json (FILE)
+  - NUS-Haas Bay Area Entrepreneurship, Investing & Innovation  (Spring 2024) (DIR)
+📁 Found course: NUS-Haas Bay Area Entrepreneurship, Investing & Innovation  (Spring 2024) (26 files)
+  - PHW223 2024 Strategy in Health Care Organizations (DIR)
+📁 Found course: PHW223 2024 Strategy in Health Care Organizations (37 files)
+  - python_course (DIR)
+📁 Found course: python_course (2 files)
+  - SHAPE Student Training - UCB - 2025-2026 (DIR)
+📁 Found course: SHAPE Student Training - UCB - 2025-2026 (6 files)
+  - Teams@Haas - Weekend MBA 2023 (DIR)
+📁 Found course: Teams@Haas - Weekend MBA 2023 (13 files)
+  - test_course (DIR)
+📁 Found course: test_course (1 files)
+  - VCPE-20241208T200025Z-001 (DIR)
+📁 Found course: VCPE-20241208T200025Z-001 (29 files)
+  - WE Launch 2022 (DIR)
+📁 Found course: WE Launch 2022 (52 files)
+  - WE Launch 2023 (DIR)
+📁 Found course: WE Launch 2023 (49 files)
+  - [FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide (DIR)
+📁 Found course: [FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide (0 files)
+  - [Resource] Haas Quantitative Readiness (DIR)
+📁 Found course: [Resource] Haas Quantitative Readiness (14 files)
+✅ Total courses found: 42 (scanned 41 directories)
+────────────────────────── Traceback (most recent call last) ───────────────────────────
+  C:\Program
+  Files\Python312\Lib\site-packages\streamlit\runtime\state\session_state.py:469 in
+  __getitem__
+
+  C:\Program
+  Files\Python312\Lib\site-packages\streamlit\runtime\state\session_state.py:517 in
+  _getitem
+────────────────────────────────────────────────────────────────────────────────────────
+KeyError
+
+During handling of the above exception, another exception occurred:
+
+────────────────────────── Traceback (most recent call last) ───────────────────────────
+  C:\Program
+  Files\Python312\Lib\site-packages\streamlit\runtime\state\session_state_proxy.py:130
+  in __getattr__
+
+  C:\Program
+  Files\Python312\Lib\site-packages\streamlit\runtime\state\session_state_proxy.py:101
+  in __getitem__
+
+  C:\Program
+  Files\Python312\Lib\site-packages\streamlit\runtime\state\safe_session_state.py:104
+  in __getitem__
+
+  C:\Program
+  Files\Python312\Lib\site-packages\streamlit\runtime\state\session_state.py:471 in
+  __getitem__
+────────────────────────────────────────────────────────────────────────────────────────
+KeyError: 'st.session_state has no key "selected_course". Did you forget to initialize
+it? More info:
+https://docs.streamlit.io/develop/concepts/architecture/session-state#initialization'
+
+During handling of the above exception, another exception occurred:
+
+────────────────────────── Traceback (most recent call last) ───────────────────────────
+  C:\Program
+  Files\Python312\Lib\site-packages\streamlit\runtime\scriptrunner\exec_code.py:128 in
+  exec_func_with_error_handling
+
+  C:\Program
+  Files\Python312\Lib\site-packages\streamlit\runtime\scriptrunner\script_runner.py:66
+  9 in code_to_exec
+
+  H:\Archive Classes\coursequery\app.py:3385 in <module>
+
+    3382
+    3383
+    3384 if __name__ == "__main__":
+  ❱ 3385 │   main()
+    3386
+
+  H:\Archive Classes\coursequery\app.py:3381 in main
+
+    3378 def main():
+    3379 │   """Application entry point."""
+    3380 │   app = RealEstateAIApp()
+  ❱ 3381 │   app.run()
+    3382
+    3383
+    3384 if __name__ == "__main__":
+
+  H:\Archive Classes\coursequery\app.py:2119 in run
+
+    2116 │   │   │   self.vector_rag_section()
+    2117 │   │
+    2118 │   │   with tab4:
+  ❱ 2119 │   │   │   self.query_interface()
+    2120 │   │
+    2121 │   │   with tab5:
+    2122 │   │   │   self.analytics_section()
+
+  H:\Archive Classes\coursequery\app.py:1198 in query_interface
+
+    1195 │
+    1196 │   def query_interface(self):
+    1197 │   │   """Handle the main query interface."""
+  ❱ 1198 │   │   if not st.session_state.selected_course:
+    1199 │   │   │   st.info("👆 Please select a course from the sidebar to start aski
+    1200 │   │   │   return
+    1201
+
+  C:\Program
+  Files\Python312\Lib\site-packages\streamlit\runtime\state\session_state_proxy.py:132
+  in __getattr__
+────────────────────────────────────────────────────────────────────────────────────────
+AttributeError: st.session_state has no attribute "selected_course". Did you forget to
+initialize it? More info:
+https://docs.streamlit.io/develop/concepts/architecture/session-state#initialization
+📁 Using local H:\ course directory: H:\Archive Classes\coursequery\archived_courses
+💡 Running in pure offline mode
+🔒 FORCED to use local directories:
+📁 Raw docs: archived_courses
+📊 Indexed: indexed_courses
+📁 Using local H:\ course directory: H:\Archive Classes\coursequery\archived_courses
+💡 Running in pure offline mode
+📁 Using local H:\ course directory: H:\Archive Classes\coursequery\archived_courses
+💡 Running in pure offline mode
+🔄 Starting course refresh...
+📁 Scanning directory: archived_courses
+📁 Raw courses: archived_courses
+📊 Indexed courses: indexed_courses
+📚 Indexed course: coursequery (6 files)
+📂 Directory contents:
+  - course_1516370 (DIR)
+📁 Found course: course_1516370 (0 files)
+  - course_1516374 (DIR)
+📁 Found course: course_1516374 (0 files)
+  - course_1516377 (DIR)
+📁 Found course: course_1516377 (0 files)
+  - course_1525959 (DIR)
+📁 Found course: course_1525959 (0 files)
+  - course_1525962 (DIR)
+📁 Found course: course_1525962 (0 files)
+  - course_1525965 (DIR)
+📁 Found course: course_1525965 (0 files)
+  - course_1529943 (DIR)
+📁 Found course: course_1529943 (0 files)
+  - course_1535278 (DIR)
+📁 Found course: course_1535278 (0 files)
+  - course_1536363 (DIR)
+📁 Found course: course_1536363 (0 files)
+  - course_1536463 (DIR)
+📁 Found course: course_1536463 (0 files)
+  - EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024) (DIR)
+📁 Found course: EW & MBA 236V-LEC-001 - New Venture Finance (Fall 2024) (49 files)
+  - EW & MBA 291E-LEC-01F - Interpersonal Skills and Embodied Systems Leadership (Fall 2023) (DIR)
+📁 Found course: EW & MBA 291E-LEC-01F - Interpersonal Skills and Embodied Systems Leadership (Fall 2023) (46 files)
+  - EWMBA 200S-LEC-31B & 32B - Data and Decisions (Fall 2023) (DIR)
+📁 Found course: EWMBA 200S-LEC-31B & 32B - Data and Decisions (Fall 2023) (15 files)
+  - EWMBA 201B-LEC-31A & 32A - Macroeconomics in the Global Economy (Spring 2024) (DIR)
+📁 Found course: EWMBA 201B-LEC-31A & 32A - Macroeconomics in the Global Economy (Spring 2024) (72 files)
+  - EWMBA 201B_ Macroeconomics (WEEKEND) - Core Waiver Exam (DIR)
+📁 Found course: EWMBA 201B_ Macroeconomics (WEEKEND) - Core Waiver Exam (2 files)
+  - EWMBA 202-LEC-31A & 32A - Financial Accounting (Spring 2024) (DIR)
+📁 Found course: EWMBA 202-LEC-31A & 32A - Financial Accounting (Spring 2024) (15 files)
+  - EWMBA 203-LEC-32B - Introduction to Finance (Spring 2024) (DIR)
+📁 Found course: EWMBA 203-LEC-32B - Introduction to Finance (Spring 2024) (43 files)
+  - EWMBA 203_ Introduction to Finance (WEEKEND) - Core Waiver Exam (DIR)
+📁 Found course: EWMBA 203_ Introduction to Finance (WEEKEND) - Core Waiver Exam (1 files)
+  - EWMBA 205-LEC-31A & 32A - Leading People (Fall 2023) (DIR)
+📁 Found course: EWMBA 205-LEC-31A & 32A - Leading People (Fall 2023) (66 files)
+  - EWMBA 205D - Business Communication in Diverse Work Environments (Spring 2025) (DIR)
+📁 Found course: EWMBA 205D - Business Communication in Diverse Work Environments (Spring 2025) (34 files)
+  - EWMBA 207-LEC-32B - Ethics and Responsibility in Business (Spring 2024) (DIR)
+📁 Found course: EWMBA 207-LEC-32B - Ethics and Responsibility in Business (Spring 2024) (59 files)
+  - EWMBA 209-Sat - Strategic Leadership (Fall 2024) (DIR)
+📁 Found course: EWMBA 209-Sat - Strategic Leadership (Fall 2024) (84 files)
+  - EWMBA 252-LEC-001 - Negotiations and Conflict Resolution (Summer 2024) (DIR)
+📁 Found course: EWMBA 252-LEC-001 - Negotiations and Conflict Resolution (Summer 2024) (121 files)
+  - EWMBA 254-LEC-02F - Power and Politics in Organizations (Fall 2023) (DIR)
+📁 Found course: EWMBA 254-LEC-02F - Power and Politics in Organizations (Fall 2023) (42 files)
+  - EWMBA 258P-LEC-11F - The Science of Productivity and Performance (Spring 2025) (DIR)
+📁 Found course: EWMBA 258P-LEC-11F - The Science of Productivity and Performance (Spring 2025) (88 files)
+  - EWMBA D&D Pre-Term '22 (DIR)
+📁 Found course: EWMBA D&D Pre-Term '22 (5 files)
+  - EWMBA D&D Pre-Term '23 (DIR)
+📁 Found course: EWMBA D&D Pre-Term '23 (5 files)
+  - index (DIR)
+📁 Found course: index (0 files)
+  - Leadership Communication (Fall 2024) (DIR)
+📁 Found course: Leadership Communication (Fall 2024) (32 files)
+  - Marketing Core Oski (Fall 23) (DIR)
+📁 Found course: Marketing Core Oski (Fall 23) (48 files)
+  - metadata.json (FILE)
+  - NUS-Haas Bay Area Entrepreneurship, Investing & Innovation  (Spring 2024) (DIR)
+📁 Found course: NUS-Haas Bay Area Entrepreneurship, Investing & Innovation  (Spring 2024) (26 files)
+  - PHW223 2024 Strategy in Health Care Organizations (DIR)
+📁 Found course: PHW223 2024 Strategy in Health Care Organizations (37 files)
+  - python_course (DIR)
+📁 Found course: python_course (2 files)
+  - SHAPE Student Training - UCB - 2025-2026 (DIR)
+📁 Found course: SHAPE Student Training - UCB - 2025-2026 (6 files)
+  - Teams@Haas - Weekend MBA 2023 (DIR)
+📁 Found course: Teams@Haas - Weekend MBA 2023 (13 files)
+  - test_course (DIR)
+📁 Found course: test_course (1 files)
+  - VCPE-20241208T200025Z-001 (DIR)
+📁 Found course: VCPE-20241208T200025Z-001 (29 files)
+  - WE Launch 2022 (DIR)
+📁 Found course: WE Launch 2022 (52 files)
+  - WE Launch 2023 (DIR)
+📁 Found course: WE Launch 2023 (49 files)
+  - [FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide (DIR)
+📁 Found course: [FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide (0 files)
+  - [Resource] Haas Quantitative Readiness (DIR)
+📁 Found course: [Resource] Haas Quantitative Readiness (14 files)
+✅ Total courses found: 42 (scanned 41 directories)
+📁 Using local H:\ course directory: H:\Archive Classes\coursequery\archived_courses
+💡 Running in pure offline mode
+🔒 FORCED to use local directories:
+📁 Raw docs: archived_courses
+📊 Indexed: indexed_courses
+📁 Using local H:\ course directory: H:\Archive Classes\coursequery\archived_courses
+💡 Running in pure offline mode
+📁 Using local H:\ course directory: H:\Archive Classes\coursequery\archived_courses
+💡 Running in pure offline mode
+📁 Using local H:\ course directory: H:\Archive Classes\coursequery\archived_courses
+💡 Running in pure offline mode
+🔒 FORCED to use local directories:
+📁 Raw docs: archived_courses
+📊 Indexed: indexed_courses
+📁 Using local H:\ course directory: H:\Archive Classes\coursequery\archived_courses
+💡 Running in pure offline mode
+📁 Using local H:\ course directory: H:\Archive Classes\coursequery\archived_courses
+💡 Running in pure offline mode

@@ -383,10 +383,11 @@ class RealEstateAIApp:
         """Refresh the list of available courses - pure offline mode."""
         print("🔄 Starting course refresh...")
         
-        # Clear cached course data only
-        for key in ['available_courses', 'selected_course']:
-            if key in st.session_state:
-                del st.session_state[key]
+        # Initialize session state if needed
+        if 'available_courses' not in st.session_state:
+            st.session_state.available_courses = []
+        if 'selected_course' not in st.session_state:
+            st.session_state.selected_course = None
         
         courses = []
         
@@ -547,7 +548,9 @@ class RealEstateAIApp:
                     # Force UI refresh
                     st.rerun()
         
-        # Available courses
+        # Initialize and get available courses
+        if 'available_courses' not in st.session_state:
+            st.session_state.available_courses = []
         courses = st.session_state.available_courses
         if courses:
             st.sidebar.subheader("Available Courses")
@@ -1195,6 +1198,12 @@ class RealEstateAIApp:
 
     def query_interface(self):
         """Handle the main query interface."""
+        # Initialize session state variables
+        if 'selected_course' not in st.session_state:
+            st.session_state.selected_course = None
+        if 'available_courses' not in st.session_state:
+            st.session_state.available_courses = []
+            
         if not st.session_state.selected_course:
             st.info("👆 Please select a course from the sidebar to start asking questions.")
             return
