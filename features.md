@@ -123,6 +123,40 @@ This document outlines the integration features for transferring course embeddin
 - Returns: formatted code + documentation
 - Integrates with VS Code via extension or manual calls
 
+## Smart Transcription Detection
+
+### Current VTT File Handling
+The system already processes VTT (subtitle) files automatically:
+- **Automatic Detection**: VTT files are recognized during course indexing
+- **Content Extraction**: Subtitle processor removes timestamps and formatting
+- **Clean Integration**: VTT content included in course embeddings seamlessly
+- **No Redundant Processing**: Videos with existing VTT files don't need re-transcription
+
+### Improved Transcription Interface
+**Smart Course-Based Workflow:**
+1. **Course Selection**: Dropdown of existing detected courses
+2. **Intelligent Media Scanning**: 
+   - Find all video/audio files in course directory
+   - Check for existing VTT subtitle files
+   - Check for existing transcription text files
+   - Only flag videos that need transcription
+3. **Status Summary**: "Found 12 videos: 8 have VTT subtitles, 4 need transcription"
+4. **Selective Processing**: Only transcribe files without existing transcriptions
+5. **Auto-Reindexing**: Update course embeddings with new transcriptions
+
+### Multi-Source Content Recognition
+**Course Content Sources:**
+- **Documents**: PDFs, DOCX, PPTX, EPUB files
+- **Existing Transcriptions**: VTT subtitle files, SRT files  
+- **Generated Transcriptions**: RTX 3060 Whisper output
+- **Code Files**: Python, JavaScript, configuration files
+- **Text Content**: Markdown, plain text documentation
+
+**Processing Logic:**
+- VTT files → Automatic inclusion in course index
+- Video files without VTT → Candidate for transcription
+- All content → Combined into unified course embeddings
+
 **API Endpoints:**
 ```
 POST /query-course
