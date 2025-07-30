@@ -117,6 +117,13 @@ class RealEstateAIApp:
         except ImportError:
             self.ignore_manager = None
         
+        # Initialize book indexer
+        try:
+            from book_indexer import BookIndexer
+            self.book_indexer = BookIndexer()
+        except ImportError:
+            self.book_indexer = None
+        
         # Initialize session state
         if 'models_loaded' not in st.session_state:
             st.session_state.models_loaded = False
@@ -2155,6 +2162,166 @@ class RealEstateAIApp:
         with st.expander("🔍 Debug Information"):
             st.json(stats)
 
+    def book_embeddings_section(self):
+        """Manage individual book embeddings within course directories."""
+        st.header("📚 Individual Book Embeddings")
+        
+        if not self.book_indexer:
+            st.error("❌ Book indexer not available")
+            return
+        
+        st.info("Create separate vector embeddings for individual books/ebooks instead of entire course folders")
+        
+        # Directory selection
+        st.subheader("📁 Select Directory to Scan")
+        
+        # Use manual path input for offline operation
+        directory_path = st.text_input(
+            "Directory Path",
+            placeholder="e.g., H:\\Archive Classes\\coursequery\\archived_courses\\EWMBA 252",
+            help="Enter the full path to a course directory containing books/ebooks"
+        )
+        
+        if directory_path and st.button("🔍 Scan for Books"):
+            scan_path = Path(directory_path)
+            
+            if not scan_path.exists():
+                st.error(f"❌ Directory not found: {directory_path}")
+                return
+            
+            # Scan for books
+            books = self.book_indexer.scan_directory_for_books(scan_path)
+            
+            if not books:
+                st.warning(f"📖 No books found in {directory_path}")
+                st.info("Supported formats: PDF, EPUB, DOCX, TXT, MD")
+                return
+            
+            st.success(f"📚 Found {len(books)} books in directory")
+            
+            # Store books in session state
+            st.session_state.scanned_books = books
+            st.session_state.scan_directory = directory_path
+        
+        # Show scanned books if available
+        if 'scanned_books' in st.session_state:
+            books = st.session_state.scanned_books
+            scan_dir = st.session_state.scan_directory
+            
+            st.subheader(f"📖 Books found in: {Path(scan_dir).name}")
+            
+            # Embedding options
+            col1, col2 = st.columns(2)
+            with col1:
+                embed_all = st.checkbox("📊 Create embeddings for all books", value=False)
+            with col2:
+                overwrite_existing = st.checkbox("🔄 Overwrite existing embeddings", value=False)
+            
+            # Process all books button
+            if embed_all and st.button("🚀 Process All Books"):
+                if not self.doc_processor or not self.course_indexer:
+                    st.error("❌ Document processor or course indexer not available")
+                    return
+                
+                progress_bar = st.progress(0)
+                status_text = st.empty()
+                
+                success_count = 0
+                total_books = len([b for b in books if not b['is_indexed'] or overwrite_existing])
+                
+                for i, book in enumerate(books):
+                    if book['is_indexed'] and not overwrite_existing:
+                        continue
+                    
+                    status_text.text(f"Processing: {book['name']}")
+                    progress_bar.progress((i + 1) / len(books))
+                    
+                    result = self.book_indexer.process_book(
+                        book, 
+                        self.doc_processor, 
+                        self.course_indexer
+                    )
+                    
+                    if result['success']:
+                        success_count += 1
+                
+                st.success(f"✅ Successfully processed {success_count} books")
+                st.rerun()
+            
+            # Individual book display
+            for i, book in enumerate(books):
+                with st.expander(f"📖 {book['name']} ({book['size_mb']} MB)"):
+                    col1, col2, col3 = st.columns(3)
+                    
+                    with col1:
+                        st.write(f"**Format:** {book['extension']}")
+                        st.write(f"**Size:** {book['size_mb']} MB")
+                        
+                    with col2:
+                        if book['is_indexed']:
+                            st.success("✅ Indexed")
+                            st.write(f"**Chunks:** {book.get('chunk_count', 0)}")
+                            st.write(f"**Date:** {book.get('indexed_date', 'Unknown')[:10]}")
+                        else:
+                            st.warning("⏳ Not indexed")
+                    
+                    with col3:
+                        # Individual process button
+                        if st.button(f"Process Book", key=f"process_book_{i}"):
+                            if not self.doc_processor or not self.course_indexer:
+                                st.error("❌ Document processor or course indexer not available")
+                                continue
+                            
+                            with st.spinner(f"Processing {book['name']}..."):
+                                result = self.book_indexer.process_book(
+                                    book, 
+                                    self.doc_processor, 
+                                    self.course_indexer
+                                )
+                            
+                            if result['success']:
+                                st.success(f"✅ Successfully processed {book['name']}")
+                                st.rerun()
+                            else:
+                                st.error(f"❌ Failed: {result.get('error', 'Unknown error')}")
+        
+        # Show book statistics
+        st.subheader("📊 Book Embedding Statistics")
+        
+        stats = self.book_indexer.get_book_stats()
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Total Books Indexed", stats['total_books'])
+        with col2:
+            st.metric("Total Chunks", stats['total_chunks'])
+        with col3:
+            st.metric("Courses with Books", len(stats['courses']))
+        
+        # Show books by course
+        if stats['courses']:
+            st.subheader("📚 Books by Course")
+            
+            for course, course_stats in stats['courses'].items():
+                with st.expander(f"📁 {course} ({course_stats['books']} books)"):
+                    st.write(f"**Books:** {course_stats['books']}")
+                    st.write(f"**Chunks:** {course_stats['chunks']}")
+                    
+                    # Search books in this course
+                    search_query = st.text_input(
+                        f"Search books in {course}",
+                        key=f"search_{course}",
+                        placeholder="Enter book name to search..."
+                    )
+                    
+                    if search_query:
+                        results = self.book_indexer.search_books(search_query, course)
+                        if results:
+                            for book in results:
+                                st.write(f"📖 {book['name']} ({book['chunks']} chunks)")
+                        else:
+                            st.info("No matching books found")
+
     def run(self):
         """Main application entry point."""
         self.setup_page_config()
@@ -2203,14 +2370,15 @@ class RealEstateAIApp:
         self.sidebar_course_management()
         
         # Main content tabs with clear billing indicators
-        tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
+        tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
             "📁 Upload Documents (FREE)", 
             "🎥 Bulk Transcription (FREE)", 
             "🔍 Vector RAG (💳 PAID)", 
             "💬 Ask Questions (FREE)", 
             "📊 Analytics (FREE)", 
             "⚙️ System Status (FREE)",
-            "🚫 Manage Ignored (FREE)"
+            "🚫 Manage Ignored (FREE)",
+            "📚 Book Embeddings (FREE)"
         ])
         
         with tab1:
@@ -2233,6 +2401,9 @@ class RealEstateAIApp:
         
         with tab7:
             self.manage_ignored_courses_section()
+        
+        with tab8:
+            self.book_embeddings_section()
         
         # Add new analytics and learning tabs
         if st.session_state.get('show_advanced_tabs', False):

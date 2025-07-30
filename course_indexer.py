@@ -483,3 +483,67 @@ class CourseIndexer:
         except Exception as e:
             logger.error(f"Error deleting course {course_name}: {e}")
             raise
+    
+    def create_book_index(self, content: str, book_name: str, output_dir: str) -> Dict:
+        """Create vector embeddings for individual book content."""
+        try:
+            from llama_index.core import Document, VectorStoreIndex, Settings
+            from llama_index.core.text_splitter import TokenTextSplitter
+            import json
+            
+            output_path = Path(output_dir)
+            output_path.mkdir(exist_ok=True)
+            
+            # Split into chunks
+            text_splitter = TokenTextSplitter(chunk_size=1000, chunk_overlap=200)
+            chunks = text_splitter.split_text(content)
+            
+            # Create documents for each chunk
+            documents = []
+            for i, chunk in enumerate(chunks):
+                doc = Document(
+                    text=chunk,
+                    metadata={
+                        'source': book_name,
+                        'chunk_id': i,
+                        'book_name': book_name
+                    }
+                )
+                documents.append(doc)
+            
+            # Create index with our local embedding model if available
+            if self.embedding_wrapper:
+                Settings.embed_model = self.embedding_wrapper
+            
+            index = VectorStoreIndex.from_documents(documents)
+            
+            # Save index
+            index.storage_context.persist(persist_dir=str(output_path))
+            
+            # Save metadata
+            metadata = {
+                'book_name': book_name,
+                'chunk_count': len(chunks),
+                'created_date': datetime.now().isoformat(),
+                'model_name': 'local_embeddings' if self.embedding_wrapper else 'default',
+                'content_length': len(content)
+            }
+            
+            with open(output_path / 'metadata.json', 'w') as f:
+                json.dump(metadata, f, indent=2)
+            
+            logger.info(f"Created book index for '{book_name}' with {len(chunks)} chunks")
+            
+            return {
+                'success': True,
+                'chunk_count': len(chunks),
+                'model_name': 'local_embeddings' if self.embedding_wrapper else 'default',
+                'output_dir': str(output_path)
+            }
+            
+        except Exception as e:
+            logger.error(f"Error creating book index for '{book_name}': {e}")
+            return {
+                'success': False,
+                'error': str(e)
+            }
