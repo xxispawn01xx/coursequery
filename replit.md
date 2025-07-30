@@ -170,6 +170,8 @@ When you "index a course," the system processes all documents in that course fol
 - **Robust File Access**: Implemented fallback path formats when primary path resolution fails for Whisper transcription
 - **Duplicate Path Resolution**: Fixed duplicate nested directory structures in Apache Airflow course paths for successful RTX 3060 transcription
 - **Path Correction Pipeline**: Enhanced file validation to detect, correct, and use proper paths throughout the transcription process
+- **Physical Duplicate Detection**: Comprehensive solution for courses with nested duplicate directory structures on H:\ drive
+- **Multi-Level Path Cleaning**: Automatic detection and correction of duplicate paths at search, validation, and final transcription stages
 
 ### July 30, 2025 - Centralized Directory Configuration & Offline Mode Fixes
 - **Single Source Directory Management**: Created `directory_config.py` with centralized MASTER_COURSE_DIRECTORY variable

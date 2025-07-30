@@ -3031,11 +3031,48 @@ class RealEstateAIApp:
                     # Search for any media files that actually exist
                     found_files = list(config.raw_docs_dir.rglob(file_name))
                     if found_files:
-                        media_path = found_files[0]
-                        logger.info(f"Found file at: {media_path}")
-                        # Update media_file to use the corrected path for both transcription and saving
-                        media_file = str(media_path)
-                        logger.info(f"Updated media_file to corrected path: {media_file}")
+                        # Check if any found files have duplicate paths and fix them
+                        for found_file in found_files:
+                            found_parts = found_file.parts
+                            
+                            # Look for duplicate consecutive directories in the found path
+                            has_duplicates = False
+                            for i in range(len(found_parts) - 1):
+                                if found_parts[i] == found_parts[i + 1] and 'Udemy' in found_parts[i]:
+                                    has_duplicates = True
+                                    break
+                            
+                            if not has_duplicates:
+                                # Use the file without duplicates
+                                media_path = found_file
+                                media_file = str(found_file)
+                                logger.info(f"Found clean file at: {media_path}")
+                                break
+                            else:
+                                # Try to construct the correct path by removing duplicates
+                                logger.warning(f"Found file has duplicate path: {found_file}")
+                                clean_parts = []
+                                prev_part = None
+                                for part in found_parts:
+                                    if part != prev_part or 'Udemy' not in part:
+                                        clean_parts.append(part)
+                                        prev_part = part
+                                
+                                clean_path = Path(*clean_parts)
+                                logger.info(f"Attempting to use cleaned path: {clean_path}")
+                                
+                                if clean_path.exists():
+                                    media_path = clean_path
+                                    media_file = str(clean_path)
+                                    logger.info(f"Successfully using cleaned path: {media_path}")
+                                    break
+                                else:
+                                    logger.warning(f"Cleaned path doesn't exist: {clean_path}")
+                        else:
+                            # If we get here, use the first found file even with duplicates
+                            media_path = found_files[0]
+                            media_file = str(found_files[0])
+                            logger.warning(f"Using file with potential duplicate path: {media_path}")
                     else:
                         logger.error(f"File '{file_name}' not found in any course directory")
                         logger.info("This is normal in development environment - actual course files are on your local H:\ drive")
@@ -3064,14 +3101,33 @@ class RealEstateAIApp:
             # Transcribe with RTX 3060 optimization
             logger.info(f"Transcribing: {media_path.name}")
             
-            # Use the corrected and validated media_path for transcription
+            # Final path verification and cleaning before Whisper
             transcribe_path = str(media_path)
-            logger.info(f"Using corrected path for Whisper: {transcribe_path}")
             
-            # Verify one more time that the file exists before passing to Whisper
-            if not Path(transcribe_path).exists():
-                logger.error(f"Final validation failed - file does not exist: {transcribe_path}")
-                return False
+            # Last attempt to clean any remaining duplicate paths
+            path_obj = Path(transcribe_path)
+            if not path_obj.exists():
+                logger.warning(f"Path doesn't exist, attempting final cleanup: {transcribe_path}")
+                
+                # Try removing one level of duplicate directory
+                parts = path_obj.parts
+                for i in range(len(parts) - 1):
+                    if parts[i] == parts[i + 1] and 'Udemy' in parts[i]:
+                        # Create path without the duplicate
+                        clean_parts = list(parts)
+                        clean_parts.pop(i + 1)
+                        cleaned_path = Path(*clean_parts)
+                        
+                        if cleaned_path.exists():
+                            transcribe_path = str(cleaned_path)
+                            media_path = cleaned_path
+                            logger.info(f"Final cleanup successful: {transcribe_path}")
+                            break
+                else:
+                    logger.error(f"Final validation failed - file does not exist: {transcribe_path}")
+                    return False
+            
+            logger.info(f"Using final validated path for Whisper: {transcribe_path}")
             
             result = model.transcribe(
                 transcribe_path,
