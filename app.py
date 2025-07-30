@@ -3075,7 +3075,7 @@ class RealEstateAIApp:
                             logger.warning(f"Using file with potential duplicate path: {media_path}")
                     else:
                         logger.error(f"File '{file_name}' not found in any course directory")
-                        logger.info("This is normal in development environment - actual course files are on your local H:\ drive")
+                        logger.info("This is normal in development environment - actual course files are on your local H:\\ drive")
                         logger.info("For testing, use files that exist in your current environment")
                         return False
                         

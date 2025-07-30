@@ -1,0 +1,38 @@
+
+H:\Archive Classes\coursequery\app.py:3078: SyntaxWarning: invalid escape sequence '\ '
+  logger.info("This is normal in development environment - actual course files are on your local H:\ drive")
+H:\Archive Classes\coursequery\app.py:3078: SyntaxWarning: invalid escape sequence '\ '
+  logger.info("This is normal in development environment - actual course files are on your local H:\ drive")
+📁 Found archived_courses in current directory: H:\Archive Classes\coursequery\archived_courses
+📁 Using MASTER course directory: H:\Archive Classes\coursequery\archived_courses
+💡 Running in pure offline mode with centralized directory config
+💡 Running in pure offline mode with centralized directory config
+📁 Master directory: H:\Archive Classes\coursequery\archived_courses
+📁 Master directory: H:\Archive Classes\coursequery\archived_courses
+📁 Active directory: H:\Archive Classes\coursequery\archived_courses
+📁 Active directory: H:\Archive Classes\coursequery\archived_courses
+🔒 FORCED to use local directories:
+🔒 FORCED to use local directories:
+📁 Raw docs: archived_courses
+📁 Raw docs: archived_courses
+📊 Indexed: indexed_courses
+📊 Indexed: indexed_courses
+💡 Running in pure offline mode with centralized directory config
+💡 Running in pure offline mode with centralized directory config
+📁 Master directory: H:\Archive Classes\coursequery\archived_courses
+📁 Master directory: H:\Archive Classes\coursequery\archived_courses
+📁 Active directory: H:\Archive Classes\coursequery\archived_courses
+📁 Active directory: H:\Archive Classes\coursequery\archived_courses
+💡 Running in pure offline mode with centralized directory config
+📁 Master directory: H:\Archive Classes\coursequery\archived_courses
+📁 Active directory: H:\Archive Classes\coursequery\archived_courses
+INFO:hybrid_query_engine:✅ Whisper available for local transcription
+INFO:hybrid_query_engine:Available models: {'local_embeddings': True, 'local_llm': True, 'whisper': True, 'openai_api': False, 'perplexity_api': False}
+💡 Running in pure offline mode with centralized directory config
+📁 Master directory: H:\Archive Classes\coursequery\archived_courses
+📁 Active directory: H:\Archive Classes\coursequery\archived_courses
+INFO:offline_course_manager:📁 Offline course manager initialized
+INFO:offline_course_manager:📚 Raw docs: archived_courses
+INFO:offline_course_manager:📊 Indexed: indexed_courses
+INFO:course_ignore_manager:Loaded 14 ignored courses
+INFO:book_indexer:No book index found, starting fresh
