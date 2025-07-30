@@ -3009,6 +3009,9 @@ class RealEstateAIApp:
                             fixed_path = Path(*fixed_parts)
                             logger.info(f"Fixed path: {fixed_path}")
                             media_path = fixed_path
+                            # Update the media_file string as well
+                            media_file = str(fixed_path)
+                            logger.info(f"Updated media_file to: {media_file}")
                             break
             
             if not media_path.exists():
@@ -3030,8 +3033,9 @@ class RealEstateAIApp:
                     if found_files:
                         media_path = found_files[0]
                         logger.info(f"Found file at: {media_path}")
-                        # Update the media_file parameter to use the corrected path for saving
+                        # Update media_file to use the corrected path for both transcription and saving
                         media_file = str(media_path)
+                        logger.info(f"Updated media_file to corrected path: {media_file}")
                     else:
                         logger.error(f"File '{file_name}' not found in any course directory")
                         logger.info("This is normal in development environment - actual course files are on your local H:\ drive")
@@ -3060,9 +3064,14 @@ class RealEstateAIApp:
             # Transcribe with RTX 3060 optimization
             logger.info(f"Transcribing: {media_path.name}")
             
-            # Fix Windows path issues - use the corrected media_path from validation
-            transcribe_path = str(media_path.resolve())
-            logger.debug(f"Using validated path for Whisper: {transcribe_path}")
+            # Use the corrected and validated media_path for transcription
+            transcribe_path = str(media_path)
+            logger.info(f"Using corrected path for Whisper: {transcribe_path}")
+            
+            # Verify one more time that the file exists before passing to Whisper
+            if not Path(transcribe_path).exists():
+                logger.error(f"Final validation failed - file does not exist: {transcribe_path}")
+                return False
             
             result = model.transcribe(
                 transcribe_path,

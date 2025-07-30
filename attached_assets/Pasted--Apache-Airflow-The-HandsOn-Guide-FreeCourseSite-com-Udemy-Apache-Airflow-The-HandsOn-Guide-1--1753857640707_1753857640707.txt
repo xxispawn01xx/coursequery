@@ -1,0 +1,42 @@
+ - Apache Airflow The HandsOn Guide\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\1 - Introduction\4 - Development Environment.mp4: [WinError 2] The system cannot find the file specified
+WARNING:__main__:Detected duplicate directory: [FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide
+INFO:__main__:Fixed path: archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\10 - Airflow 20\107 - What to expect from Airflow 20.mp4
+ERROR:__main__:Media file not found: archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\10 - Airflow 20\107 - What to expect from Airflow 20.mp4
+ERROR:__main__:Absolute path attempted: H:\Archive Classes\coursequery\archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\10 - Airflow 20\107 - What to expect from Airflow 20.mp4
+ERROR:__main__:Parent directory exists: False
+INFO:__main__:Searching for file: 107 - What to expect from Airflow 20.mp4
+💡 Running in pure offline mode with centralized directory config
+📁 Master directory: H:\Archive Classes\coursequery\archived_courses
+📁 Active directory: H:\Archive Classes\coursequery\archived_courses
+INFO:__main__:Found file at: H:\Archive Classes\coursequery\archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\10 - Airflow 20\107 - What to expect from Airflow 20.mp4
+INFO:__main__:File validation passed: 107 - What to expect from Airflow 20.mp4
+INFO:__main__:Loading Whisper model for RTX 3060...
+INFO:__main__:Transcribing: 107 - What to expect from Airflow 20.mp4
+ERROR:__main__:Local transcription failed for H:\Archive Classes\coursequery\archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\10 - Airflow 20\107 - What to expect from Airflow 20.mp4: [WinError 2] The system cannot find the file specified
+WARNING:__main__:Detected duplicate directory: [FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide
+INFO:__main__:Fixed path: archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\11 - BONUS APPENDIX\113 - VIDEO The DockerOperator The basics and more.mp4
+ERROR:__main__:Media file not found: archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\11 - BONUS APPENDIX\113 - VIDEO The DockerOperator The basics and more.mp4
+ERROR:__main__:Absolute path attempted: H:\Archive Classes\coursequery\archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\11 - BONUS APPENDIX\113 - VIDEO The DockerOperator The basics and more.mp4
+ERROR:__main__:Parent directory exists: False
+INFO:__main__:Searching for file: 113 - VIDEO The DockerOperator The basics and more.mp4
+💡 Running in pure offline mode with centralized directory config
+📁 Master directory: H:\Archive Classes\coursequery\archived_courses
+📁 Active directory: H:\Archive Classes\coursequery\archived_courses
+INFO:__main__:Found file at: H:\Archive Classes\coursequery\archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\11 - BONUS APPENDIX\113 - VIDEO The DockerOperator The basics and more.mp4
+INFO:__main__:File validation passed: 113 - VIDEO The DockerOperator The basics and more.mp4
+INFO:__main__:Loading Whisper model for RTX 3060...
+INFO:__main__:Transcribing: 113 - VIDEO The DockerOperator The basics and more.mp4
+ERROR:__main__:Local transcription failed for H:\Archive Classes\coursequery\archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\11 - BONUS APPENDIX\113 - VIDEO The DockerOperator The basics and more.mp4: [WinError 2] The system cannot find the file specified
+WARNING:__main__:Detected duplicate directory: [FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide
+INFO:__main__:Fixed path: archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\2 - The basics of Apache Airflow\10 - Practice Installing Airflow 20.mp4
+ERROR:__main__:Media file not found: archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\2 - The basics of Apache Airflow\10 - Practice Installing Airflow 20.mp4
+ERROR:__main__:Absolute path attempted: H:\Archive Classes\coursequery\archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\2 - The basics of Apache Airflow\10 - Practice Installing Airflow 20.mp4
+ERROR:__main__:Parent directory exists: False
+INFO:__main__:Searching for file: 10 - Practice Installing Airflow 20.mp4
+💡 Running in pure offline mode with centralized directory config
+📁 Master directory: H:\Archive Classes\coursequery\archived_courses
+📁 Active directory: H:\Archive Classes\coursequery\archived_courses
+INFO:__main__:Found file at: H:\Archive Classes\coursequery\archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\2 - The basics of Apache Airflow\10 - Practice Installing Airflow 20.mp4
+INFO:__main__:File validation passed: 10 - Practice Installing Airflow 20.mp4
+INFO:__main__:Loading Whisper model for RTX 3060...
+INFO:__main__:Transcribing: 10 - Practice Installing Airflow 20.mp4
