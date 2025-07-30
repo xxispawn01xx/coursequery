@@ -29,6 +29,66 @@ class WhisperTranscriptionManager:
         self.model_name = "base"  # Start with base model for RTX 3060
         self.device = "cuda" if TORCH_AVAILABLE and torch.cuda.is_available() else "cpu"
         
+        # Setup FFmpeg path for Windows compatibility
+        self._setup_ffmpeg_environment()
+    
+    def _setup_ffmpeg_environment(self):
+        """Setup FFmpeg environment for Windows compatibility."""
+        try:
+            import os
+            import subprocess
+            
+            # Check if FFmpeg is already available
+            try:
+                subprocess.run(['ffmpeg', '-version'], 
+                             capture_output=True, 
+                             check=True, 
+                             timeout=5)
+                logger.info("✅ FFmpeg already available in PATH")
+                return
+            except (FileNotFoundError, subprocess.CalledProcessError, subprocess.TimeoutExpired):
+                logger.info("🔍 FFmpeg not in PATH, searching for local installation...")
+            
+            # Common FFmpeg installation paths on Windows
+            ffmpeg_paths = [
+                r"C:\ffmpeg\bin",
+                r"C:\Program Files\ffmpeg\bin",
+                r"C:\Program Files (x86)\ffmpeg\bin",
+                os.path.expanduser(r"~\ffmpeg\bin"),
+                r"D:\ffmpeg\bin",
+                r"E:\ffmpeg\bin",
+            ]
+            
+            # Search for FFmpeg executable
+            for path in ffmpeg_paths:
+                ffmpeg_exe = os.path.join(path, "ffmpeg.exe")
+                if os.path.exists(ffmpeg_exe):
+                    logger.info(f"✅ Found FFmpeg at: {ffmpeg_exe}")
+                    
+                    # Add to PATH for current session
+                    current_path = os.environ.get('PATH', '')
+                    if path not in current_path:
+                        os.environ['PATH'] = path + os.pathsep + current_path
+                        logger.info(f"✅ Added FFmpeg to PATH: {path}")
+                    
+                    # Verify it's now available
+                    try:
+                        subprocess.run(['ffmpeg', '-version'], 
+                                     capture_output=True, 
+                                     check=True, 
+                                     timeout=5)
+                        logger.info("✅ FFmpeg now available after PATH update")
+                        return
+                    except Exception:
+                        logger.warning("⚠️ FFmpeg found but still not accessible")
+                        continue
+            
+            logger.warning("⚠️ FFmpeg not found in common locations")
+            logger.info("💡 Install FFmpeg or use librosa fallback for audio processing")
+            
+        except Exception as e:
+            logger.error(f"❌ Error setting up FFmpeg environment: {e}")
+        
     def load_whisper_model(self, model_size: str = "base") -> bool:
         """Load Whisper model for transcription.
         
@@ -109,9 +169,41 @@ class WhisperTranscriptionManager:
                 "fp16": self.device == "cuda",  # Use FP16 on GPU for efficiency
             }
             
-            # Perform transcription
+            # Perform transcription with FFmpeg fallback handling
             logger.info(f"🔄 Starting Whisper transcription on {self.device}...")
-            result = self.whisper_model.transcribe(str(audio_file), **options)
+            
+            try:
+                result = self.whisper_model.transcribe(str(audio_file), **options)
+            except FileNotFoundError as ffmpeg_error:
+                if "ffmpeg" in str(ffmpeg_error).lower() or "WinError 2" in str(ffmpeg_error):
+                    logger.error("❌ FFmpeg not found or not accessible")
+                    logger.info("🔧 Attempting direct audio loading...")
+                    
+                    # Try using librosa for direct audio loading if available
+                    try:
+                        import librosa
+                        import numpy as np
+                        
+                        # Load audio directly using librosa
+                        audio_data, sr = librosa.load(str(audio_file), sr=16000)
+                        
+                        # Convert to numpy array format expected by Whisper
+                        audio_array = np.array(audio_data, dtype=np.float32)
+                        
+                        logger.info(f"✅ Direct audio loading successful: {len(audio_array)} samples at {sr}Hz")
+                        
+                        # Transcribe using the loaded audio array
+                        result = self.whisper_model.transcribe(audio_array, **options)
+                        
+                    except ImportError:
+                        logger.error("❌ librosa not available for direct audio loading")
+                        logger.error("💡 Install librosa: pip install librosa")
+                        raise Exception("FFmpeg not found and librosa not available. Install FFmpeg or librosa for audio processing.")
+                    except Exception as librosa_error:
+                        logger.error(f"❌ Direct audio loading failed: {librosa_error}")
+                        raise Exception(f"Both FFmpeg and direct audio loading failed: {librosa_error}")
+                else:
+                    raise ffmpeg_error
             
             # Clean up GPU memory
             if self.device == "cuda" and TORCH_AVAILABLE:
