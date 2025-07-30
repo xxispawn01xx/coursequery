@@ -143,10 +143,16 @@ class DocumentProcessor:
                 if not EPUB_AVAILABLE:
                     raise ValueError("ebooklib not installed. Cannot process EPUB files.")
                 content = self._process_epub(file_path)
-            elif file_extension in ['.mp4', '.avi', '.mov', '.mp3', '.wav']:
+            elif file_extension in ['.mp4', '.avi', '.mov', '.mkv', '.wmv', '.flv', '.webm', '.mp3', '.wav', '.m4a', '.aac', '.ogg', '.flac']:
                 if not WHISPER_AVAILABLE:
                     raise ValueError("whisper not installed. Cannot process audio/video files.")
                 content = self._process_audio_video(file_path)
+            elif file_extension in ['.vtt', '.srt', '.ass', '.ssa', '.sub']:
+                content = self._process_subtitle_file(file_path)
+            elif file_extension in ['.txt', '.md', '.rtf']:
+                content = self._process_text_file(file_path)
+            elif file_extension in ['.py', '.js', '.html', '.css', '.sql', '.json', '.xml', '.yaml', '.yml']:
+                content = self._process_code_file(file_path)
             else:
                 raise ValueError(f"Unsupported file type: {file_extension}")
             
@@ -419,9 +425,116 @@ class DocumentProcessor:
         seconds = int(seconds % 60)
         return f"{minutes:02d}:{seconds:02d}"
     
+    def _process_subtitle_file(self, file_path: Path) -> str:
+        """Process subtitle files (VTT, SRT, etc.)."""
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+            
+            file_extension = file_path.suffix.lower()
+            
+            if file_extension == '.vtt':
+                # Clean VTT format - remove WEBVTT header and cue settings
+                lines = content.split('\n')
+                clean_lines = []
+                for line in lines:
+                    line = line.strip()
+                    if line and not line.startswith('WEBVTT') and not line.startswith('NOTE') and '-->' not in line:
+                        # Skip timestamp lines and cue settings
+                        if not line.replace(':', '').replace('.', '').replace(',', '').isdigit():
+                            clean_lines.append(line)
+                
+                return f"[SUBTITLE CONTENT - {file_path.name}]\n" + '\n'.join(clean_lines)
+            
+            elif file_extension == '.srt':
+                # Clean SRT format - remove numbers and timestamps
+                lines = content.split('\n')
+                clean_lines = []
+                for line in lines:
+                    line = line.strip()
+                    if line and not line.isdigit() and '-->' not in line:
+                        clean_lines.append(line)
+                
+                return f"[SUBTITLE CONTENT - {file_path.name}]\n" + '\n'.join(clean_lines)
+            
+            else:
+                # For other subtitle formats, return raw content with header
+                return f"[SUBTITLE CONTENT - {file_path.name}]\n{content}"
+                
+        except Exception as e:
+            logger.error(f"Error processing subtitle file {file_path}: {e}")
+            return f"[SUBTITLE CONTENT - {file_path.name} - Processing failed: {e}]"
+    
+    def _process_text_file(self, file_path: Path) -> str:
+        """Process plain text files."""
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+            return f"[TEXT FILE - {file_path.name}]\n{content}"
+        except UnicodeDecodeError:
+            # Try with different encoding
+            try:
+                with open(file_path, 'r', encoding='latin-1') as f:
+                    content = f.read()
+                return f"[TEXT FILE - {file_path.name}]\n{content}"
+            except Exception as e:
+                logger.error(f"Error processing text file {file_path}: {e}")
+                return f"[TEXT FILE - {file_path.name} - Encoding error: {e}]"
+        except Exception as e:
+            logger.error(f"Error processing text file {file_path}: {e}")
+            return f"[TEXT FILE - {file_path.name} - Processing failed: {e}]"
+    
+    def _process_code_file(self, file_path: Path) -> str:
+        """Process code and configuration files."""
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+            
+            file_extension = file_path.suffix.lower()
+            file_type_map = {
+                '.py': 'PYTHON CODE',
+                '.js': 'JAVASCRIPT CODE', 
+                '.html': 'HTML CODE',
+                '.css': 'CSS CODE',
+                '.sql': 'SQL CODE',
+                '.json': 'JSON CONFIG',
+                '.xml': 'XML CONFIG',
+                '.yaml': 'YAML CONFIG',
+                '.yml': 'YAML CONFIG'
+            }
+            
+            file_type = file_type_map.get(file_extension, 'CODE FILE')
+            return f"[{file_type} - {file_path.name}]\n{content}"
+            
+        except UnicodeDecodeError:
+            # Try with different encoding
+            try:
+                with open(file_path, 'r', encoding='latin-1') as f:
+                    content = f.read()
+                return f"[CODE FILE - {file_path.name}]\n{content}"
+            except Exception as e:
+                logger.error(f"Error processing code file {file_path}: {e}")
+                return f"[CODE FILE - {file_path.name} - Encoding error: {e}]"
+        except Exception as e:
+            logger.error(f"Error processing code file {file_path}: {e}")
+            return f"[CODE FILE - {file_path.name} - Processing failed: {e}]"
+    
     def get_supported_formats(self) -> List[str]:
         """Return list of supported file formats."""
-        return ['.pdf', '.docx', '.pptx', '.epub', '.mp4', '.avi', '.mov', '.mp3', '.wav']
+        return [
+            # Document formats
+            '.pdf', '.docx', '.pptx', '.epub', '.txt', '.md', '.rtf',
+            # Video formats  
+            '.mp4', '.avi', '.mov', '.mkv', '.wmv', '.flv', '.webm',
+            # Audio formats
+            '.mp3', '.wav', '.m4a', '.aac', '.ogg', '.flac',
+            # Subtitle/caption formats
+            '.vtt', '.srt', '.ass', '.ssa', '.sub',
+            # Code/script formats
+            '.py', '.js', '.html', '.css', '.sql', '.json', '.xml', '.yaml', '.yml',
+            # Archive formats (we can extract and process contents)
+            '.zip', '.rar', '.7z'
+        ]
     
     def is_supported_format(self, file_path: Path) -> bool:
         """Check if file format is supported."""
