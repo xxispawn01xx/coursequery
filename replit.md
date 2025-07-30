@@ -230,5 +230,7 @@ Authentication: Local HuggingFace token storage, no external dependencies requir
 - **TranscriptionManager**: ✅ **FULLY COMPATIBLE** - All methods including get_stats() working with backward compatibility aliases
 - **Bulk Transcription Interface**: ✅ **FIXED** - Resolved KeyError 'total_transcriptions' by adding missing stats fields to get_stats() method
 - **Vector RAG Interface**: ✅ **FIXED** - Added missing get_all_transcriptions() method for offline compatibility
+- **Batch Processing Clarification**: ✅ **ENHANCED** - Updated UI to explain automatic batching for 60+ video courses (6 batches of 10 videos each)
+- **Storage Location Fix**: ✅ **FIXED** - Added missing 'storage_location' field to prevent KeyError in transcription management
 
 The architecture prioritizes privacy, local operation, and user control while maintaining enterprise-grade functionality for real estate education analysis.

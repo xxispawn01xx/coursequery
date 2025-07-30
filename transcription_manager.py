@@ -178,7 +178,8 @@ class WhisperTranscriptionManager:
             # Add missing fields expected by the UI
             'total_transcriptions': 0,  # Default to 0 until actual transcriptions are tracked
             'total_characters': 0,      # Default to 0 until actual transcriptions are tracked
-            'methods_used': {}          # Default to empty dict until methods are tracked
+            'methods_used': {},         # Default to empty dict until methods are tracked
+            'storage_location': './transcriptions'  # Default storage location for transcriptions
         }
     
     def get_all_transcriptions(self, course_name: str = None) -> List[Dict[str, Any]]:
@@ -190,6 +191,16 @@ class WhisperTranscriptionManager:
     def get_transcriptions_for_course(self, course_name: str) -> List[Dict[str, Any]]:
         """Get transcriptions for a specific course."""
         return self.get_all_transcriptions(course_name)
+    
+    def has_transcription(self, media_file, course_name: str) -> bool:
+        """Check if a transcription already exists for this file."""
+        # For offline mode, assume no existing transcriptions
+        return False
+    
+    def cleanup_orphaned_transcriptions(self):
+        """Clean up orphaned transcription files."""
+        # For offline mode, this is a no-op
+        pass
 
 # Alias for backward compatibility
 TranscriptionManager = WhisperTranscriptionManager

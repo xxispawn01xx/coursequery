@@ -2574,9 +2574,32 @@ class RealEstateAIApp:
             preserve_structure = st.checkbox("Preserve folder structure", value=True)
             skip_existing = st.checkbox("Skip already transcribed files", value=True)
         with col2:
-            batch_size = st.slider("Batch size", min_value=1, max_value=10, value=5, 
-                                  help="Number of files to process at once")
+            batch_size = st.slider("Batch size", min_value=1, max_value=50, value=10, 
+                                  help="Files processed simultaneously (RTX 3060 can handle 10-20)")
             show_progress = st.checkbox("Show detailed progress", value=True)
+        
+        # Explain batch processing for large courses
+        with st.expander("🎯 How Batch Processing Works for Large Courses (60+ videos)"):
+            st.markdown("""
+            **Automatic Batching for Your Apache Airflow Course (60 videos):**
+            
+            - **Batch Size = 10**: Process 10 videos at once, automatically move to next batch
+            - **6 Batches Total**: 60 videos ÷ 10 = 6 automatic batches 
+            - **RTX 3060 Optimized**: Each batch uses your GPU efficiently without overload
+            - **Automatic Continuation**: System processes all 60 videos in sequence
+            - **Progress Tracking**: See real-time progress through all batches
+            
+            **Memory Management:**
+            - Each batch clears GPU memory before starting next batch
+            - Skip existing files means you can resume if interrupted
+            - Folder structure preserved throughout all batches
+            
+            **Recommended Settings for 60 Videos:**
+            - Batch size: 10-15 (optimal for RTX 3060 12GB)
+            - Skip existing: ✓ (allows resuming)
+            - Preserve structure: ✓ (maintains course organization)
+            """)
+        
         
         # Preview files to be processed
         if media_directory and course_name and file_types:
