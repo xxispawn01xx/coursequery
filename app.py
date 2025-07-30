@@ -52,6 +52,14 @@ except ImportError:
     CourseIndexer = None
     COURSE_INDEXER_AVAILABLE = False
 
+# Always try to use offline course manager as fallback
+try:
+    from offline_course_manager import OfflineCourseManager
+    OFFLINE_COURSE_MANAGER_AVAILABLE = True
+except ImportError:
+    OfflineCourseManager = None
+    OFFLINE_COURSE_MANAGER_AVAILABLE = False
+
 try:
     from query_engine import LocalQueryEngine
     QUERY_ENGINE_AVAILABLE = True
@@ -108,7 +116,22 @@ class RealEstateAIApp:
             else:
                 self.query_engine = None
             
-        self.course_indexer = CourseIndexer() if COURSE_INDEXER_AVAILABLE else None
+        # Try CourseIndexer first, fallback to OfflineCourseManager
+        if COURSE_INDEXER_AVAILABLE:
+            try:
+                self.course_indexer = CourseIndexer()
+                logger.info("✅ Using full CourseIndexer")
+            except Exception as e:
+                logger.warning(f"⚠️ CourseIndexer failed, using offline fallback: {e}")
+                self.course_indexer = OfflineCourseManager(
+                    self.config.raw_docs_dir, 
+                    self.config.indexed_courses_dir
+                ) if OFFLINE_COURSE_MANAGER_AVAILABLE else None
+        else:
+            self.course_indexer = OfflineCourseManager(
+                self.config.raw_docs_dir, 
+                self.config.indexed_courses_dir
+            ) if OFFLINE_COURSE_MANAGER_AVAILABLE else None
         
         # Initialize ignore manager
         try:

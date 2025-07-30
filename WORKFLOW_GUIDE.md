@@ -4,6 +4,22 @@
 
 This guide covers the specific workflows for processing different types of content with your hybrid course assistant system. The system leverages RTX 3060 for local Whisper transcription and vector embeddings, combined with cloud APIs for superior response quality.
 
+## New Feature: Individual Book Embeddings
+
+### Scenario: Process individual books separately for granular control
+
+**New "📚 Book Embeddings" Tab:**
+- Create separate vector embeddings for each book/ebook
+- Better precision than processing entire course folders together
+- Perfect for textbooks, reference materials, and strategic planning documents
+
+### Steps:
+1. Go to "📚 Book Embeddings" tab
+2. Enter directory path containing books
+3. Click "🔍 Scan for Books"
+4. Choose individual books or use "📊 Create embeddings for all books"
+5. Books get separate vector spaces for precise querying
+
 ## Workflow 1: Processing Your eBook Library
 
 ### Scenario: You have all your eBooks in one directory and want to create focused learning experiences

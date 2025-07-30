@@ -10,12 +10,26 @@ A comprehensive, privacy-focused real estate course analysis application that ru
 - **No censorship** - local models under your control
 - **GPU optimized** - designed for RTX 3060 and similar GPUs
 
+### 📁 **Centralized Directory Management**
+- **Single Source Configuration** - One variable controls all directory paths system-wide
+- **Master Directory Detection** - Automatically uses `H:\Archive Classes\coursequery\archived_courses` when available
+- **Smart Fallback System** - Local directories for development when master not accessible
+- **Persistent Settings** - Directory configuration saved between sessions
+- **System-Wide Updates** - Change master directory and all components update automatically
+
 ### 📚 **Comprehensive Document Support**
 - **PDFs** - Extract text from real estate textbooks and materials
 - **DOCX/PPTX** - Process Word documents and PowerPoint presentations
 - **EPUB ebooks** - Support for digital textbooks and reference materials
 - **Video/Audio** - Automatic transcription using local Whisper
 - **Syllabus weighting** - Prioritize syllabus content in responses
+
+### 📖 **Individual Book Processing**
+- **Granular Embeddings** - Create separate vector spaces for individual books/ebooks
+- **Book-Level Control** - Process PDF, EPUB, DOCX, TXT, MD files individually
+- **Bulk Processing Options** - Process all books in directory or select individual books
+- **Book Management** - Search, statistics, and organization by parent course
+- **Metadata Tracking** - File size, format, chunk count, indexing date for each book
 
 ### 🧠 **Advanced AI Capabilities**
 - **Llama 2 7B** - Primary conversation model with fine-tuning support

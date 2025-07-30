@@ -3,6 +3,30 @@ Course indexing module using LlamaIndex for document storage and retrieval.
 Handles course-specific indexing with syllabus weighting.
 """
 
+# Offline mode compatibility fix - handle pydantic import issues gracefully
+try:
+    # Try to import pydantic normally first
+    from pydantic import BaseModel
+    PYDANTIC_AVAILABLE = True
+except ImportError:
+    # Create minimal mock BaseModel for offline mode
+    class BaseModel:
+        def __init__(self, **kwargs):
+            for key, value in kwargs.items():
+                setattr(self, key, value)
+    PYDANTIC_AVAILABLE = False
+    print("⚠️ Pydantic not available - using minimal mock for offline mode")
+
+# Handle internal pydantic issues
+try:
+    import pydantic._internal
+    if not hasattr(pydantic._internal, '_model_construction'):
+        class MockConstruction:
+            pass
+        pydantic._internal._model_construction = MockConstruction()
+except:
+    pass
+
 import logging
 import json
 from pathlib import Path
@@ -187,7 +211,7 @@ class CourseIndexer:
     
     def get_course_index(self, course_name: str) -> Optional[VectorStoreIndex]:
         """
-        Load index for a specific course.
+        Load index for a specific course with comprehensive debugging.
         
         Args:
             course_name: Name of the course
@@ -196,29 +220,82 @@ class CourseIndexer:
             VectorStoreIndex or None if not found
         """
         try:
+            logger.info(f"🔍 DEBUG: Starting index load for course: {course_name}")
+            
             course_index_dir = self.config.indexed_courses_dir / course_name
             index_path = course_index_dir / "index"
             
+            logger.info(f"📁 DEBUG: Course index directory: {course_index_dir}")
+            logger.info(f"📂 DEBUG: Index path: {index_path}")
+            logger.info(f"📋 DEBUG: Index path exists: {index_path.exists()}")
+            
             if not index_path.exists():
-                logger.warning(f"No index found for course: {course_name}")
+                logger.warning(f"❌ No index found for course: {course_name}")
                 return None
             
+            # Check directory contents
+            if index_path.exists():
+                try:
+                    contents = list(index_path.iterdir())
+                    logger.info(f"📄 DEBUG: Index directory contains {len(contents)} files:")
+                    for item in contents[:5]:  # Show first 5 files
+                        logger.info(f"  - {item.name}")
+                    if len(contents) > 5:
+                        logger.info(f"  ... and {len(contents) - 5} more files")
+                except Exception as dir_error:
+                    logger.error(f"❌ DEBUG: Cannot read index directory: {dir_error}")
+            
+            logger.info(f"⏳ DEBUG: Creating storage context from {index_path}")
             storage_context = StorageContext.from_defaults(persist_dir=str(index_path))
+            logger.info(f"✅ DEBUG: Storage context created successfully")
             
-            # Load with custom embeddings if available
-            if self.embedding_wrapper:
-                index = load_index_from_storage(
-                    storage_context,
-                    embed_model=self.embedding_wrapper
-                )
-            else:
-                index = load_index_from_storage(storage_context)
+            # Check embedding configuration
+            logger.info(f"🤖 DEBUG: Embedding wrapper available: {self.embedding_wrapper is not None}")
             
-            logger.info(f"Loaded index for course: {course_name}")
+            # Load with timeout protection
+            import signal
+            import time
+            
+            def timeout_handler(signum, frame):
+                raise TimeoutError("Index loading timed out after 30 seconds")
+            
+            # Set timeout for index loading
+            signal.signal(signal.SIGALRM, timeout_handler)
+            signal.alarm(30)  # 30 second timeout
+            
+            try:
+                logger.info(f"⏳ DEBUG: Starting index load from storage...")
+                start_time = time.time()
+                
+                # Load with custom embeddings if available
+                if self.embedding_wrapper:
+                    logger.info(f"🔧 DEBUG: Loading with custom embedding wrapper")
+                    index = load_index_from_storage(
+                        storage_context,
+                        embed_model=self.embedding_wrapper
+                    )
+                else:
+                    logger.info(f"🔧 DEBUG: Loading with default embeddings")
+                    index = load_index_from_storage(storage_context)
+                
+                load_time = time.time() - start_time
+                logger.info(f"✅ DEBUG: Index loaded successfully in {load_time:.2f} seconds")
+                
+            finally:
+                signal.alarm(0)  # Cancel timeout
+            
+            logger.info(f"✅ Loaded index for course: {course_name}")
             return index
             
+        except TimeoutError as e:
+            logger.error(f"⏰ TIMEOUT: Index loading for course {course_name} timed out after 30 seconds")
+            logger.error("💡 SUGGESTION: This course index may be corrupted or too large")
+            return None
         except Exception as e:
-            logger.error(f"Error loading index for course {course_name}: {e}")
+            logger.error(f"❌ Error loading index for course {course_name}: {e}")
+            logger.error(f"🔍 DEBUG: Exception type: {type(e).__name__}")
+            import traceback
+            logger.error(f"📋 DEBUG: Full traceback:\n{traceback.format_exc()}")
             return None
     
     def get_available_courses(self) -> List[Dict[str, Any]]:
@@ -240,9 +317,25 @@ class CourseIndexer:
             indexed_count = 0
             if self.config.indexed_courses_dir.exists():
                 logger.info("📊 Checking indexed courses directory...")
-                for course_dir in self.config.indexed_courses_dir.iterdir():
+                logger.info(f"📁 DEBUG: Indexed courses path: {self.config.indexed_courses_dir}")
+                
+                try:
+                    dirs = list(self.config.indexed_courses_dir.iterdir())
+                    logger.info(f"🔍 DEBUG: Found {len(dirs)} items in indexed courses directory")
+                except Exception as dir_error:
+                    logger.error(f"❌ DEBUG: Cannot read indexed courses directory: {dir_error}")
+                    dirs = []
+                
+                for course_dir in dirs:
                     if course_dir.is_dir():
-                        logger.info(f"  Found indexed directory: {course_dir.name}")
+                        logger.info(f"  📂 Found indexed directory: {course_dir.name}")
+                        
+                        # Check if this directory actually contains an index
+                        index_path = course_dir / "index"
+                        metadata_path = course_dir / "metadata.json"
+                        
+                        logger.info(f"    🔍 Index exists: {index_path.exists()}")
+                        logger.info(f"    🔍 Metadata exists: {metadata_path.exists()}")
                         metadata_path = course_dir / "metadata.json"
                         
                         if metadata_path.exists():

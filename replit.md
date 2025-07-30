@@ -113,6 +113,19 @@ Authentication: Local HuggingFace token storage, no external dependencies requir
 
 ## Recent Changes
 
+### July 30, 2025 - Centralized Directory Configuration System
+- **Single Source Directory Management**: Created `directory_config.py` with centralized MASTER_COURSE_DIRECTORY variable
+- **System-Wide Path Cascading**: One variable change updates paths across all components (course processing, book embeddings, indexing, transcription)
+- **Persistent Configuration**: Directory settings saved in `directory_config.json` and persist between sessions
+- **Smart Fallback System**: Automatically detects H:\ drive access, falls back to local directories for development
+- **Enhanced UI Controls**: "Update Master Directory" button in sidebar cascades changes system-wide with validation
+- **Individual Book Embedding System**: New "📚 Book Embeddings" tab processes individual books/ebooks separately from course folders
+- **Granular Content Control**: Each book gets separate vector embedding space for precise querying
+- **Bulk Processing Options**: Process all books in directory or individual books with progress tracking
+- **Book Management Interface**: Search, statistics, and organization by parent course with metadata tracking
+- **Path Validation System**: Comprehensive directory access validation with readable/writable status checking
+- **Cross-Component Integration**: Book indexer, course indexer, document processor all use centralized directory configuration
+
 ### July 29, 2025 - Multi-Course Detection & Replit Integration
 - **Enhanced Course Detection**: System now detects both indexed courses and unprocessed course directories automatically
 - **Multi-Course Sidebar**: Displays processed courses (ready for querying) and unprocessed courses (ready for processing) separately
