@@ -481,9 +481,13 @@ class RealEstateAIApp:
         
         # Manual path input
         with st.sidebar.expander("📝 Set Custom Directory Path"):
+            st.text("Copy this path:")
+            st.code("H:\\Archive Classes\\coursequery\\archived_courses", language=None)
+            
             custom_path = st.text_input(
                 "Enter full directory path:",
-                value="H:\\Archive Classes\\coursequery\\archived_courses",
+                value="",
+                placeholder="Paste your directory path here",
                 help="Enter the full path to your course directory",
                 key="custom_path_input"
             )
