@@ -259,7 +259,7 @@ class RealEstateAIApp:
         if saved_token:
             col1, col2 = st.columns([3, 1])
             with col2:
-                if st.button("🗑️ Clear Saved Token"):
+                if st.button("🗑️ Clear Saved Token", key="clear_hf_token_btn"):
                     try:
                         Path(".hf_token").unlink(missing_ok=True)
                         if "HF_TOKEN" in os.environ:
@@ -278,7 +278,7 @@ class RealEstateAIApp:
         )
         
         if token and token.startswith("hf_"):
-            if st.button("💾 Save Token & Load Models"):
+            if st.button("💾 Save Token & Load Models", key="save_hf_token_btn"):
                 try:
                     # Test authentication first
                     from huggingface_hub import HfApi
@@ -368,8 +368,11 @@ class RealEstateAIApp:
             st.info("💡 Pure offline mode - loading models directly")
             
             if self.model_manager is None:
-                st.error("❌ Model manager not available. Please install AI dependencies.")
-                return False
+                st.warning("⚠️ Model manager not available - using hybrid mode")
+                # Continue without local models - use cloud APIs instead
+                st.session_state.models_loaded = True
+                st.session_state.selected_model = "cloud_api"
+                return True
             
             # Show loading message based on model change
             if st.session_state.models_loaded and st.session_state.get('selected_model') != selected_model:
@@ -608,7 +611,7 @@ class RealEstateAIApp:
                 logger.error(f"Error checking for renamed courses: {e}")
         
         # Quick fix for sidebar loading issues
-        if st.sidebar.button("🚨 Fix Sidebar Loading"):
+        if st.sidebar.button("🚨 Fix Sidebar Loading", key="fix_sidebar_loading_btn"):
             st.sidebar.info("Clearing course cache and refreshing...")
             # Clear all course-related session state
             for key in list(st.session_state.keys()):
@@ -637,7 +640,7 @@ class RealEstateAIApp:
                 key="custom_path_input"
             )
             
-            if st.button("📂 Update Master Directory", key="update_path_btn"):
+            if st.button("📂 Update Master Directory", key="update_master_directory_btn"):
                 try:
                     from directory_config import update_master_directory
                     
@@ -667,11 +670,11 @@ class RealEstateAIApp:
                 placeholder="e.g., Python Programming, Real Estate Finance"
             )
             
-            if course_name and st.sidebar.button("💾 Save Course Files"):
+            if course_name and st.sidebar.button("💾 Save Course Files", key="save_course_files_btn"):
                 self.save_uploaded_course(uploaded_files, course_name)
         
         # Refresh courses button with debug info
-        if st.sidebar.button("🔄 Refresh Course List"):
+        if st.sidebar.button("🔄 Refresh Course List", key="refresh_course_list_btn"):
             with st.sidebar:
                 with st.spinner("Refreshing courses..."):
                     courses = self.refresh_available_courses()
@@ -717,11 +720,11 @@ class RealEstateAIApp:
                         st.write(f"Documents: {doc_count}")
                         st.write(f"Last indexed: {last_indexed}")
                         
-                        if st.button(f"Select {course_name}", key=f"select_{course_name}"):
+                        if st.button(f"Select {course_name}", key=f"select_indexed_{course_name}"):
                             st.session_state.selected_course = course_name
                             st.rerun()
                         
-                        if st.button(f"Re-index {course_name}", key=f"reindex_{course_name}"):
+                        if st.button(f"Re-index {course_name}", key=f"reindex_indexed_{course_name}"):
                             self.reindex_course(course_name)
             
             # Show unprocessed courses
@@ -739,13 +742,13 @@ class RealEstateAIApp:
                             
                             col1, col2, col3 = st.columns(3)
                             with col1:
-                                if st.button(f"Process", key=f"process_{course_name}"):
+                                if st.button(f"Process", key=f"process_raw_{course_name}"):
                                     self.process_raw_course(course_name)
                             with col2:
-                                if st.button(f"Select", key=f"select_raw_{course_name}"):
+                                if st.button(f"Select", key=f"select_unprocessed_{course_name}"):
                                     st.warning("⚠️ This course isn't processed yet. Process it first to enable querying.")
                             with col3:
-                                if st.button(f"Ignore", key=f"ignore_{course_name}"):
+                                if st.button(f"Ignore", key=f"ignore_raw_{course_name}"):
                                     if self.ignore_manager and self.ignore_manager.ignore_course(course_name):
                                         st.success(f"Ignored '{course_name}'")
                                         st.rerun()
@@ -2465,8 +2468,7 @@ class RealEstateAIApp:
         """Main application entry point."""
         self.setup_page_config()
         
-        # Display sidebar first to ensure course management is available
-        self.sidebar_course_management()
+        # Skip duplicate sidebar call - it's called later
         
         # Title
         st.title("📚 Local Course AI Assistant")
