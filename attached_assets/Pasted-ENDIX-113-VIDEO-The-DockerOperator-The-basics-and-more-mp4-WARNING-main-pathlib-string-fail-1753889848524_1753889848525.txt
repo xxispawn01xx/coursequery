@@ -1,0 +1,27 @@
+ENDIX\113 - VIDEO The DockerOperator The basics and more.mp4
+WARNING:__main__:❌ pathlib_string failed: [WinError 2] The system cannot find the file specified
+ERROR:__main__:Local transcription failed for archived_courses\Udemy - Apache Airflow The HandsOn Guide\part 2\11 - BONUS APPENDIX\113 - VIDEO The DockerOperator The basics and more.mp4: All path format attempts failed
+ERROR:__main__:Error type: Exception
+ERROR:__main__:Current working directory: H:\Archive Classes\coursequery
+ERROR:__main__:File exists check: True
+INFO:__main__:File validation passed: 56 - Practice Distributing your tasks with the Celery Executor.mp4
+INFO:__main__:Loading Whisper model for RTX 3060...
+INFO:__main__:Transcribing: 56 - Practice Distributing your tasks with the Celery Executor.mp4
+INFO:__main__:Using validated path for Whisper: archived_courses\Udemy - Apache Airflow The HandsOn Guide\part 2\5 - Distributing Apache Airflow\56 - Practice Distributing your tasks with the Celery Executor.mp4
+INFO:__main__:File size: 0.0 MB
+INFO:__main__:Attempting forward_slashes: archived_courses/Udemy - Apache Airflow The HandsOn Guide/part 2/5 - Distributing Apache Airflow/56 - Practice Distributing your tasks with the Celery Executor.mp4
+WARNING:__main__:❌ forward_slashes failed: [WinError 2] The system cannot find the file specified
+INFO:__main__:Attempting raw_string: archived_courses\Udemy - Apache Airflow The HandsOn Guide\part 2\5 - Distributing Apache Airflow\56 - Practice Distributing your tasks with the Celery Executor.mp4
+WARNING:__main__:❌ raw_string failed: [WinError 2] The system cannot find the file specified
+INFO:__main__:Attempting short_path: archived_courses\Udemy - Apache Airflow The HandsOn Guide\part 2\5 - Distributing Apache Airflow\56 - Practice Distributing your tasks with the Celery Executor.mp4
+WARNING:__main__:❌ short_path failed: [WinError 2] The system cannot find the file specified
+INFO:__main__:Attempting quoted_path: "archived_courses\Udemy - Apache Airflow The HandsOn Guide\part 2\5 - Distributing Apache Airflow\56 - Practice Distributing your tasks with the Celery Executor.mp4"
+WARNING:__main__:❌ quoted_path failed: [WinError 2] The system cannot find the file specified
+INFO:__main__:Attempting pathlib_string: archived_courses\Udemy - Apache Airflow The HandsOn Guide\part 2\5 - Distributing Apache Airflow\56 - Practice Distributing your tasks with the Celery Executor.mp4
+WARNING:__main__:❌ pathlib_string failed: [WinError 2] The system cannot find the file specified
+ERROR:__main__:Local transcription failed for archived_courses\Udemy - Apache Airflow The HandsOn Guide\part 2\5 - Distributing Apache Airflow\56 - Practice Distributing your tasks with the Celery Executor.mp4: All path format attempts failed
+ERROR:__main__:Error type: Exception
+ERROR:__main__:Current working directory: H:\Archive Classes\coursequery
+ERROR:__main__:File exists check: True
+INFO:__main__:File validation passed: 57 - Practice Adding new worker nodes with the Celery Executor.mp4
+INFO:__main__:Loading Whisper model for RTX 3060...

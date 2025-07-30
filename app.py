@@ -3061,178 +3061,51 @@ class RealEstateAIApp:
             st.error(f"Error during bulk transcription: {e}")
     
     def transcribe_file_local(self, media_file, course_name: str, tm) -> bool:
-        """Transcribe a single file using local Whisper."""
+        """Transcribe a single file using enhanced Whisper transcription manager."""
         try:
-            import whisper
+            from transcription_manager import WhisperTranscriptionManager
             from pathlib import Path
             
-            # Validate file exists and is accessible
-            media_path = Path(media_file)
-            logger.debug(f"Checking file: {media_path}")
-            logger.debug(f"Absolute path: {media_path.absolute()}")
+            # Initialize enhanced Whisper transcription manager
+            whisper_manager = WhisperTranscriptionManager()
             
-            # Check for duplicate nested directory structure and fix it
-            path_parts = media_path.parts
-            if len(path_parts) >= 3:
-                # Look for duplicate course name in path
-                course_name_part = None
-                for i, part in enumerate(path_parts):
-                    if part.startswith('[') and 'Udemy' in part:
-                        course_name_part = part
-                        # Check if next part is the same (duplicate)
-                        if i + 1 < len(path_parts) and path_parts[i + 1] == part:
-                            logger.warning(f"Detected duplicate directory: {part}")
-                            # Rebuild path without duplicate
-                            fixed_parts = list(path_parts)
-                            fixed_parts.pop(i + 1)  # Remove duplicate
-                            fixed_path = Path(*fixed_parts)
-                            logger.info(f"Fixed path: {fixed_path}")
-                            media_path = fixed_path
-                            # Update the media_file string as well
-                            media_file = str(fixed_path)
-                            logger.info(f"Updated media_file to: {media_file}")
-                            break
-            
-            if not media_path.exists():
-                logger.error(f"Media file not found: {media_file}")
-                logger.error(f"Absolute path attempted: {media_path.absolute()}")
-                logger.error(f"Parent directory exists: {media_path.parent.exists()}")
-                
-                # Try to find the actual file location
-                file_name = media_path.name
-                logger.info(f"Searching for file: {file_name}")
-                
-                # Search in course directories
-                try:
-                    from config import Config
-                    config = Config()
-                    
-                    # Search for any media files that actually exist
-                    found_files = list(config.raw_docs_dir.rglob(file_name))
-                    if found_files:
-                        # Check if any found files have duplicate paths and fix them
-                        for found_file in found_files:
-                            found_parts = found_file.parts
-                            
-                            # Look for duplicate consecutive directories in the found path
-                            has_duplicates = False
-                            for i in range(len(found_parts) - 1):
-                                if found_parts[i] == found_parts[i + 1] and 'Udemy' in found_parts[i]:
-                                    has_duplicates = True
-                                    break
-                            
-                            if not has_duplicates:
-                                # Use the file without duplicates
-                                media_path = found_file
-                                media_file = str(found_file)
-                                logger.info(f"Found clean file at: {media_path}")
-                                break
-                            else:
-                                # Try to construct the correct path by removing duplicates
-                                logger.warning(f"Found file has duplicate path: {found_file}")
-                                clean_parts = []
-                                prev_part = None
-                                for part in found_parts:
-                                    if part != prev_part or 'Udemy' not in part:
-                                        clean_parts.append(part)
-                                        prev_part = part
-                                
-                                clean_path = Path(*clean_parts)
-                                logger.info(f"Attempting to use cleaned path: {clean_path}")
-                                
-                                if clean_path.exists():
-                                    media_path = clean_path
-                                    media_file = str(clean_path)
-                                    logger.info(f"Successfully using cleaned path: {media_path}")
-                                    break
-                                else:
-                                    logger.warning(f"Cleaned path doesn't exist: {clean_path}")
-                        else:
-                            # If we get here, use the first found file even with duplicates
-                            media_path = found_files[0]
-                            media_file = str(found_files[0])
-                            logger.warning(f"Using file with potential duplicate path: {media_path}")
-                    else:
-                        logger.error(f"File '{file_name}' not found in any course directory")
-                        logger.info("This is normal in development environment - actual course files are on your local H: drive")
-                        logger.info("For testing, use files that exist in your current environment")
-                        return False
-                        
-                except Exception as e:
-                    logger.error(f"Error searching for file: {e}")
-                    return False
-                
-            if not media_path.is_file():
-                logger.error(f"Path is not a file: {media_file}")
+            # Load Whisper model if not already loaded
+            if not whisper_manager.load_whisper_model("base"):  # Use base model for RTX 3060
+                logger.error("Failed to load Whisper model")
                 return False
-                
+            
+            media_path = Path(media_file)
             logger.info(f"File validation passed: {media_path.name}")
-            
-            # Check if transcription already exists
-            if tm.has_transcription(media_file, course_name):
-                logger.info(f"Transcription already exists for: {media_path.name}")
-                return True
-            
-            # Load model (cached after first load)
             logger.info(f"Loading Whisper model for RTX 3060...")
-            model = whisper.load_model("base")  # Start with base for RTX 3060 compatibility
-            
-            # Transcribe with RTX 3060 optimization
             logger.info(f"Transcribing: {media_path.name}")
             
-            # Prepare path for Whisper transcription
-            transcribe_path = str(media_path)
+            # Use enhanced transcription manager with comprehensive path resolution
+            result = whisper_manager.transcribe_audio(str(media_file))
             
-            # Final validation - ensure file exists before transcription
-            if not Path(transcribe_path).exists():
-                logger.error(f"File does not exist for transcription: {transcribe_path}")
+            if result and "text" in result:
+                # Save transcription using existing transcription manager
+                transcription_text = result["text"]
+                output_file = tm.save_transcription(
+                    media_file=media_file,
+                    transcription_text=transcription_text,
+                    course_name=course_name,
+                    preserve_structure=True  # Maintain folder structure
+                )
+                
+                logger.info(f"✅ Transcription saved: {output_file}")
+                logger.info(f"📊 Characters transcribed: {len(transcription_text)}")
+                return True
+            else:
+                logger.error("❌ Transcription failed - no result returned")
                 return False
-            
-            logger.info(f"Using validated path for Whisper: {transcribe_path}")
-            logger.info(f"File size: {Path(transcribe_path).stat().st_size / (1024*1024):.1f} MB")
-            
-            # Try multiple path formats for Whisper compatibility
-            path_attempts = [
-                ("forward_slashes", transcribe_path.replace('\\', '/')),
-                ("raw_string", transcribe_path),
-                ("short_path", self._get_short_path(transcribe_path)),
-                ("quoted_path", f'"{transcribe_path}"'),
-                ("pathlib_string", str(Path(transcribe_path)))
-            ]
-            
-            result = None
-            for attempt_name, path_to_try in path_attempts:
-                try:
-                    logger.info(f"Attempting {attempt_name}: {path_to_try}")
-                    result = model.transcribe(
-                        path_to_try,
-                        fp16=True,  # Use FP16 for RTX 3060 efficiency
-                        verbose=False
-                    )
-                    logger.info(f"✅ {attempt_name} successful!")
-                    break
-                except Exception as e:
-                    logger.warning(f"❌ {attempt_name} failed: {e}")
-                    continue
-            
-            if result is None:
-                raise Exception("All path format attempts failed")
-            transcription = result["text"]
-            
-            # Save transcription
-            success = tm.save_transcription(media_file, course_name, transcription, "whisper_local")
-            if success:
-                logger.info(f"✅ Successfully transcribed: {media_path.name} ({len(transcription)} characters)")
-            return success
-            
+        
         except ImportError:
             logger.error("Whisper not installed. Install with: pip install openai-whisper")
             return False
         except Exception as e:
-            logger.error(f"Local transcription failed for {media_file}: {e}")
-            logger.error(f"Error type: {type(e).__name__}")
-            logger.error(f"Current working directory: {os.getcwd()}")
-            logger.error(f"File exists check: {Path(transcribe_path).exists() if 'transcribe_path' in locals() else 'Path not set'}")
+            logger.error(f"🚨 Enhanced transcription failed for {media_file}: {e}")
+            logger.error(f"🔧 Error type: {type(e).__name__}")
+            logger.error(f"📁 Current working directory: {os.getcwd()}")
             return False
     
     def _get_short_path(self, path_str):
