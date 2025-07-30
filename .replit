@@ -2,7 +2,7 @@ modules = ["python-3.11", "python3"]
 
 [nix]
 channel = "stable-25_05"
-packages = ["cargo", "ffmpeg-full", "freetype", "glibcLocales", "gumbo", "harfbuzz", "jbig2dec", "lcms2", "libiconv", "libimagequant", "libjpeg", "libjpeg_turbo", "libpng", "libtiff", "libwebp", "libxcrypt", "mupdf", "openjpeg", "pkg-config", "rustc", "swig", "tcl", "tk", "which", "xcbuild", "xsimd", "zlib"]
+packages = ["cargo", "ffmpeg-full", "freetype", "glibcLocales", "gumbo", "harfbuzz", "jbig2dec", "lcms2", "libGL", "libGLU", "libiconv", "libimagequant", "libjpeg", "libjpeg_turbo", "libpng", "libtiff", "libwebp", "libxcrypt", "mupdf", "openjpeg", "pkg-config", "rustc", "swig", "tcl", "tk", "which", "xcbuild", "xsimd", "zlib"]
 
 [deployment]
 deploymentTarget = "autoscale"

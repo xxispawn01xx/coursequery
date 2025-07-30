@@ -386,6 +386,214 @@ class RealEstateAIApp:
                 return True
         
         return True
+    
+    def _transition_screenshot_interface(self):
+        """Custom video transition screenshot detection interface."""
+        st.subheader("Video Transition Screenshot Detection")
+        
+        st.markdown("""
+        **Custom-Built Transition Detection for Multimodal Embeddings**
+        - Automatically detect scene changes in educational videos
+        - Capture screenshots at transition points  
+        - Analyze visual content with OpenAI Vision API
+        - Generate searchable text descriptions from screenshots
+        - Perfect for slide-based courses and lecture videos
+        """)
+        
+        # OpenAI API key check
+        col1, col2 = st.columns(2)
+        with col1:
+            try:
+                import cv2
+                st.success("✅ OpenCV installed")
+            except ImportError:
+                st.error("❌ OpenCV not installed")
+                st.code("pip install opencv-python")
+        
+        with col2:
+            if st.session_state.get('openai_api_key'):
+                st.success("✅ OpenAI API key configured")
+            else:
+                st.warning("⚠️ OpenAI API key needed for visual analysis")
+                if st.button("🔑 Add OpenAI API Key"):
+                    openai_key = st.text_input("OpenAI API Key", type="password")
+                    if openai_key:
+                        st.session_state.openai_api_key = openai_key
+                        st.success("API key saved!")
+                        st.rerun()
+        
+        # Course selection for transition detection
+        available_courses = self.course_indexer.get_available_courses() if self.course_indexer else []
+        
+        if available_courses:
+            course_options = [f"{course['name']} ({course['document_count']} files)" 
+                            for course in available_courses]
+            
+            selected_course_display = st.selectbox(
+                "📚 Select Course for Transition Detection",
+                options=course_options,
+                help="Choose a course to process videos for transition screenshots"
+            )
+            
+            if selected_course_display:
+                # Extract course name from display
+                course_name = selected_course_display.split(' (')[0]
+                
+                # Transition detection settings
+                st.subheader("⚙️ Detection Settings")
+                
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    sensitivity = st.slider(
+                        "Transition Sensitivity", 
+                        min_value=0.1, max_value=0.8, value=0.3, step=0.1,
+                        help="Lower = more sensitive (more transitions detected)"
+                    )
+                
+                with col2:
+                    min_duration = st.slider(
+                        "Min Scene Duration (seconds)", 
+                        min_value=1.0, max_value=10.0, value=3.0, step=0.5,
+                        help="Minimum time between detected transitions"
+                    )
+                
+                with col3:
+                    max_screenshots = st.number_input(
+                        "Max Screenshots per Video", 
+                        min_value=10, max_value=100, value=30, step=5,
+                        help="Limit screenshots to prevent overload"
+                    )
+                
+                # Process transitions
+                if st.button("🎬 Detect Video Transitions", type="primary"):
+                    try:
+                        # Import and initialize detector
+                        from video_transition_detector import VideoTransitionDetector
+                        
+                        detector = VideoTransitionDetector(
+                            transition_threshold=sensitivity,
+                            min_scene_duration=min_duration,
+                            max_screenshots_per_video=max_screenshots
+                        )
+                        
+                        # Get course directory
+                        course_dir = self.config.raw_docs_dir / course_name
+                        
+                        with st.spinner(f"🎯 Processing video transitions in {course_name}..."):
+                            results = detector.process_course_videos(str(course_dir))
+                        
+                        if results and results.get('total_transitions', 0) > 0:
+                            st.success(f"🎉 Detected {results['total_transitions']} transitions across {results['total_videos']} videos!")
+                            
+                            # Show results summary
+                            col1, col2, col3 = st.columns(3)
+                            with col1:
+                                st.metric("Videos Processed", results['total_videos'])
+                            with col2:
+                                st.metric("Transitions Found", results['total_transitions'])
+                            with col3:
+                                avg_per_video = results['total_transitions'] / results['total_videos'] if results['total_videos'] > 0 else 0
+                                st.metric("Avg per Video", f"{avg_per_video:.1f}")
+                            
+                            # Show video breakdown
+                            with st.expander("📹 Detailed Results by Video"):
+                                for video_name, video_data in results.get('videos', {}).items():
+                                    st.write(f"**{video_data['filename']}**: {video_data['transitions_count']} transitions")
+                        else:
+                            st.warning("No transitions detected. Try adjusting sensitivity settings.")
+                    
+                    except Exception as e:
+                        st.error(f"Error processing transitions: {e}")
+        else:
+            st.info("📁 No courses found. Upload course materials first in the Documents tab.")
+    
+    def _multimodal_processing_interface(self):
+        """Comprehensive multimodal processing interface."""
+        st.subheader("Multimodal Course Processing")
+        
+        st.markdown("""
+        **Complete Multimodal Analysis**
+        - Combines documents (PDF, DOCX, PPTX)
+        - Processes transcriptions (VTT, SRT files) 
+        - Analyzes video transitions (screenshots + descriptions)
+        - Creates unified vector embeddings for intelligent search
+        - Perfect for comprehensive course analysis
+        """)
+        
+        # Course selection
+        available_courses = self.course_indexer.get_available_courses() if self.course_indexer else []
+        
+        if available_courses:
+            course_options = [f"{course['name']} ({course['document_count']} files)" 
+                            for course in available_courses]
+            
+            selected_course_display = st.selectbox(
+                "📚 Select Course for Multimodal Processing",
+                options=course_options,
+                help="Choose a course for complete multimodal analysis"
+            )
+            
+            if selected_course_display:
+                course_name = selected_course_display.split(' (')[0]
+                
+                # Processing options
+                st.subheader("🎯 Processing Options")
+                
+                col1, col2 = st.columns(2)
+                with col1:
+                    process_documents = st.checkbox("📄 Process Documents", value=True)
+                    process_transcriptions = st.checkbox("📝 Process Transcriptions", value=True)
+                
+                with col2:
+                    process_transitions = st.checkbox("📸 Process Video Transitions", value=True)
+                    include_vision_analysis = st.checkbox("👁️ Include Vision Analysis", 
+                                                        value=bool(st.session_state.get('openai_api_key')))
+                
+                # Start multimodal processing
+                if st.button("🚀 Start Multimodal Processing", type="primary"):
+                    try:
+                        from multimodal_processor import MultimodalProcessor
+                        
+                        processor = MultimodalProcessor()
+                        course_dir = self.config.raw_docs_dir / course_name
+                        
+                        with st.spinner(f"🔄 Processing {course_name} with multimodal analysis..."):
+                            results = processor.process_course_comprehensive(str(course_dir))
+                        
+                        if results:
+                            st.success("🎉 Multimodal processing complete!")
+                            
+                            # Show comprehensive results
+                            content_types = results.get('content_types', {})
+                            
+                            col1, col2, col3, col4 = st.columns(4)
+                            with col1:
+                                st.metric("Documents", content_types.get('documents', {}).get('count', 0))
+                            with col2:
+                                st.metric("Transcriptions", content_types.get('transcriptions', {}).get('count', 0))
+                            with col3:
+                                st.metric("Video Transitions", content_types.get('video_transitions', {}).get('count', 0))
+                            with col4:
+                                st.metric("Total Content Pieces", content_types.get('total_content_pieces', 0))
+                            
+                            # Show embedding readiness
+                            embedding_docs = results.get('embedding_documents', [])
+                            st.success(f"📊 **Ready for Vector Embedding**: {len(embedding_docs)} searchable content pieces")
+                            
+                            with st.expander("📋 Content Analysis Details"):
+                                for content_type, data in content_types.items():
+                                    if content_type != 'total_content_pieces' and isinstance(data, dict):
+                                        st.write(f"**{content_type.title()}**: {data.get('count', 0)} items")
+                                        if 'files' in data:
+                                            for file_info in data['files'][:5]:  # Show first 5
+                                                st.write(f"  • {file_info.get('filename', 'Unknown')}")
+                                            if len(data['files']) > 5:
+                                                st.write(f"  • ... and {len(data['files']) - 5} more")
+                    
+                    except Exception as e:
+                        st.error(f"Error in multimodal processing: {e}")
+        else:
+            st.info("📁 No courses found. Upload course materials first in the Documents tab.")
 
     def refresh_available_courses(self):
         """Refresh the list of available courses - pure offline mode."""
@@ -2527,9 +2735,25 @@ class RealEstateAIApp:
         )
         
     def bulk_transcription_section(self):
-        """Dedicated section for bulk audio/video transcription with folder structure preservation."""
-        st.header("🎥 Bulk Media Transcription")
-        st.info("**RTX 3060 Optimized**: Process entire folders of audio/video files while preserving folder structure")
+        """Enhanced multimodal video processing with transcription and screenshot detection."""
+        st.header("🎥 Enhanced Video Processing")
+        st.info("**RTX 3060 Optimized**: Transcription + Screenshot Detection for Multimodal AI")
+        
+        # Create tabs for different processing modes
+        tab1, tab2, tab3 = st.tabs(["🎯 Bulk Transcription", "📸 Transition Screenshots", "🔄 Multimodal Processing"])
+        
+        with tab1:
+            self._transcription_interface()
+        
+        with tab2:
+            self._transition_screenshot_interface()
+            
+        with tab3:
+            self._multimodal_processing_interface()
+    
+    def _transcription_interface(self):
+        """Original transcription interface with fixes."""
+        st.subheader("Bulk Video Transcription")
         
         # Economic benefits and setup callout
         with st.expander("💰 Cost Savings & Setup Requirements"):
@@ -2573,13 +2797,14 @@ class RealEstateAIApp:
                 st.error("❌ PyTorch not installed")
                 st.code("pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118")
         
-        # Import transcription manager
+        # Import transcription manager with proper class name
         try:
-            from transcription_manager import TranscriptionManager
+            from transcription_manager import WhisperTranscriptionManager
             from course_ignore_manager import CourseIgnoreManager
-            tm = TranscriptionManager()
+            tm = WhisperTranscriptionManager()
         except Exception as e:
             st.error(f"Transcription manager not available: {e}")
+            st.info("💡 Install dependencies: pip install openai-whisper torch")
             return
         
         # Show current transcription stats
