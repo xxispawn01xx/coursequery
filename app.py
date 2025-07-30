@@ -422,21 +422,9 @@ class RealEstateAIApp:
         st.sidebar.header("📚 Course Management")
         
         # Show course directory configuration
-        course_path = Path(r"H:\Archive Classes")
-        if not course_path.exists():
-            st.sidebar.warning(f"⚠️ Course directory not found: {course_path}")
-            with st.sidebar.expander("🔧 Setup Your Courses"):
-                st.markdown("""
-                **Expected path:** `H:\\Archive Classes`
-                
-                **If your courses are elsewhere:**
-                1. Update the path in `config.py`
-                2. Or use the file uploader below
-                
-                **Current Status:** Using local archived_courses for courses
-                """)
-        else:
-            st.sidebar.success(f"✅ Connected to: {course_path}")
+        course_path = self.config.raw_docs_dir
+        st.sidebar.success(f"📁 Using local directory: archived_courses/")
+        st.sidebar.info("Course materials are stored locally in the archived_courses/ folder")
         
         # File uploader for courses
         st.sidebar.subheader("📁 Upload Course Directory")

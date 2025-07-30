@@ -67,14 +67,14 @@ class Config:
                 'load_in_4bit': True,
             },
             'small': {
-                'model_name': 'microsoft/DialoGPT-small',  # Fallback for system RAM issues
+                'model_name': 'gpt2',  # Fallback for system RAM issues
                 'max_length': 512,
                 'temperature': 0.7,
                 'device': 'cpu',
                 'load_in_4bit': False,
             },
             'medium': {
-                'model_name': 'microsoft/DialoGPT-medium', 
+                'model_name': 'distilgpt2', 
                 'max_length': 1024,
                 'temperature': 0.7,
                 'device': 'cuda',  # Can use GPU
