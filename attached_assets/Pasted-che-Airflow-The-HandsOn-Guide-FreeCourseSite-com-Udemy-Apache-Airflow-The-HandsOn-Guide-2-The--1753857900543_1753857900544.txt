@@ -1,0 +1,17 @@
+che Airflow The HandsOn Guide\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\2 - The basics of Apache Airflow\10 - Practice Installing Airflow 20.mp4: [WinError 2] The system cannot find the file specified
+WARNING:__main__:Detected duplicate directory: [FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide
+INFO:__main__:Fixed path: archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\2 - The basics of Apache Airflow\11 - Practice Quick tour of Airflow UI.mp4
+INFO:__main__:Updated media_file to: archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\2 - The basics of Apache Airflow\11 - Practice Quick tour of Airflow UI.mp4
+ERROR:__main__:Media file not found: archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\2 - The basics of Apache Airflow\11 - Practice Quick tour of Airflow UI.mp4
+ERROR:__main__:Absolute path attempted: H:\Archive Classes\coursequery\archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\2 - The basics of Apache Airflow\11 - Practice Quick tour of Airflow UI.mp4
+ERROR:__main__:Parent directory exists: False
+INFO:__main__:Searching for file: 11 - Practice Quick tour of Airflow UI.mp4
+💡 Running in pure offline mode with centralized directory config
+📁 Master directory: H:\Archive Classes\coursequery\archived_courses
+📁 Active directory: H:\Archive Classes\coursequery\archived_courses
+WARNING:__main__:Found file has duplicate path: H:\Archive Classes\coursequery\archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\2 - The basics of Apache Airflow\11 - Practice Quick tour of Airflow UI.mp4
+INFO:__main__:Attempting to use cleaned path: H:\Archive Classes\coursequery\archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\2 - The basics of Apache Airflow\11 - Practice Quick tour of Airflow UI.mp4
+WARNING:__main__:Cleaned path doesn't exist: H:\Archive Classes\coursequery\archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\2 - The basics of Apache Airflow\11 - Practice Quick tour of Airflow UI.mp4
+WARNING:__main__:Using file with potential duplicate path: H:\Archive Classes\coursequery\archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\2 - The basics of Apache Airflow\11 - Practice Quick tour of Airflow UI.mp4
+INFO:__main__:File validation passed: 11 - Practice Quick tour of Airflow UI.mp4
+INFO:__main__:Loading Whisper model for RTX 3060...

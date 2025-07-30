@@ -3101,33 +3101,16 @@ class RealEstateAIApp:
             # Transcribe with RTX 3060 optimization
             logger.info(f"Transcribing: {media_path.name}")
             
-            # Final path verification and cleaning before Whisper
+            # Prepare path for Whisper transcription
             transcribe_path = str(media_path)
             
-            # Last attempt to clean any remaining duplicate paths
-            path_obj = Path(transcribe_path)
-            if not path_obj.exists():
-                logger.warning(f"Path doesn't exist, attempting final cleanup: {transcribe_path}")
-                
-                # Try removing one level of duplicate directory
-                parts = path_obj.parts
-                for i in range(len(parts) - 1):
-                    if parts[i] == parts[i + 1] and 'Udemy' in parts[i]:
-                        # Create path without the duplicate
-                        clean_parts = list(parts)
-                        clean_parts.pop(i + 1)
-                        cleaned_path = Path(*clean_parts)
-                        
-                        if cleaned_path.exists():
-                            transcribe_path = str(cleaned_path)
-                            media_path = cleaned_path
-                            logger.info(f"Final cleanup successful: {transcribe_path}")
-                            break
-                else:
-                    logger.error(f"Final validation failed - file does not exist: {transcribe_path}")
-                    return False
+            # Final validation - ensure file exists before transcription
+            if not Path(transcribe_path).exists():
+                logger.error(f"File does not exist for transcription: {transcribe_path}")
+                return False
             
-            logger.info(f"Using final validated path for Whisper: {transcribe_path}")
+            logger.info(f"Using validated path for Whisper: {transcribe_path}")
+            logger.info(f"File size: {Path(transcribe_path).stat().st_size / (1024*1024):.1f} MB")
             
             result = model.transcribe(
                 transcribe_path,
