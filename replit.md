@@ -139,7 +139,7 @@ Authentication: Local HuggingFace token storage, no external dependencies requir
 - **Comprehensive Course Processing**: Now captures VTT subtitle content, Python/JS code examples, JSON configs, and diverse media files for complete coverage
 - **Enhanced Path Debugging**: Added comprehensive logging to diagnose nested folder structures with special characters and long Windows paths
 - **Windows Path Compatibility**: Enhanced file processing to handle complex nested structures like Udemy course folders with duplicate names and special characters
-- **Flexible Directory Detection**: Added automatic coursequery folder detection regardless of location using relative paths and os module
+- **Simplified Directory Detection**: Course directory is now consistently relative to where streamlit is launched from (current working directory)
 - **TranscriptionManager Import Fix**: Resolved import error by adding backward compatibility alias and graceful torch fallback
 
 ### July 29, 2025 - Multi-Course Detection & Replit Integration
