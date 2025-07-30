@@ -6,13 +6,15 @@ This is a comprehensive, privacy-focused real estate course analysis application
 
 ## User Preferences
 
-**CRITICAL**: Pure offline operation - never build for Replit, always offline-first architecture. NEVER store model files on Replit - models exist only locally.
+**CRITICAL**: Pure offline operation - NEVER build for Replit, always 100% offline-first architecture. All development is for local Windows system with H:\ drive access.
+**NEVER store model files on Replit** - models exist only locally on user's RTX 3060 system.
 Preferred communication style: Simple, everyday language.
 Model preference: Local RTX 3060 models with hybrid cloud API fallback for enhanced responses.
 Creative tasks preference: Local Excel generation with Google Drive integration as optional enhancement.
 Workflow: Pure offline development → RTX 3060 local processing → optional cloud API enhancement.
-Deployment strategy: 100% offline capable, RTX 3060 for all AI processing, local file system for courses.
+Deployment strategy: 100% offline capable, RTX 3060 for all AI processing, local file system for courses on H:\ drive.
 Authentication: Local HuggingFace token storage, no external dependencies required.
+**Architecture Focus**: Windows local development only - Replit is purely for development/testing, not deployment.
 
 ## Primary Use Cases
 
@@ -206,15 +208,16 @@ Authentication: Local HuggingFace token storage, no external dependencies requir
 - **Persistent API Key Storage**: Added secure local storage for OpenAI/Perplexity keys with auto-save functionality
 
 ### System Status
-- **Architecture**: ✅ **PURE OFFLINE** - No Replit dependencies, 100% local operation
+- **Architecture**: ✅ **PURE OFFLINE WINDOWS** - 100% local H:\ drive operation, no Replit deployment
 - **Local**: ✅ **FULLY OPERATIONAL** - RTX 3060 running all AI models successfully on CUDA
 - **GPU Status**: ✅ **RTX 3060 PERFECT** - All models loading on cuda:0, memory fragmentation fix successful
 - **Local Models**: ✅ **ALL WORKING** - local_embeddings, local_llm, whisper all operational
-- **Course Directory**: Uses centralized directory configuration with master directory detection
+- **Course Directory**: Uses centralized H:\ drive directory configuration with master directory detection
 - **Query Engine**: Complete offline AI system with RTX 3060 acceleration
-- **Configuration**: Pure offline mode - no cloud dependencies required
-- **Course Processing**: Enhanced multi-course detection with cross-platform compatibility and offline fallback
+- **Configuration**: Pure offline Windows mode - no cloud dependencies required
+- **Course Processing**: Enhanced multi-course detection with 37+ file format support for comprehensive coverage
 - **Loading Issues**: ✅ **RESOLVED** - Fixed Windows SIGALRM compatibility and Pydantic import issues
 - **Fallback System**: ✅ **OPERATIONAL** - OfflineCourseManager handles course detection when complex imports fail
+- **File Format Support**: ✅ **EXPANDED** - Now processes VTT subtitles, code files, configs, and 37+ formats total
 
 The architecture prioritizes privacy, local operation, and user control while maintaining enterprise-grade functionality for real estate education analysis.
