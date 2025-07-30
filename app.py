@@ -3117,7 +3117,8 @@ class RealEstateAIApp:
                 ("forward_slashes", transcribe_path.replace('\\', '/')),
                 ("raw_string", transcribe_path),
                 ("short_path", self._get_short_path(transcribe_path)),
-                ("pathlib_object", Path(transcribe_path))
+                ("quoted_path", f'"{transcribe_path}"'),
+                ("pathlib_string", str(Path(transcribe_path)))
             ]
             
             result = None
