@@ -2549,12 +2549,29 @@ class RealEstateAIApp:
             available_courses = []
         
         if available_courses:
-            course_options = [course['name'] for course in available_courses]
-            selected_course = st.selectbox(
+            # Create shortened display names for long course names
+            course_options = []
+            course_mapping = {}
+            
+            for course in available_courses:
+                original_name = course['name']
+                # Shorten very long course names for display
+                if len(original_name) > 50:
+                    short_name = original_name[:47] + "..."
+                    display_name = f"{short_name} ({course.get('file_count', 0)} files)"
+                else:
+                    display_name = f"{original_name} ({course.get('file_count', 0)} files)"
+                
+                course_options.append(display_name)
+                course_mapping[display_name] = original_name
+            
+            selected_display = st.selectbox(
                 "Choose Course:",
                 course_options,
                 help="Select from your existing courses - system will auto-detect media files"
             )
+            
+            selected_course = course_mapping.get(selected_display) if selected_display else None
             
             if selected_course:
                 # Get course directory automatically
@@ -2564,40 +2581,58 @@ class RealEstateAIApp:
                 
                 # Auto-scan for media and VTT files
                 if course_dir.exists():
-                    media_files = []
-                    vtt_files = []
-                    video_extensions = ['.mp4', '.avi', '.mov', '.mkv']
-                    audio_extensions = ['.mp3', '.wav', '.flac', '.m4a']
-                    
-                    for ext in video_extensions + audio_extensions:
-                        media_files.extend(list(course_dir.rglob(f"*{ext}")))
-                    
-                    for vtt_ext in ['.vtt', '.srt']:
-                        vtt_files.extend(list(course_dir.rglob(f"*{vtt_ext}")))
-                    
-                    # Display smart summary
-                    col1, col2, col3 = st.columns(3)
-                    with col1:
-                        st.metric("📹 Videos/Audio", len(media_files))
-                    with col2:
-                        st.metric("📝 VTT/Subtitles", len(vtt_files))
-                    with col3:
-                        videos_with_vtt = 0
-                        for media_file in media_files:
-                            vtt_name = media_file.stem + '.vtt'
-                            srt_name = media_file.stem + '.srt'
-                            if any(vtt.name in [vtt_name, srt_name] for vtt in vtt_files):
-                                videos_with_vtt += 1
-                        needs_transcription = len(media_files) - videos_with_vtt
-                        st.metric("⚡ Need Transcription", needs_transcription)
-                    
-                    if len(vtt_files) > 0:
-                        st.success(f"✅ Found {len(vtt_files)} existing subtitle files - these are already processed in your course index")
-                    
-                    if needs_transcription > 0:
-                        st.info(f"🎯 {needs_transcription} media files need transcription to complete your course")
-                    else:
-                        st.success("🎉 All media files already have transcriptions! Your course is complete.")
+                    try:
+                        media_files = []
+                        vtt_files = []
+                        video_extensions = ['.mp4', '.avi', '.mov', '.mkv']
+                        audio_extensions = ['.mp3', '.wav', '.flac', '.m4a']
+                        
+                        # Safely scan for media files
+                        for ext in video_extensions + audio_extensions:
+                            try:
+                                media_files.extend(list(course_dir.rglob(f"*{ext}")))
+                            except (OSError, PermissionError) as e:
+                                st.warning(f"Cannot access some {ext} files: {e}")
+                        
+                        # Safely scan for VTT files
+                        for vtt_ext in ['.vtt', '.srt']:
+                            try:
+                                vtt_files.extend(list(course_dir.rglob(f"*{vtt_ext}")))
+                            except (OSError, PermissionError) as e:
+                                st.warning(f"Cannot access some {vtt_ext} files: {e}")
+                        
+                        # Display smart summary
+                        col1, col2, col3 = st.columns(3)
+                        with col1:
+                            st.metric("📹 Videos/Audio", len(media_files))
+                        with col2:
+                            st.metric("📝 VTT/Subtitles", len(vtt_files))
+                        with col3:
+                            videos_with_vtt = 0
+                            for media_file in media_files:
+                                vtt_name = media_file.stem + '.vtt'
+                                srt_name = media_file.stem + '.srt'
+                                if any(vtt.name in [vtt_name, srt_name] for vtt in vtt_files):
+                                    videos_with_vtt += 1
+                            needs_transcription = len(media_files) - videos_with_vtt
+                            st.metric("⚡ Need Transcription", needs_transcription)
+                        
+                        if len(vtt_files) > 0:
+                            st.success(f"✅ Found {len(vtt_files)} existing subtitle files - these are already processed in your course index")
+                        
+                        if needs_transcription > 0:
+                            st.info(f"🎯 {needs_transcription} media files need transcription to complete your course")
+                        else:
+                            st.success("🎉 All media files already have transcriptions! Your course is complete.")
+                            
+                        # Show environment notice for Replit
+                        if len(media_files) > 0:
+                            st.info("📍 **Note**: This is the Replit development environment. For actual transcription, transfer to your local RTX 3060 system where course files are accessible.")
+                            
+                    except Exception as e:
+                        st.error(f"Error scanning course directory: {e}")
+                        media_directory = ""
+                        course_name = ""
                 else:
                     st.warning(f"Course directory not found: {course_dir}")
                     media_directory = ""

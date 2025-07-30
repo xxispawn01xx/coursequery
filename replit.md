@@ -159,6 +159,9 @@ When you "index a course," the system processes all documents in that course fol
 - **Course Integration**: Transcription interface now uses existing course detection system for seamless workflow
 - **Completion Validation**: Interface indicates when all media files already have transcriptions
 - **Fallback Support**: Manual directory input still available when no courses are detected
+- **Long Course Name Handling**: Automatically truncates very long course names for better UI display
+- **Environment Awareness**: Clear indication that transcription works locally on RTX 3060, not in Replit development environment
+- **Error Resilience**: Graceful handling of file access errors and missing directories with informative user feedback
 
 ### July 30, 2025 - Centralized Directory Configuration & Offline Mode Fixes
 - **Single Source Directory Management**: Created `directory_config.py` with centralized MASTER_COURSE_DIRECTORY variable
