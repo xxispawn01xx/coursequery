@@ -174,7 +174,11 @@ class WhisperTranscriptionManager:
             'whisper_loaded': self.whisper_model is not None,
             'gpu_available': TORCH_AVAILABLE and torch.cuda.is_available() if TORCH_AVAILABLE else False,
             'supported_formats': self.get_supported_formats(),
-            'status': 'Ready for RTX 3060 transcription' if TORCH_AVAILABLE else 'PyTorch not available - install locally for GPU acceleration'
+            'status': 'Ready for RTX 3060 transcription' if TORCH_AVAILABLE else 'PyTorch not available - install locally for GPU acceleration',
+            # Add missing fields expected by the UI
+            'total_transcriptions': 0,  # Default to 0 until actual transcriptions are tracked
+            'total_characters': 0,      # Default to 0 until actual transcriptions are tracked
+            'methods_used': {}          # Default to empty dict until methods are tracked
         }
 
 # Alias for backward compatibility
