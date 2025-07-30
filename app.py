@@ -110,6 +110,13 @@ class RealEstateAIApp:
             
         self.course_indexer = CourseIndexer() if COURSE_INDEXER_AVAILABLE else None
         
+        # Initialize ignore manager
+        try:
+            from course_ignore_manager import CourseIgnoreManager
+            self.ignore_manager = CourseIgnoreManager()
+        except ImportError:
+            self.ignore_manager = None
+        
         # Initialize session state
         if 'models_loaded' not in st.session_state:
             st.session_state.models_loaded = False
@@ -463,6 +470,11 @@ class RealEstateAIApp:
         
         print(f"✅ Total courses found: {len(courses)} (scanned {course_count} directories)")
         
+        # Filter out ignored courses
+        if self.ignore_manager:
+            courses = self.ignore_manager.filter_courses(courses)
+            print(f"✂️ After filtering ignored courses: {len(courses)} remaining")
+        
         # Store results
         st.session_state.available_courses = courses
         return courses
@@ -591,11 +603,18 @@ class RealEstateAIApp:
                             st.write(f"Files found: {doc_count}")
                             st.write(f"Status: Not processed")
                             
-                            if st.button(f"Process {course_name}", key=f"process_{course_name}"):
-                                self.process_raw_course(course_name)
-                            
-                            if st.button(f"Select anyway", key=f"select_raw_{course_name}"):
-                                st.warning("⚠️ This course isn't processed yet. Process it first to enable querying.")
+                            col1, col2, col3 = st.columns(3)
+                            with col1:
+                                if st.button(f"Process", key=f"process_{course_name}"):
+                                    self.process_raw_course(course_name)
+                            with col2:
+                                if st.button(f"Select", key=f"select_raw_{course_name}"):
+                                    st.warning("⚠️ This course isn't processed yet. Process it first to enable querying.")
+                            with col3:
+                                if st.button(f"Ignore", key=f"ignore_{course_name}"):
+                                    if self.ignore_manager and self.ignore_manager.ignore_course(course_name):
+                                        st.success(f"Ignored '{course_name}'")
+                                        st.rerun()
         else:
             st.sidebar.info("No courses found. Upload documents to get started.")
 
@@ -2060,6 +2079,82 @@ class RealEstateAIApp:
             st.error(f"Error showing knowledge graph: {str(e)}")
             logger.error(f"Knowledge graph error: {e}")
 
+    def manage_ignored_courses_section(self):
+        """Manage ignored courses - view and unignore courses."""
+        st.header("🚫 Ignored Courses Management")
+        
+        if not self.ignore_manager:
+            st.error("❌ Ignore manager not available")
+            return
+            
+        # Get ignored courses stats
+        stats = self.ignore_manager.get_stats()
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("Total Ignored Courses", stats['total_ignored'])
+        with col2:
+            st.metric("Config File Status", "✅ Exists" if stats['config_exists'] else "❌ Missing")
+        
+        if stats['total_ignored'] == 0:
+            st.info("✅ No courses are currently ignored")
+            st.markdown("""
+            **How to ignore courses:**
+            1. Go to the sidebar course list
+            2. Find the course you want to hide
+            3. Click the "Ignore" button in the unprocessed courses section
+            4. The course will be hidden from the main interface
+            5. Come back to this tab to unignore courses
+            """)
+            return
+        
+        st.subheader("📋 Currently Ignored Courses")
+        
+        # Show ignored courses with unignore option
+        ignored_courses = stats['ignored_courses']
+        
+        for i, course_name in enumerate(ignored_courses):
+            col1, col2 = st.columns([3, 1])
+            
+            with col1:
+                st.write(f"📁 **{course_name}**")
+                st.caption("Hidden from main course list")
+                
+            with col2:
+                if st.button(f"Unignore", key=f"unignore_{i}"):
+                    if self.ignore_manager.unignore_course(course_name):
+                        st.success(f"✅ Unignored '{course_name}'")
+                        st.rerun()
+                    else:
+                        st.error(f"❌ Failed to unignore '{course_name}'")
+        
+        # Bulk actions
+        st.subheader("🔧 Bulk Actions")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            if st.button("🔄 Unignore All Courses"):
+                success_count = 0
+                for course_name in ignored_courses:
+                    if self.ignore_manager.unignore_course(course_name):
+                        success_count += 1
+                
+                if success_count > 0:
+                    st.success(f"✅ Unignored {success_count} courses")
+                    st.rerun()
+                else:
+                    st.error("❌ Failed to unignore courses")
+        
+        with col2:
+            if st.button("📄 Show Config File Path"):
+                st.code(stats['config_file'])
+                st.caption("You can manually edit this JSON file if needed")
+        
+        # Debug info
+        with st.expander("🔍 Debug Information"):
+            st.json(stats)
+
     def run(self):
         """Main application entry point."""
         self.setup_page_config()
@@ -2108,13 +2203,14 @@ class RealEstateAIApp:
         self.sidebar_course_management()
         
         # Main content tabs with clear billing indicators
-        tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+        tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
             "📁 Upload Documents (FREE)", 
             "🎥 Bulk Transcription (FREE)", 
             "🔍 Vector RAG (💳 PAID)", 
             "💬 Ask Questions (FREE)", 
             "📊 Analytics (FREE)", 
-            "⚙️ System Status (FREE)"
+            "⚙️ System Status (FREE)",
+            "🚫 Manage Ignored (FREE)"
         ])
         
         with tab1:
@@ -2134,6 +2230,9 @@ class RealEstateAIApp:
         
         with tab6:
             self.system_status_section()
+        
+        with tab7:
+            self.manage_ignored_courses_section()
         
         # Add new analytics and learning tabs
         if st.session_state.get('show_advanced_tabs', False):
@@ -2180,6 +2279,7 @@ class RealEstateAIApp:
         # Import transcription manager
         try:
             from transcription_manager import TranscriptionManager
+            from course_ignore_manager import CourseIgnoreManager
             tm = TranscriptionManager()
         except Exception as e:
             st.error(f"Transcription manager not available: {e}")
