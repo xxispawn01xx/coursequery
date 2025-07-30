@@ -444,20 +444,52 @@ class RealEstateAIApp:
         print(f"📁 Raw courses: {raw_docs_path}")
         print(f"📊 Indexed courses: {indexed_path}")
         
-        # Get already indexed courses
+        # Get already indexed courses with proper document counting
         indexed_courses = set()
         for item in indexed_path.iterdir():
             if item.is_dir():
                 indexed_courses.add(item.name)
-                # Count actual indexed files
-                doc_count = len(list(item.rglob('*.json'))) + len(list(item.rglob('*.pkl')))
-                courses.append({
-                    'name': item.name,
-                    'status': 'indexed',
-                    'document_count': doc_count,
-                    'last_indexed': 'Ready for queries'
-                })
-                print(f"📚 Indexed course: {item.name} ({doc_count} files)")
+                
+                # Try to read actual document count from metadata
+                metadata_file = item / "metadata.json"
+                doc_count = 0
+                
+                if metadata_file.exists():
+                    try:
+                        with open(metadata_file, 'r', encoding='utf-8') as f:
+                            metadata = json.load(f)
+                        doc_count = metadata.get('document_count', 0)
+                        
+                        courses.append({
+                            'name': item.name,
+                            'status': 'indexed',
+                            'document_count': doc_count,
+                            'last_indexed': metadata.get('last_indexed', 'Ready for queries'),
+                            'total_content_length': metadata.get('total_content_length', 0),
+                            'document_types': metadata.get('document_types', {})
+                        })
+                        print(f"📚 Indexed course: {item.name} ({doc_count} documents)")
+                        
+                    except Exception as e:
+                        # Fallback to file counting if metadata is corrupted
+                        doc_count = len(list(item.rglob('*.json'))) + len(list(item.rglob('*.pkl')))
+                        courses.append({
+                            'name': item.name,
+                            'status': 'indexed',
+                            'document_count': doc_count,
+                            'last_indexed': 'Metadata error'
+                        })
+                        print(f"📚 Indexed course: {item.name} ({doc_count} files, metadata error)")
+                else:
+                    # Fallback to file counting
+                    doc_count = len(list(item.rglob('*.json'))) + len(list(item.rglob('*.pkl')))
+                    courses.append({
+                        'name': item.name,
+                        'status': 'indexed',
+                        'document_count': doc_count,
+                        'last_indexed': 'No metadata'
+                    })
+                    print(f"📚 Indexed course: {item.name} ({doc_count} files, no metadata)")
         
         # Scan for courses in the directory
         course_count = 0
@@ -796,20 +828,32 @@ class RealEstateAIApp:
             logger.error(f"File processing error: {e}")
 
     def reindex_course(self, course_name: str):
-        """Re-index a specific course."""
-        if self.course_indexer is None:
-            st.error("❌ Course indexer not available. Please install AI dependencies.")
-            return
-            
+        """Re-index a specific course using simple indexer."""
         with st.spinner(f"Re-indexing {course_name}..."):
             try:
-                self.course_indexer.reindex_course(course_name)
-                st.success(f"✅ Successfully re-indexed {course_name}")
+                # Use simple course indexer as fallback
+                from simple_course_indexer import SimpleCourseIndexer
+                simple_indexer = SimpleCourseIndexer()
+                
+                # Process the course
+                result = simple_indexer.process_course_simple(course_name)
+                
+                st.success(f"✅ Successfully re-indexed {course_name}: {result['document_count']} documents processed")
+                st.info(f"📄 Content: {result['total_content_length']:,} characters across {len(result['document_types'])} file types")
+                
+                # Show document type breakdown
+                if result['document_types']:
+                    types_str = ", ".join([f"{ext}: {count}" for ext, count in result['document_types'].items()])
+                    st.info(f"📁 File types: {types_str}")
+                
                 self.refresh_available_courses()
                 st.rerun()
+                
             except Exception as e:
                 st.error(f"❌ Failed to re-index {course_name}: {str(e)}")
                 logger.error(f"Re-indexing error: {e}")
+                import traceback
+                logger.error(f"Full traceback: {traceback.format_exc()}")
     
     def process_directory(self, directory_path: str, course_name: str):
         """Process all files in a directory and add to course index."""
