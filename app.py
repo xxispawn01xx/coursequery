@@ -363,12 +363,9 @@ class RealEstateAIApp:
                                st.session_state.get('selected_model') != selected_model)
         
         if model_needs_loading:
-            # Offline mode - always attempt to load models
-                
-            # Check if AI dependencies are available
-            if not LOCAL_MODELS_AVAILABLE or not QUERY_ENGINE_AVAILABLE:
-                st.warning("⚠️ AI dependencies are not installed. Please check the System Status tab for installation instructions.")
-                return False
+            # Offline mode - force models to load even if dependencies seem unavailable
+            # Skip dependency check for pure offline mode
+            st.info("💡 Pure offline mode - loading models directly")
             
             if self.model_manager is None:
                 st.error("❌ Model manager not available. Please install AI dependencies.")
@@ -2468,6 +2465,9 @@ class RealEstateAIApp:
         """Main application entry point."""
         self.setup_page_config()
         
+        # Display sidebar first to ensure course management is available
+        self.sidebar_course_management()
+        
         # Title
         st.title("📚 Local Course AI Assistant")
         
@@ -2500,9 +2500,12 @@ class RealEstateAIApp:
         
         st.markdown("**Fully Local Course Analysis with Mistral 7B + Whisper**")
         
-        # Load models
-        if not self.load_models():
-            st.stop()
+        # Try to load models but don't stop interface if they fail
+        try:
+            self.load_models()
+        except Exception as e:
+            st.warning(f"⚠️ Model loading failed: {e}")
+            st.info("💡 Interface will still work - some features may be limited")
         
         # Initialize available courses
         if not st.session_state.available_courses:
@@ -3149,7 +3152,7 @@ class RealEstateAIApp:
                             logger.warning(f"Using file with potential duplicate path: {media_path}")
                     else:
                         logger.error(f"File '{file_name}' not found in any course directory")
-                        logger.info("This is normal in development environment - actual course files are on your local H:\\ drive")
+                        logger.info("This is normal in development environment - actual course files are on your local H: drive")
                         logger.info("For testing, use files that exist in your current environment")
                         return False
                         
