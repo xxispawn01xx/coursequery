@@ -160,10 +160,47 @@ class OfflineCourseManager:
             logger.info(f"📊 Total courses detected: {len(courses)}")
             
             return courses
-            
+        
         except Exception as e:
             logger.error(f"❌ Error in offline course detection: {e}")
             return []
+    
+    def get_course_analytics(self, course_name):
+        """Get analytics for a specific course."""
+        # Check if course is indexed
+        indexed_path = self.indexed_courses_dir / course_name
+        if indexed_path.exists():
+            # Count files in indexed course
+            file_count = 0
+            for file_path in indexed_path.rglob('*'):
+                if file_path.is_file():
+                    file_count += 1
+            
+            return {
+                'total_documents': file_count,
+                'indexed': True,
+                'status': 'ready'
+            }
+        else:
+            # Check raw course
+            raw_path = self.raw_docs_dir / course_name
+            if raw_path.exists():
+                file_count = 0
+                for file_path in raw_path.rglob('*'):
+                    if file_path.is_file():
+                        file_count += 1
+                
+                return {
+                    'total_documents': file_count,
+                    'indexed': False,
+                    'status': 'unprocessed'
+                }
+        
+        return {
+            'total_documents': 0,
+            'indexed': False,
+            'status': 'not_found'
+        }
     
     def create_simple_course_info(self, course_name: str, documents: List[Dict]) -> Dict[str, Any]:
         """Create simple course info without complex indexing"""

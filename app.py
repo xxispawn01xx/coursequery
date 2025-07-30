@@ -363,77 +363,28 @@ class RealEstateAIApp:
                                st.session_state.get('selected_model') != selected_model)
         
         if model_needs_loading:
-            # Offline mode - force models to load even if dependencies seem unavailable
-            # Skip dependency check for pure offline mode
-            st.info("💡 Pure offline mode - loading models directly")
+            # Always mark as loaded for offline development mode
+            st.info("💡 Development mode - using hybrid query engine")
             
-            if self.model_manager is None:
-                st.warning("⚠️ Model manager not available - using hybrid mode")
-                # Continue without local models - use cloud APIs instead
+            # Initialize hybrid query engine instead of local models
+            try:
+                from hybrid_query_engine import HybridQueryEngine
+                if 'hybrid_query_engine' not in st.session_state:
+                    st.session_state.hybrid_query_engine = HybridQueryEngine()
+                
                 st.session_state.models_loaded = True
-                st.session_state.selected_model = "local_models"
+                st.session_state.selected_model = selected_model
+                st.success("✅ Hybrid query engine ready for transcription and analysis")
                 return True
-            
-            # Show loading message based on model change
-            if st.session_state.models_loaded and st.session_state.get('selected_model') != selected_model:
-                loading_msg = f"Switching from {st.session_state.get('selected_model', 'unknown')} to {selected_model} (RTX 3060 memory optimization)..."
-            else:
-                loading_msg = f"Loading {selected_model} model (cached models load quickly, first download takes longer)..."
-            
-            with st.spinner(loading_msg):
-                try:
-                    # Load specific model for RTX 3060 optimization
-                    self.model_manager.load_models(model_type=selected_model)
-                    logger.info(f"Model manager loaded successfully with {selected_model}")
-                    
-                    # Store model manager in session state to persist across requests
-                    st.session_state.model_manager = self.model_manager
-                    
-                    # Initialize query engine
-                    if QUERY_ENGINE_AVAILABLE:
-                        self.query_engine = LocalQueryEngine(self.model_manager)
-                        st.session_state.query_engine = self.query_engine
-                        logger.info("Query engine initialized successfully")
-                    else:
-                        logger.error("Query engine not available")
-                        st.error("❌ Query engine not available. Please check dependencies.")
-                        return False
-                    
-                    st.session_state.models_loaded = True
-                    st.session_state.selected_model = selected_model
-                    st.success(f"✅ {selected_model.title()} model loaded successfully on RTX 3060!")
-                    logger.info(f"Models and query engine loaded successfully with {selected_model}")
-                except Exception as e:
-                    # Show more helpful error message for authentication issues
-                    error_msg = str(e)
-                    if "401" in error_msg or "gated repo" in error_msg or "authenticated" in error_msg:
-                        st.error("❌ Model authentication required")
-                        st.markdown("""
-                        **HuggingFace Authentication Needed:**
-                        1. Get token from https://huggingface.co/settings/tokens
-                        2. Open Shell tab and run: `huggingface-cli login`
-                        3. For Llama 2, request access at: https://huggingface.co/meta-llama/Llama-2-7b-chat-hf
-                        4. Reload this page after authentication
-                        
-                        **Alternative:** Set HF_TOKEN in Secrets tab
-                        """)
-                    elif "paging file" in error_msg.lower() or "os error 1455" in error_msg.lower():
-                        st.error("❌ Memory Error: Paging file too small")
-                        st.markdown("""
-                        **Windows Memory Issue - Quick Fix:**
-                        1. Press Windows + R, type "sysdm.cpl", press Enter
-                        2. Advanced tab → Performance Settings → Advanced → Virtual Memory
-                        3. Click "Change" → Uncheck "Automatically manage"
-                        4. Custom size: Initial 4096 MB, Maximum 8192 MB
-                        5. Click Set → OK → Restart computer
-                        
-                        **Alternative:** Use smaller models by setting model preference to "small" in config.
-                        """)
-                    else:
-                        st.error(f"❌ Failed to load models: {error_msg}")
-                    
-                    logger.error(f"Model loading failed: {e}")
-                    return False
+                
+            except Exception as e:
+                logger.error(f"Hybrid query engine initialization failed: {e}")
+                # Continue anyway for basic functionality
+                st.session_state.models_loaded = True
+                st.session_state.selected_model = selected_model
+                st.warning("⚠️ Basic mode active - transcription available, AI querying requires API keys")
+                return True
+        
         return True
 
     def refresh_available_courses(self):
