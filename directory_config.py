@@ -8,6 +8,12 @@ from pathlib import Path
 from typing import Dict, Any, Optional
 import json
 
+# =====================================
+# MASTER ROOT DIRECTORY CONFIGURATION
+# =====================================
+# Single place to change the root coursequery directory
+ROOT_COURSEQUERY_DIRECTORY = r"H:\coursequery"
+
 class DirectoryConfigManager:
     """Manages centralized directory configuration for the entire system."""
     
@@ -52,13 +58,13 @@ class DirectoryConfigManager:
             return str(parent_archived)
         
         # Default: create archived_courses in current directory if H:\ not accessible
-        if not os.path.exists("H:\\"):
-            print(f"📁 H:\\ drive not accessible, using local: {archived_courses_path}")
+        if not os.path.exists(ROOT_COURSEQUERY_DIRECTORY):
+            print(f"📁 Root directory not accessible ({ROOT_COURSEQUERY_DIRECTORY}), using local: {archived_courses_path}")
             return str(archived_courses_path)
         
-        # Fallback to H:\ drive location
-        print("📁 Using H:\\ drive location")
-        return r"H:\Archive Classes\coursequery\archived_courses"
+        # Fallback to configured root location
+        print(f"📁 Using configured root location: {ROOT_COURSEQUERY_DIRECTORY}")
+        return os.path.join(ROOT_COURSEQUERY_DIRECTORY, "archived_courses")
     
     def load_configuration(self):
         """Load saved directory configuration if available."""

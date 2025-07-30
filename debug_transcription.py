@@ -7,6 +7,7 @@ For your local RTX 3060 system
 import logging
 import sys
 from pathlib import Path
+from directory_config import ROOT_COURSEQUERY_DIRECTORY
 
 # Set up detailed logging
 logging.basicConfig(
@@ -54,7 +55,7 @@ def debug_specific_error():
         # Try different path formats
         alternative_paths = [
             Path("archived_courses") / "[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide" / "1 - Introduction" / "1 - Important Prerequisites.mp4",
-            Path("H:/Archive Classes/coursequery/archived_courses") / "[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide" / "1 - Introduction" / "1 - Important Prerequisites.mp4"
+            Path(ROOT_COURSEQUERY_DIRECTORY) / "archived_courses" / "[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide" / "1 - Introduction" / "1 - Important Prerequisites.mp4"
         ]
         
         print("\nTrying alternative path formats:")

@@ -178,6 +178,17 @@ When you "index a course," the system processes all documents in that course fol
 - **Path Object Type Fix**: Resolved "expected np.ndarray (got WindowsPath)" error by ensuring string conversion for all path formats
 - **Multi-Format Testing**: Comprehensive path format attempts including forward slashes, raw strings, short paths, quoted paths, and pathlib strings
 
+### July 30, 2025 - H:\ Drive Optimization & Path Simplification
+- **Directory Structure Optimization**: Updated system to support H:\coursequery\ as root location instead of H:\Archive Classes\coursequery\
+- **Path Length Reduction**: Shortened paths by 16 characters to improve Windows file access and reduce long path issues
+- **Move Guide Creation**: Created comprehensive guide for moving coursequery folder to H:\ drive root with verification steps
+- **Automatic Detection**: System automatically detects and adapts to new H:\coursequery\archived_courses location
+- **Configuration Update**: Updated fallback paths in directory_config.py to use simplified H:\ structure
+- **Centralized Path Configuration**: Created single ROOT_COURSEQUERY_DIRECTORY variable in directory_config.py to control all H:\ paths
+- **Eliminated Hardcoded Paths**: Updated all system files to reference central configuration variable instead of hardcoded paths
+- **Single Point of Control**: Now changing one variable (ROOT_COURSEQUERY_DIRECTORY) updates paths system-wide
+- **Configuration Documentation**: Created CENTRAL_CONFIG_GUIDE.md explaining how to change root directory in one place
+
 ### July 30, 2025 - Centralized Directory Configuration & Offline Mode Fixes
 - **Single Source Directory Management**: Created `directory_config.py` with centralized MASTER_COURSE_DIRECTORY variable
 - **System-Wide Path Cascading**: One variable change updates paths across all components (course processing, book embeddings, indexing, transcription)
