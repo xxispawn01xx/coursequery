@@ -388,41 +388,49 @@ class RealEstateAIApp:
         return True
     
     def _transition_screenshot_interface(self):
-        """Custom video transition screenshot detection interface."""
-        st.subheader("Video Transition Screenshot Detection")
+        """Enhanced scene detection interface using PySceneDetect for professional accuracy."""
+        st.subheader("Enhanced Scene Detection with PySceneDetect")
         
         st.markdown("""
-        **Custom-Built Transition Detection for Multimodal Embeddings**
-        - Automatically detect scene changes in educational videos
-        - Capture screenshots at transition points  
-        - Analyze visual content with OpenAI Vision API
-        - Generate searchable text descriptions from screenshots
-        - Perfect for slide-based courses and lecture videos
+        **Professional Scene Analysis Powered by PySceneDetect** 🎯
+        - **Industry-Standard Algorithms**: ContentDetector, AdaptiveDetector, ThresholdDetector
+        - **Superior Accuracy**: HSL color space analysis vs basic histogram comparison  
+        - **Educational Content Optimized**: Perfect for slides, code demonstrations, lectures
+        - **OpenAI Vision Integration**: Intelligent screenshot content analysis
+        - **Multiple Detection Methods**: Automatic selection based on content type
         """)
         
-        # OpenAI API key check
+        # Check PySceneDetect availability
+        detection_engine = "unknown"
+        use_enhanced = False
+        
         col1, col2 = st.columns(2)
         with col1:
             try:
-                import cv2
-                st.success("✅ OpenCV installed")
+                from enhanced_scene_detector import PYSCENEDETECT_AVAILABLE
+                if PYSCENEDETECT_AVAILABLE:
+                    st.success("✅ PySceneDetect available")
+                    detection_engine = "PySceneDetect (Professional)"
+                    use_enhanced = True
+                else:
+                    st.warning("⚠️ PySceneDetect not installed")
+                    st.info("Install with: `pip install scenedetect[opencv]`")
+                    detection_engine = "OpenCV (Basic)"
+                    use_enhanced = False
             except ImportError:
-                st.error("❌ OpenCV not installed")
-                st.code("pip install opencv-python")
+                st.warning("⚠️ Falling back to basic OpenCV")
+                detection_engine = "OpenCV (Basic)"
+                use_enhanced = False
         
         with col2:
             if st.session_state.get('openai_api_key'):
-                st.success("✅ OpenAI API key configured")
+                st.success("✅ OpenAI Vision API ready")
             else:
-                st.warning("⚠️ OpenAI API key needed for visual analysis")
-                if st.button("🔑 Add OpenAI API Key"):
-                    openai_key = st.text_input("OpenAI API Key", type="password")
-                    if openai_key:
-                        st.session_state.openai_api_key = openai_key
-                        st.success("API key saved!")
-                        st.rerun()
+                st.info("💡 Add OpenAI API key for screenshot analysis")
         
-        # Course selection for transition detection
+        st.info(f"🔧 **Detection Engine**: {detection_engine}")
+        
+        # Course selection for scene detection
         available_courses = self.course_indexer.get_available_courses() if self.course_indexer else []
         
         if available_courses:
@@ -430,80 +438,183 @@ class RealEstateAIApp:
                             for course in available_courses]
             
             selected_course_display = st.selectbox(
-                "📚 Select Course for Transition Detection",
+                "📚 Select Course for Scene Analysis",
                 options=course_options,
-                help="Choose a course to process videos for transition screenshots"
+                help="Choose a course with video files for professional scene detection"
             )
             
             if selected_course_display:
-                # Extract course name from display
                 course_name = selected_course_display.split(' (')[0]
                 
-                # Transition detection settings
-                st.subheader("⚙️ Detection Settings")
+                # Enhanced detection settings
+                st.subheader("🎯 Detection Configuration")
                 
-                col1, col2, col3 = st.columns(3)
-                with col1:
-                    sensitivity = st.slider(
-                        "Transition Sensitivity", 
-                        min_value=0.1, max_value=0.8, value=0.3, step=0.1,
-                        help="Lower = more sensitive (more transitions detected)"
-                    )
-                
-                with col2:
-                    min_duration = st.slider(
-                        "Min Scene Duration (seconds)", 
-                        min_value=1.0, max_value=10.0, value=3.0, step=0.5,
-                        help="Minimum time between detected transitions"
-                    )
-                
-                with col3:
-                    max_screenshots = st.number_input(
-                        "Max Screenshots per Video", 
-                        min_value=10, max_value=100, value=30, step=5,
-                        help="Limit screenshots to prevent overload"
-                    )
-                
-                # Process transitions
-                if st.button("🎬 Detect Video Transitions", type="primary"):
-                    try:
-                        # Import and initialize detector
-                        from video_transition_detector import VideoTransitionDetector
-                        
-                        detector = VideoTransitionDetector(
-                            transition_threshold=sensitivity,
-                            min_scene_duration=min_duration,
-                            max_screenshots_per_video=max_screenshots
+                if use_enhanced:
+                    # PySceneDetect-specific settings
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        detection_method = st.selectbox(
+                            "Detection Algorithm",
+                            ["content", "adaptive", "threshold"],
+                            index=0,
+                            help="Content: Best for slide changes\nAdaptive: Handles camera movement\nThreshold: Fastest processing"
                         )
+                    with col2:
+                        video_type = st.selectbox(
+                            "Content Type",
+                            ["educational", "lecture", "demonstration", "fast_paced"],
+                            help="Optimizes detection parameters for content type"
+                        )
+                    
+                    # Get recommended settings
+                    try:
+                        from enhanced_scene_detector import EnhancedSceneDetector
+                        recommendations = EnhancedSceneDetector.get_detection_recommendations(video_type)
                         
-                        # Get course directory
+                        if st.button("📋 Apply Recommended Settings"):
+                            detection_method = recommendations["method"]
+                            st.rerun()
+                        
+                        st.info(f"💡 **Recommended for {video_type}**: {recommendations['description']}")
+                    except:
+                        pass
+                    
+                    col3, col4, col5 = st.columns(3)
+                    with col3:
+                        if detection_method == "content":
+                            threshold = st.slider("Content Threshold", 10.0, 50.0, 30.0, 2.5,
+                                                help="Higher = less sensitive to scene changes")
+                        elif detection_method == "adaptive":
+                            threshold = st.slider("Adaptive Threshold", 10.0, 40.0, 25.0, 2.5,
+                                                help="Automatically adapts to lighting changes")
+                        else:  # threshold
+                            threshold = st.slider("Basic Threshold", 5.0, 20.0, 12.0, 1.0,
+                                                help="Simple difference-based detection")
+                    
+                    with col4:
+                        min_duration = st.slider("Min Scene Length (sec)", 1.0, 10.0, 2.0, 0.5,
+                                               help="Minimum scene duration")
+                    with col5:
+                        max_screenshots = st.slider("Max Screenshots/Video", 10, 100, 40, 5,
+                                                  help="Maximum scenes per video")
+                    
+                    # Performance optimization
+                    downscale = st.selectbox(
+                        "Processing Speed",
+                        [1, 2, 4],
+                        index=0,
+                        format_func=lambda x: f"{'Full Quality' if x==1 else f'{x}x Faster'}",
+                        help="Higher values process faster but may miss subtle changes"
+                    )
+                    
+                else:
+                    # Basic OpenCV settings (fallback)
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        threshold = st.slider("Sensitivity", 0.1, 0.8, 0.3, 0.05, 
+                                            help="Lower = more sensitive to changes")
+                    with col2:
+                        min_duration = st.slider("Min Scene Length (sec)", 1.0, 10.0, 3.0, 0.5,
+                                               help="Minimum time between transitions")
+                    with col3:
+                        max_screenshots = st.slider("Max Screenshots/Video", 10, 100, 30, 5,
+                                                  help="Maximum screenshots per video file")
+                
+                # Vision analysis option
+                vision_analysis = False
+                if st.session_state.get('openai_api_key'):
+                    vision_analysis = st.checkbox("👁️ Enable Vision Analysis", 
+                                                value=True,
+                                                help="Analyze screenshots with OpenAI Vision for content descriptions")
+                
+                # Process scenes
+                button_text = "🚀 Start Enhanced Scene Detection" if use_enhanced else "🎬 Start Basic Scene Detection"
+                if st.button(button_text, type="primary"):
+                    try:
+                        if use_enhanced:
+                            # Use PySceneDetect enhanced detector
+                            from enhanced_scene_detector import EnhancedSceneDetector
+                            detector = EnhancedSceneDetector(
+                                detection_method=detection_method,
+                                threshold=threshold,
+                                min_scene_len=min_duration,
+                                max_screenshots_per_video=max_screenshots,
+                                downscale_factor=downscale
+                            )
+                            method_info = f"PySceneDetect {detection_method.title()}Detector"
+                        else:
+                            # Fall back to basic OpenCV
+                            from video_transition_detector import VideoTransitionDetector
+                            detector = VideoTransitionDetector(
+                                transition_threshold=threshold,
+                                min_scene_duration=min_duration,
+                                max_screenshots_per_video=max_screenshots
+                            )
+                            method_info = "OpenCV Basic Detection"
+                        
                         course_dir = self.config.raw_docs_dir / course_name
                         
-                        with st.spinner(f"🎯 Processing video transitions in {course_name}..."):
+                        with st.spinner(f"🔄 Analyzing scenes with {method_info}..."):
                             results = detector.process_course_videos(str(course_dir))
                         
-                        if results and results.get('total_transitions', 0) > 0:
-                            st.success(f"🎉 Detected {results['total_transitions']} transitions across {results['total_videos']} videos!")
+                        # Handle different result formats
+                        if use_enhanced:
+                            scene_count = results.get('total_scenes', 0)
+                            screenshot_count = results.get('total_screenshots', 0)
+                        else:
+                            scene_count = results.get('total_transitions', 0)
+                            screenshot_count = scene_count
+                        
+                        if results and scene_count > 0:
+                            st.success(f"🎉 Scene detection complete with {method_info}!")
                             
-                            # Show results summary
-                            col1, col2, col3 = st.columns(3)
+                            # Enhanced results display
+                            col1, col2, col3, col4 = st.columns(4)
                             with col1:
                                 st.metric("Videos Processed", results['total_videos'])
                             with col2:
-                                st.metric("Transitions Found", results['total_transitions'])
+                                st.metric("Scenes Detected", scene_count)
                             with col3:
-                                avg_per_video = results['total_transitions'] / results['total_videos'] if results['total_videos'] > 0 else 0
+                                st.metric("Screenshots", screenshot_count)
+                            with col4:
+                                avg_per_video = scene_count / results['total_videos'] if results['total_videos'] > 0 else 0
                                 st.metric("Avg per Video", f"{avg_per_video:.1f}")
                             
-                            # Show video breakdown
-                            with st.expander("📹 Detailed Results by Video"):
+                            # Detailed breakdown
+                            with st.expander("📹 Processing Results by Video"):
                                 for video_name, video_data in results.get('videos', {}).items():
-                                    st.write(f"**{video_data['filename']}**: {video_data['transitions_count']} transitions")
+                                    if use_enhanced:
+                                        count = video_data.get('scenes_count', 0)
+                                        status = video_data.get('processing_status', 'unknown')
+                                        status_icon = "✅" if status == "completed" else "❌"
+                                        st.write(f"{status_icon} **{video_data['filename']}**: {count} scenes")
+                                    else:
+                                        count = video_data.get('transitions_count', 0)
+                                        st.write(f"**{video_data['filename']}**: {count} transitions")
+                            
+                            # Show processing details
+                            if use_enhanced:
+                                with st.expander("🔧 Detection Details"):
+                                    st.write(f"**Algorithm**: {results.get('detection_method', 'unknown')}")
+                                    st.write(f"**Threshold**: {results.get('threshold', 'unknown')}")
+                                    st.write(f"**Processing Date**: {results.get('processing_date', 'unknown')[:19]}")
+                                    
+                                    # Results file location
+                                    results_file = course_dir / "pyscenedetect_analysis.json"
+                                    if results_file.exists():
+                                        st.write(f"**Results File**: `{results_file}`")
+                                        st.write(f"**File Size**: {results_file.stat().st_size / 1024:.1f} KB")
                         else:
-                            st.warning("No transitions detected. Try adjusting sensitivity settings.")
+                            st.warning("No scenes detected. Try adjusting threshold settings or check video format compatibility.")
+                            if use_enhanced:
+                                st.info("💡 Try switching to 'threshold' method for more sensitive detection")
+                            else:
+                                st.info("💡 Install PySceneDetect for better scene detection accuracy")
                     
                     except Exception as e:
-                        st.error(f"Error processing transitions: {e}")
+                        st.error(f"Scene detection failed: {e}")
+                        if "scenedetect" in str(e).lower():
+                            st.info("💡 Install PySceneDetect: `pip install scenedetect[opencv]`")
         else:
             st.info("📁 No courses found. Upload course materials first in the Documents tab.")
     

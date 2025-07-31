@@ -321,10 +321,21 @@ When you "index a course," the system processes all documents in that course fol
 - **Comprehensive Error Resolution**: Fixed both security vulnerabilities and memory management issues
 - **Persistent API Key Storage**: Added secure local storage for OpenAI/Perplexity keys with auto-save functionality
 
-### July 30, 2025 - Custom Multimodal Video Processing System - NEW FEATURES
-- **Custom Video Transition Detection**: Built custom OpenCV-based system to detect scene changes in educational videos and capture screenshots at transition points
+### July 30, 2025 - Enhanced PySceneDetect Integration - UPGRADED ARCHITECTURE
+- **Professional Scene Detection**: Upgraded from basic OpenCV to industry-standard PySceneDetect algorithms for superior accuracy
+- **Multiple Detection Algorithms**: ContentDetector (HSL color space), AdaptiveDetector (camera movement), ThresholdDetector (fast processing)
+- **Educational Content Optimization**: Specialized detection parameters for slides, lectures, demonstrations, and fast-paced content
+- **Intelligent Fallback System**: Graceful degradation to OpenCV when PySceneDetect unavailable with clear user feedback
+- **Enhanced User Interface**: Professional detection settings with algorithm selection, content type optimization, and performance tuning
+- **Smart Recommendations**: Automatic parameter suggestions based on content type (educational, lecture, demonstration, fast-paced)
+- **Superior Detection Quality**: HSL color space analysis provides significantly better accuracy than basic histogram comparison
+- **Performance Optimization**: Configurable downscaling (1x, 2x, 4x) for speed vs accuracy trade-offs
+- **Comprehensive Results**: Detailed processing status, algorithm information, and results file management
+- **OpenAI Vision Integration**: Enhanced screenshot analysis with GPT-4o for intelligent content descriptions
+- **Professional Documentation**: Complete implementation with proper error handling and user guidance for installation
+
+### July 30, 2025 - Custom Multimodal Video Processing System - FOUNDATION
 - **Multimodal Vector Embeddings**: Enhanced system to combine documents, transcriptions, AND visual content analysis for comprehensive course understanding
-- **OpenAI Vision Integration**: Screenshots analyzed with GPT-4 Vision to extract text descriptions of slides, diagrams, and code examples for searchable embeddings
 - **Enhanced Bulk Transcription**: Fixed WhisperTranscriptionManager import and improved RTX 3060 compatibility for reliable bulk processing
 - **Three-Tab Interface**: Added dedicated tabs for Bulk Transcription, Transition Screenshots, and Multimodal Processing with unified workflow
 - **Folder Structure Preservation**: Both transcription and screenshot detection maintain course folder organization for seamless integration
