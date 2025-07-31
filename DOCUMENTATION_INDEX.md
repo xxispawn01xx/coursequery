@@ -86,6 +86,12 @@ This document provides a comprehensive overview of all documentation files in th
 3. **`SECURITY_AUDIT_REPORT.md`** - Security features and compliance
 4. **`FEATURES_TASKS_ROADMAP.md`** - Current capabilities and future plans
 
+### Data Science & Evaluation
+- **`AI_MODEL_EVALUATION_FRAMEWORK.md`** - Comprehensive evaluation for all AI components
+- **`MULTIMODAL_EVALUATION_FRAMEWORK.md`** - Specialized evaluation for bulk transcription, scene detection, and content integration
+- **`PERFORMANCE_BENCHMARKING.md`** - RTX 3060 optimization and throughput analysis
+- **`EXPERIMENTAL_DESIGN.md`** - A/B testing and statistical analysis protocols
+
 ### Essential Setup Documents
 1. **`AUTHENTICATION_SETUP.md`** - Required for AI model access
 2. **`CENTRAL_CONFIG_GUIDE.md`** - Directory configuration
