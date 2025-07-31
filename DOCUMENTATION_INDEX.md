@@ -86,11 +86,17 @@ This document provides a comprehensive overview of all documentation files in th
 3. **`SECURITY_AUDIT_REPORT.md`** - Security features and compliance
 4. **`FEATURES_TASKS_ROADMAP.md`** - Current capabilities and future plans
 
+### Movie Summarizer & VLC Integration
+- **`MOVIE_SUMMARIZER_ARCHITECTURE.md`** - Complete architecture for movie analysis and VLC plugin integration
+- **`VLC_PLUGIN_IMPLEMENTATION.md`** - Lua scripting and overlay system for native video player integration
+- **`INTERACTIVE_TIMELINE_DESIGN.md`** - User interface design for clickable scene navigation and AI summaries
+- **`SCENE_DETECTION_OPTIMIZATION.md`** - Movie-specific PySceneDetect parameter tuning and cinematic analysis
+
 ### Data Science & Evaluation
 - **`AI_MODEL_EVALUATION_FRAMEWORK.md`** - Comprehensive evaluation for all AI components
 - **`MULTIMODAL_EVALUATION_FRAMEWORK.md`** - Specialized evaluation for bulk transcription, scene detection, and content integration
-- **`PERFORMANCE_BENCHMARKING.md`** - RTX 3060 optimization and throughput analysis
-- **`EXPERIMENTAL_DESIGN.md`** - A/B testing and statistical analysis protocols
+- **`PROCESSING_TIME_ESTIMATION.md`** - RTX 3060 performance analysis and realistic processing time estimates
+- **`PRODUCTION_VALIDATION_REPORT.md`** - PySceneDetect production testing with 157-video Apache Airflow course
 
 ### Essential Setup Documents
 1. **`AUTHENTICATION_SETUP.md`** - Required for AI model access
