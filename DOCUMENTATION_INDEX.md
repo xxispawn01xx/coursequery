@@ -88,9 +88,9 @@ This document provides a comprehensive overview of all documentation files in th
 
 ### Movie Summarizer & VLC Integration
 - **`MOVIE_SUMMARIZER_ARCHITECTURE.md`** - Complete architecture for movie analysis and VLC plugin integration
-- **`VLC_PLUGIN_IMPLEMENTATION.md`** - Lua scripting and overlay system for native video player integration
-- **`INTERACTIVE_TIMELINE_DESIGN.md`** - User interface design for clickable scene navigation and AI summaries
-- **`SCENE_DETECTION_OPTIMIZATION.md`** - Movie-specific PySceneDetect parameter tuning and cinematic analysis
+- **`OFFLINE_BATCH_PROCESSING_GUIDE.md`** - 100% offline processing for 400+ movies using local RTX models
+- **`GPU_COMPATIBILITY_GUIDE.md`** - Universal CUDA GPU support with automatic hardware optimization
+- **`offline_movie_summarizer.py`** - Complete implementation for batch movie processing with local AI models
 
 ### Data Science & Evaluation
 - **`AI_MODEL_EVALUATION_FRAMEWORK.md`** - Comprehensive evaluation for all AI components
