@@ -32,12 +32,14 @@ A comprehensive, privacy-focused real estate course analysis application that ru
 - **Metadata Tracking** - File size, format, chunk count, indexing date for each book
 
 ### 🧠 **Advanced AI Capabilities**
+- **Professional Scene Detection** - PySceneDetect integration with ContentDetector, AdaptiveDetector, ThresholdDetector
+- **Superior Video Analysis** - HSL color space analysis for accurate scene transitions
 - **Llama 2 7B** - Primary conversation model with fine-tuning support
 - **Mistral 7B** - Fast fallback model for text generation
 - **Local Whisper** - GPU-accelerated video/audio transcription
 - **Smart indexing** - LlamaIndex with custom embeddings
 - **Course isolation** - Separate, focused responses per course
-- **Manual control** - User-controlled re-indexing for efficiency
+- **Intelligent Fallback** - Graceful degradation from PySceneDetect to OpenCV when needed
 
 ## 🛠️ System Requirements
 
