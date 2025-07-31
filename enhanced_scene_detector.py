@@ -56,7 +56,9 @@ class EnhancedSceneDetector:
             downscale_factor: Downscale factor for performance (1=no downscale)
         """
         if not PYSCENEDETECT_AVAILABLE:
-            raise ImportError("PySceneDetect not available. Install with: pip install scenedetect[opencv]")
+            logger.warning("PySceneDetect not available - falling back to OpenCV basic detection")
+            logger.info("Note: This is an offline-first application. PySceneDetect is optional for enhanced accuracy.")
+            raise ImportError("PySceneDetect optional enhancement not available")
         
         self.detection_method = detection_method
         self.threshold = threshold

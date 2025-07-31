@@ -81,19 +81,24 @@ The course management system has been upgraded with professional PySceneDetect a
 
 ## Installation and Setup
 
-### Required Dependencies
+### Optional Enhancement (PySceneDetect)
+PySceneDetect is an **optional** enhancement for professional-grade scene detection:
+
 ```bash
-# Install PySceneDetect with OpenCV support
+# Optional: Install PySceneDetect for enhanced accuracy
 pip install scenedetect[opencv]
 
 # Alternative: Basic PySceneDetect
 pip install scenedetect
 ```
 
-### Fallback Compatibility
-- System automatically detects PySceneDetect availability
-- Falls back to basic OpenCV detection when unavailable
-- Clear user feedback about detection engine in use
+**Important**: This is an offline-first application. PySceneDetect provides superior accuracy but is not required.
+
+### Offline-First Design
+- **Default**: Basic OpenCV detection works 100% offline
+- **Enhanced**: PySceneDetect provides professional algorithms when available
+- **Automatic Fallback**: System gracefully degrades when PySceneDetect unavailable
+- **Clear Feedback**: User interface shows which detection engine is active
 
 ## Usage in Course Processing
 

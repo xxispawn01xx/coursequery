@@ -8,6 +8,7 @@ This is a comprehensive, privacy-focused real estate course analysis application
 
 **CRITICAL**: Pure offline operation - NEVER build for Replit, always 100% offline-first architecture. All development is for local Windows system with H:\ drive access.
 **NEVER store model files on Replit** - models exist only locally on user's RTX 3060 system.
+**PySceneDetect is OPTIONAL** - System works 100% offline with basic OpenCV detection, PySceneDetect only enhances accuracy when available.
 Preferred communication style: Simple, everyday language.
 Model preference: Local RTX 3060 models with hybrid cloud API fallback for enhanced responses.
 Creative tasks preference: Local Excel generation with Google Drive integration as optional enhancement.
