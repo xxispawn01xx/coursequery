@@ -106,29 +106,30 @@ class MovieSceneDetector(EnhancedSceneDetector):
         return self.process_videos([movie_path], self.movie_optimized_settings)
 ```
 
-### Phase 2: AI Scene Summarization (Current Capability)
-**Implementation**: Use existing OpenAI integration
+### Phase 2: AI Scene Summarization (100% Offline)
+**Implementation**: Use existing local Mistral/Llama models
 
 ```python
-class MovieSceneSummarizer:
+class OfflineMovieSceneSummarizer:
     def __init__(self):
-        self.openai_client = self.initialize_openai()
+        self.local_llm = self.load_mistral_or_llama()  # Your existing local models
+        self.whisper_model = self.load_whisper()      # Your existing Whisper
     
-    def summarize_scene(self, screenshot_path, timestamp, context):
-        prompt = f"""
-        Analyze this movie scene at timestamp {timestamp}.
+    def summarize_scene(self, scene_context, movie_title):
+        prompt = f"""[INST] Analyze this movie scene:
         
-        Visual content: [Screenshot analysis]
+        Movie: {movie_title}
+        Timestamp: {scene_context['timestamp']}
+        Audio: {scene_context['audio_transcription']}
         
-        Provide a concise, engaging summary for:
-        1. What's happening in this scene
+        Provide 2-line summary:
+        1. What happens in this scene
         2. Why this moment is significant
-        3. Character development or plot advancement
         
-        Format as a subtitle-friendly summary (max 2 lines, 60 chars each).
-        """
+        Max 50 chars per line for subtitles:
+        [/INST]"""
         
-        return self.openai_client.analyze_scene(screenshot_path, prompt)
+        return self.local_llm.generate(prompt)  # Completely offline
 ```
 
 ### Phase 3: Interactive Movie Interface (New)
@@ -295,14 +296,14 @@ vlc --intf lua --lua-intf movie_summarizer
 ### Current Movie Analysis Tools
 | Tool | Scene Detection | AI Summary | Offline | Real-time |
 |------|----------------|------------|---------|-----------|
-| **Your System** | ✅ Professional | ✅ GPT-4 | ✅ RTX 3060 | ✅ Local |
+| **Your System** | ✅ Professional | ✅ Local Mistral/Llama | ✅ 100% RTX 3060 | ✅ Local |
 | **Commercial Tools** | ❌ Basic | ❌ Limited | ❌ Cloud-only | ❌ Slow |
 | **VLC Built-in** | ❌ None | ❌ None | ✅ Offline | ✅ Fast |
 
 ### Unique Value Proposition
 1. **Professional Scene Detection**: PySceneDetect algorithms
 2. **Local Processing**: RTX 3060 acceleration, complete privacy
-3. **AI-Powered Summaries**: GPT-4 level scene understanding
+3. **AI-Powered Summaries**: Local Mistral/Llama 7B scene understanding
 4. **VLC Integration**: Native video player experience
 5. **Offline Operation**: No internet required after setup
 
