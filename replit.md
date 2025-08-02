@@ -16,6 +16,7 @@ Workflow: Pure offline development → RTX 3060 local processing → optional cl
 Deployment strategy: 100% offline capable, RTX 3060 for all AI processing, local file system for courses on H:\ drive.
 Authentication: Local HuggingFace token storage, no external dependencies required.
 **Security**: Complete credential security audit passed - no hardcoded API keys, proper .gitignore protection, secure local storage patterns.
+**Repository Security**: Confirmed no API keys in current codebase. Fork to new repository recommended before making public to ensure zero historical risk.
 **Architecture Focus**: Windows local development only - Replit is purely for development/testing, not deployment.
 
 ## System Architecture
