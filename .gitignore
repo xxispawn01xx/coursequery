@@ -68,13 +68,18 @@ temp/
 *.log
 
 # Course data and indexes (user's private content - never sync)
-archived_courses/
+archived_courses/*
+!archived_courses/.gitkeep
 raw_docs/
-indexed_courses/
-cache/
-vectors/
+indexed_courses/*
+!indexed_courses/.gitkeep
+cache/*
+!cache/.gitkeep
+vectors/*
+!vectors/.gitkeep
 transcriptions/
-models/
+models/*
+!models/.gitkeep
 
 # Model files and caches (NEVER store on Replit - local only)
 *.bin
@@ -85,4 +90,6 @@ models/
 **/cache/**
 **/vectors/**
 **/.cache/**
+book_embeddings/*
+!book_embeddings/.gitkeep
 .pythonlibs/
