@@ -59,10 +59,12 @@ class OfflineCourseManager:
                             
                             # Test directory access
                             accessible = True
+                            access_error = None
                             try:
                                 list(course_dir.iterdir())
-                            except (OSError, PermissionError) as access_error:
-                                logger.warning(f" Course directory not accessible: {course_name} - {access_error}")
+                            except (OSError, PermissionError) as e:
+                                access_error = e
+                                logger.warning(f" Course directory not accessible: {course_name} - {e}")
                                 accessible = False
                             
                             if not accessible:
@@ -72,7 +74,7 @@ class OfflineCourseManager:
                                     'status': 'inaccessible',
                                     'document_count': 'Cannot access',
                                     'last_indexed': 'Unknown',
-                                    'error': str(access_error) if 'access_error' in locals() else 'Directory not accessible'
+                                    'error': str(access_error) if access_error else 'Directory not accessible'
                                 }
                             elif metadata_path.exists():
                                 try:
