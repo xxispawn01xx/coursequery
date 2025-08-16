@@ -22,7 +22,7 @@ def setup_cuda_environment():
     # Reduce memory fragmentation
     os.environ['CUDA_VISIBLE_DEVICES'] = '0'
     
-    print("✅ CUDA environment configured for RTX 3060 12GB")
+    print(" CUDA environment configured for RTX 3060 12GB")
     print("Environment variables set:")
     print(f"  CUDA_LAUNCH_BLOCKING: {os.environ.get('CUDA_LAUNCH_BLOCKING')}")
     print(f"  TORCH_USE_CUDA_DSA: {os.environ.get('TORCH_USE_CUDA_DSA')}")
@@ -47,7 +47,7 @@ def check_cuda_status():
         return torch.cuda.is_available()
     
     except ImportError:
-        print("❌ PyTorch not installed")
+        print(" PyTorch not installed")
         return False
 
 def clear_cuda_cache():
@@ -57,43 +57,43 @@ def clear_cuda_cache():
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
             torch.cuda.synchronize()
-            print("✅ CUDA cache cleared")
+            print(" CUDA cache cleared")
         else:
             print("ℹ️ CUDA not available - cache clear skipped")
     except Exception as e:
-        print(f"❌ Error clearing CUDA cache: {e}")
+        print(f" Error clearing CUDA cache: {e}")
 
 def run_memory_test():
     """Test GPU memory allocation."""
     try:
         import torch
         if not torch.cuda.is_available():
-            print("❌ CUDA not available for memory test")
+            print(" CUDA not available for memory test")
             return False
         
         print("🧪 Testing GPU memory allocation...")
         
         # Test small allocation
         test_tensor = torch.randn(1000, 1000, device='cuda')
-        print(f"✅ Small allocation successful: {test_tensor.shape}")
+        print(f" Small allocation successful: {test_tensor.shape}")
         
         # Test larger allocation (4GB equivalent)
         large_tensor = torch.randn(16384, 16384, device='cuda')
-        print(f"✅ Large allocation successful: {large_tensor.shape}")
+        print(f" Large allocation successful: {large_tensor.shape}")
         
         # Clean up
         del test_tensor, large_tensor
         torch.cuda.empty_cache()
-        print("✅ Memory test passed")
+        print(" Memory test passed")
         return True
         
     except Exception as e:
-        print(f"❌ Memory test failed: {e}")
+        print(f" Memory test failed: {e}")
         return False
 
 def main():
     """Main function to set up CUDA environment and run tests."""
-    print("🔧 CUDA Error Fix for RTX 3060 12GB")
+    print(" CUDA Error Fix for RTX 3060 12GB")
     print("=" * 50)
     
     # Set up environment
@@ -101,7 +101,7 @@ def main():
     print()
     
     # Check CUDA status
-    print("📊 CUDA Status Check:")
+    print(" CUDA Status Check:")
     cuda_available = check_cuda_status()
     print()
     
@@ -117,16 +117,16 @@ def main():
         print()
         
         if test_passed:
-            print("✅ CUDA setup complete and tested successfully!")
-            print("\n🚀 You can now run the application:")
+            print(" CUDA setup complete and tested successfully!")
+            print("\n You can now run the application:")
             print("   streamlit run app.py --server.port 5000")
         else:
-            print("❌ Memory test failed. Try the following:")
+            print(" Memory test failed. Try the following:")
             print("1. Restart your computer")
             print("2. Close other GPU-intensive applications")
             print("3. Update your NVIDIA drivers")
     else:
-        print("❌ CUDA not available. Check your PyTorch installation.")
+        print(" CUDA not available. Check your PyTorch installation.")
 
 if __name__ == "__main__":
     main()

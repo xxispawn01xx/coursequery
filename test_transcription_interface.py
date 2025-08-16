@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 def test_course_detection():
     """Test course detection functionality."""
-    print("🔍 Testing Course Detection")
+    print(" Testing Course Detection")
     print("=" * 50)
     
     try:
@@ -50,22 +50,22 @@ def test_course_detection():
                 
             return courses
         else:
-            print("❌ Raw docs directory not found")
+            print(" Raw docs directory not found")
             return []
             
     except Exception as e:
-        print(f"❌ Error testing course detection: {e}")
+        print(f" Error testing course detection: {e}")
         return []
 
 def test_media_detection(course_path: str):
     """Test media file detection in a specific course."""
-    print(f"\n🎬 Testing Media Detection for: {Path(course_path).name}")
+    print(f"\n Testing Media Detection for: {Path(course_path).name}")
     print("=" * 50)
     
     try:
         course_dir = Path(course_path)
         if not course_dir.exists():
-            print(f"❌ Course directory not found: {course_path}")
+            print(f" Course directory not found: {course_path}")
             return
         
         # Count different file types
@@ -88,7 +88,7 @@ def test_media_detection(course_path: str):
         
         print(f"\nSummary:")
         print(f"  📹 Total media files: {len(media_files)}")
-        print(f"  📝 Total subtitle files: {len(subtitle_files)}")
+        print(f" Total subtitle files: {len(subtitle_files)}")
         
         # Check which media files have corresponding subtitles
         media_with_subtitles = 0
@@ -99,7 +99,7 @@ def test_media_detection(course_path: str):
                 media_with_subtitles += 1
         
         needs_transcription = len(media_files) - media_with_subtitles
-        print(f"  ✅ Media with subtitles: {media_with_subtitles}")
+        print(f" Media with subtitles: {media_with_subtitles}")
         print(f"  ⚡ Need transcription: {needs_transcription}")
         
         # Show sample files (first 3 of each type)
@@ -124,7 +124,7 @@ def test_media_detection(course_path: str):
         }
         
     except Exception as e:
-        print(f"❌ Error testing media detection: {e}")
+        print(f" Error testing media detection: {e}")
         return None
 
 def test_transcription_manager():
@@ -149,7 +149,7 @@ def test_transcription_manager():
         return True
         
     except Exception as e:
-        print(f"❌ Error testing transcription manager: {e}")
+        print(f" Error testing transcription manager: {e}")
         return False
 
 def test_file_access(file_path: str):
@@ -176,7 +176,7 @@ def test_file_access(file_path: str):
 
 def generate_validation_report():
     """Generate a comprehensive validation report."""
-    print("\n📋 Generating Validation Report")
+    print("\n Generating Validation Report")
     print("=" * 50)
     
     report = {
@@ -224,7 +224,7 @@ def generate_validation_report():
     with open(report_file, 'w') as f:
         json.dump(report, f, indent=2)
     
-    print(f"\n✅ Validation report saved to: {report_file}")
+    print(f"\n Validation report saved to: {report_file}")
     print("\nKey Findings:")
     for rec in report['recommendations']:
         print(f"  • {rec}")
@@ -241,10 +241,10 @@ if __name__ == "__main__":
     try:
         report = generate_validation_report()
         
-        print(f"\n🎯 Summary:")
-        print(f"  Course detection: {'✅' if report['course_detection']['success'] else '❌'}")
-        print(f"  Media detection: {'✅' if report.get('sample_media_detection') else '❌'}")
-        print(f"  Transcription manager: {'✅' if report['transcription_manager']['success'] else '❌'}")
+        print(f"\n Summary:")
+        print(f"  Course detection: {' ' if report['course_detection']['success'] else ' '}")
+        print(f"  Media detection: {' ' if report.get('sample_media_detection') else ' '}")
+        print(f"  Transcription manager: {' ' if report['transcription_manager']['success'] else ' '}")
         
         print(f"\n📍 Environment Note:")
         print(f"  This is the Replit development environment.")
@@ -252,6 +252,6 @@ if __name__ == "__main__":
         print(f"  where course files are accessible and Whisper is installed.")
         
     except Exception as e:
-        print(f"❌ Test failed: {e}")
+        print(f" Test failed: {e}")
         import traceback
         traceback.print_exc()

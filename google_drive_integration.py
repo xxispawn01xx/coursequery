@@ -197,9 +197,7 @@ class GoogleDriveFinancialCreator:
         
         You ask: "Create a DCF for a $2M revenue property company"
         
-        System creates:
-        📊 **Google Sheet Created**: DCF_PropertyCo_2025_01_28
-        🔗 **Live Link**: https://docs.google.com/spreadsheets/d/abc123...
+        System creates: **Google Sheet Created**: DCF_PropertyCo_2025_01_28 **Live Link**: https://docs.google.com/spreadsheets/d/abc123...
         ⚡ **Features**: Live formulas, scenario analysis, professional formatting
         
         This approach gives you actual working financial models, not just static data!
@@ -230,7 +228,7 @@ def suggest_google_drive_approach(query: str, response: str) -> str:
         
         ---
         
-        ## 💡 **Better Approach: Google Drive Integration**
+        ## **Better Approach: Google Drive Integration**
         
         For creative financial tasks like this, **Google Drive integration** would provide:
         

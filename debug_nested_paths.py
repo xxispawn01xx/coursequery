@@ -19,21 +19,21 @@ def analyze_nested_course_structure():
     # Example path structure from user
     example_path = r"H:\Archive Classes\coursequery\archived_courses\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\[FreeCourseSite.com] Udemy - Apache Airflow The HandsOn Guide\2 - The basics of Apache Airflow"
     
-    print("🔍 NESTED PATH STRUCTURE ANALYSIS")
+    print(" NESTED PATH STRUCTURE ANALYSIS")
     print("=" * 60)
-    print(f"📁 Example nested path:")
+    print(f" Example nested path:")
     print(f"   {example_path}")
     print()
     
     # Break down the path structure
     path_parts = Path(example_path).parts
-    print("📂 PATH BREAKDOWN:")
+    print(" PATH BREAKDOWN:")
     for i, part in enumerate(path_parts):
         indent = "  " * i
         print(f"{indent}└─ {part}")
     print()
     
-    print("⚠️ POTENTIAL ISSUES:")
+    print(" POTENTIAL ISSUES:")
     print("1. Special characters in folder names: [, ], spaces")
     print("2. Very long path names (Windows has 260 char limit)")
     print("3. Duplicate folder names in nested structure")
@@ -46,27 +46,27 @@ def analyze_nested_course_structure():
         processor = DocumentProcessor()
         supported = processor.get_supported_formats()
         
-        print("✅ SUPPORTED FORMATS (should be captured):")
+        print(" SUPPORTED FORMATS (should be captured):")
         video_formats = [f for f in supported if f in ['.mp4', '.avi', '.mov', '.mkv', '.wmv']]
         subtitle_formats = [f for f in supported if f in ['.vtt', '.srt', '.ass']]
         code_formats = [f for f in supported if f in ['.py', '.js', '.json', '.html']]
         
         print(f"📹 Videos: {', '.join(video_formats)}")
-        print(f"📝 Subtitles: {', '.join(subtitle_formats)}")
-        print(f"💻 Code: {', '.join(code_formats)}")
+        print(f" Subtitles: {', '.join(subtitle_formats)}")
+        print(f" Code: {', '.join(code_formats)}")
         print()
         
     except ImportError:
-        print("❌ Could not import DocumentProcessor")
+        print(" Could not import DocumentProcessor")
     
-    print("🔧 DEBUGGING RECOMMENDATIONS:")
+    print(" DEBUGGING RECOMMENDATIONS:")
     print("1. Check if Windows path length limits are hit")
     print("2. Verify special characters in paths are handled")
     print("3. Test file.exists() on actual nested paths")
     print("4. Check if rglob() works with complex folder names")
     print()
     
-    print("💡 EXPECTED COURSE CONTENT:")
+    print(" EXPECTED COURSE CONTENT:")
     print("For Apache Airflow Udemy course, you should see:")
     print("• Hundreds of MP4 video files")
     print("• Corresponding VTT subtitle files")
@@ -76,7 +76,7 @@ def analyze_nested_course_structure():
     print("• Course resources (PDFs, docs)")
     print()
     
-    print("🎯 LOCAL TESTING SCRIPT:")
+    print(" LOCAL TESTING SCRIPT:")
     print("Run this on your H:\\ drive to debug:")
     print("""
 from pathlib import Path

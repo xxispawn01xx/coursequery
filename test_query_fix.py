@@ -14,19 +14,19 @@ logger = logging.getLogger(__name__)
 
 def test_query_engine():
     """Test if query engine works without MockLLM errors."""
-    print("🔧 Testing Query Engine Fix...")
+    print(" Testing Query Engine Fix...")
     
     try:
         # Initialize model manager
-        print("📦 Initializing model manager...")
+        print(" Initializing model manager...")
         model_manager = LocalModelManager()
         
         # Load models
-        print("🚀 Loading models...")
+        print(" Loading models...")
         model_manager.load_models()
         
         # Initialize query engine
-        print("🔍 Initializing query engine...")
+        print(" Initializing query engine...")
         query_engine = LocalQueryEngine(model_manager)
         
         # Test basic response generation
@@ -34,13 +34,13 @@ def test_query_engine():
         test_prompt = "What is real estate?"
         response = model_manager.generate_response(test_prompt, max_new_tokens=100)
         
-        print(f"✅ Success! Generated response: {response[:100]}...")
+        print(f" Success! Generated response: {response[:100]}...")
         print("🎉 Query engine is working properly!")
         
         return True
         
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f" Error: {e}")
         return False
 
 if __name__ == "__main__":

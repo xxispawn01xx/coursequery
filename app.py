@@ -101,9 +101,9 @@ class RealEstateAIApp:
         self.config.raw_docs_dir.mkdir(exist_ok=True)
         self.config.indexed_courses_dir.mkdir(exist_ok=True)
         
-        print(f"🔒 FORCED to use local directories:")
-        print(f"📁 Raw docs: {self.config.raw_docs_dir}")
-        print(f"📊 Indexed: {self.config.indexed_courses_dir}")
+        print(f"FORCED to use local directories:")
+        print(f"Raw docs: {self.config.raw_docs_dir}")
+        print(f"Indexed: {self.config.indexed_courses_dir}")
         
         # Initialize available components
         self.doc_processor = DocumentProcessor() if DOCUMENT_PROCESSOR_AVAILABLE else None
@@ -127,9 +127,9 @@ class RealEstateAIApp:
         if COURSE_INDEXER_AVAILABLE:
             try:
                 self.course_indexer = CourseIndexer()
-                logger.info("✅ Using full CourseIndexer")
+                logger.info("Using full CourseIndexer")
             except Exception as e:
-                logger.warning(f"⚠️ CourseIndexer failed, using offline fallback: {e}")
+                logger.warning(f"CourseIndexer failed, using offline fallback: {e}")
                 self.course_indexer = OfflineCourseManager(
                     self.config.raw_docs_dir, 
                     self.config.indexed_courses_dir
@@ -183,7 +183,7 @@ class RealEstateAIApp:
         """Configure the Streamlit page."""
         st.set_page_config(
             page_title="Local Course AI Assistant",
-            page_icon="📚",
+            page_icon=" ",
             layout="wide",
             initial_sidebar_state="expanded"
         )
@@ -240,7 +240,7 @@ class RealEstateAIApp:
                 api = HfApi(token=saved_token)
                 whoami = api.whoami()
                 if whoami:
-                    st.success(f"✅ Using saved token - Authenticated as: {whoami['name']}")
+                    st.success(f" Using saved token - Authenticated as: {whoami['name']}")
                     st.session_state.hf_token_set = True
                     return True
             except Exception:
@@ -278,7 +278,7 @@ class RealEstateAIApp:
         )
         
         if token and token.startswith("hf_"):
-            if st.button("💾 Save Token & Load Models", key="save_hf_token_btn"):
+            if st.button(" Save Token & Load Models", key="save_hf_token_btn"):
                 try:
                     # Test authentication first
                     from huggingface_hub import HfApi
@@ -287,22 +287,22 @@ class RealEstateAIApp:
                     
                     # Save token if valid
                     if self.save_token(token):
-                        st.success(f"✅ Token saved permanently! Authenticated as: {whoami['name']}")
+                        st.success(f" Token saved permanently! Authenticated as: {whoami['name']}")
                         st.session_state.hf_token_set = True
                         st.rerun()
                     
                 except Exception as e:
-                    st.error(f"❌ Invalid token: {e}")
+                    st.error(f" Invalid token: {e}")
                     return False
         
         elif token and not token.startswith("hf_"):
-            st.warning("⚠️ Token should start with 'hf_'")
+            st.warning(" Token should start with 'hf_'")
         
         return False
 
     def model_selection_interface(self):
         """RTX 3060 GPU Memory Optimization - Choose ONE model to prevent GPU overload."""
-        st.subheader("🚀 RTX 3060 Model Selection")
+        st.subheader(" RTX 3060 Model Selection")
         
         st.info("RTX 3060 12GB Memory Optimization: Load only ONE model at a time to prevent GPU overload")
         
@@ -323,9 +323,9 @@ class RealEstateAIApp:
         # Show current model status
         if st.session_state.get('selected_model'):
             if st.session_state.selected_model == selected_model:
-                st.success(f"✅ Currently loaded: {model_options[selected_model]}")
+                st.success(f" Currently loaded: {model_options[selected_model]}")
             else:
-                st.warning(f"⚠️ Model change detected. Current: {model_options[st.session_state.selected_model]} → New: {model_options[selected_model]}")
+                st.warning(f" Model change detected. Current: {model_options[st.session_state.selected_model]} → New: {model_options[selected_model]}")
         
         return selected_model
 
@@ -344,7 +344,7 @@ class RealEstateAIApp:
                     whoami = api.whoami()
                     if whoami:
                         st.session_state.hf_token_set = True
-                        st.success(f"✅ Using saved authentication - {whoami['name']}")
+                        st.success(f" Using saved authentication - {whoami['name']}")
                     else:
                         if not self.setup_authentication():
                             return False
@@ -364,7 +364,7 @@ class RealEstateAIApp:
         
         if model_needs_loading:
             # Always mark as loaded for offline development mode
-            st.info("💡 Development mode - using hybrid query engine")
+            st.info(" Development mode - using hybrid query engine")
             
             # Initialize hybrid query engine instead of local models
             try:
@@ -374,7 +374,7 @@ class RealEstateAIApp:
                 
                 st.session_state.models_loaded = True
                 st.session_state.selected_model = selected_model
-                st.success("✅ Hybrid query engine ready for transcription and analysis")
+                st.success(" Hybrid query engine ready for transcription and analysis")
                 return True
                 
             except Exception as e:
@@ -382,7 +382,7 @@ class RealEstateAIApp:
                 # Continue anyway for basic functionality
                 st.session_state.models_loaded = True
                 st.session_state.selected_model = selected_model
-                st.warning("⚠️ Basic mode active - transcription available, AI querying requires API keys")
+                st.warning(" Basic mode active - transcription available, AI querying requires API keys")
                 return True
         
         return True
@@ -392,8 +392,7 @@ class RealEstateAIApp:
         st.subheader("Enhanced Scene Detection with PySceneDetect")
         
         st.markdown("""
-        **Professional Scene Analysis Powered by PySceneDetect** 🎯
-        - **Industry-Standard Algorithms**: ContentDetector, AdaptiveDetector, ThresholdDetector
+        **Professional Scene Analysis Powered by PySceneDetect** - **Industry-Standard Algorithms**: ContentDetector, AdaptiveDetector, ThresholdDetector
         - **Superior Accuracy**: HSL color space analysis vs basic histogram comparison  
         - **Educational Content Optimized**: Perfect for slides, code demonstrations, lectures
         - **OpenAI Vision Integration**: Intelligent screenshot content analysis
@@ -409,26 +408,26 @@ class RealEstateAIApp:
             try:
                 from enhanced_scene_detector import PYSCENEDETECT_AVAILABLE
                 if PYSCENEDETECT_AVAILABLE:
-                    st.success("✅ PySceneDetect available")
+                    st.success(" PySceneDetect available")
                     detection_engine = "PySceneDetect (Professional)"
                     use_enhanced = True
                 else:
-                    st.warning("⚠️ PySceneDetect not installed")
+                    st.warning(" PySceneDetect not installed")
                     st.info("Install with: `pip install scenedetect[opencv]`")
                     detection_engine = "OpenCV (Basic)"
                     use_enhanced = False
             except ImportError:
-                st.warning("⚠️ Falling back to basic OpenCV")
+                st.warning(" Falling back to basic OpenCV")
                 detection_engine = "OpenCV (Basic)"
                 use_enhanced = False
         
         with col2:
             if st.session_state.get('openai_api_key'):
-                st.success("✅ OpenAI Vision API ready")
+                st.success(" OpenAI Vision API ready")
             else:
-                st.info("💡 Add OpenAI API key for screenshot analysis")
+                st.info(" Add OpenAI API key for screenshot analysis")
         
-        st.info(f"🔧 **Detection Engine**: {detection_engine}")
+        st.info(f" **Detection Engine**: {detection_engine}")
         
         # Course selection for scene detection
         available_courses = self.course_indexer.get_available_courses() if self.course_indexer else []
@@ -438,7 +437,7 @@ class RealEstateAIApp:
                             for course in available_courses]
             
             selected_course_display = st.selectbox(
-                "📚 Select Course for Scene Analysis",
+                " Select Course for Scene Analysis",
                 options=course_options,
                 help="Choose a course with video files for professional scene detection"
             )
@@ -447,7 +446,7 @@ class RealEstateAIApp:
                 course_name = selected_course_display.split(' (')[0]
                 
                 # Enhanced detection settings
-                st.subheader("🎯 Detection Configuration")
+                st.subheader(" Detection Configuration")
                 
                 if use_enhanced:
                     # PySceneDetect-specific settings
@@ -471,11 +470,11 @@ class RealEstateAIApp:
                         from enhanced_scene_detector import EnhancedSceneDetector
                         recommendations = EnhancedSceneDetector.get_detection_recommendations(video_type)
                         
-                        if st.button("📋 Apply Recommended Settings"):
+                        if st.button(" Apply Recommended Settings"):
                             detection_method = recommendations["method"]
                             st.rerun()
                         
-                        st.info(f"💡 **Recommended for {video_type}**: {recommendations['description']}")
+                        st.info(f" **Recommended for {video_type}**: {recommendations['description']}")
                     except:
                         pass
                     
@@ -528,7 +527,7 @@ class RealEstateAIApp:
                                                 help="Analyze screenshots with OpenAI Vision for content descriptions")
                 
                 # Process scenes
-                button_text = "🚀 Start Enhanced Scene Detection" if use_enhanced else "🎬 Start Basic Scene Detection"
+                button_text = " Start Enhanced Scene Detection" if use_enhanced else " Start Basic Scene Detection"
                 if st.button(button_text, type="primary"):
                     try:
                         if use_enhanced:
@@ -554,7 +553,7 @@ class RealEstateAIApp:
                         
                         course_dir = self.config.raw_docs_dir / course_name
                         
-                        with st.spinner(f"🔄 Analyzing scenes with {method_info}..."):
+                        with st.spinner(f" Analyzing scenes with {method_info}..."):
                             results = detector.process_course_videos(str(course_dir))
                         
                         # Handle different result formats
@@ -586,7 +585,7 @@ class RealEstateAIApp:
                                     if use_enhanced:
                                         count = video_data.get('scenes_count', 0)
                                         status = video_data.get('processing_status', 'unknown')
-                                        status_icon = "✅" if status == "completed" else "❌"
+                                        status_icon = " " if status == "completed" else " "
                                         st.write(f"{status_icon} **{video_data['filename']}**: {count} scenes")
                                     else:
                                         count = video_data.get('transitions_count', 0)
@@ -594,7 +593,7 @@ class RealEstateAIApp:
                             
                             # Show processing details
                             if use_enhanced:
-                                with st.expander("🔧 Detection Details"):
+                                with st.expander(" Detection Details"):
                                     st.write(f"**Algorithm**: {results.get('detection_method', 'unknown')}")
                                     st.write(f"**Threshold**: {results.get('threshold', 'unknown')}")
                                     st.write(f"**Processing Date**: {results.get('processing_date', 'unknown')[:19]}")
@@ -607,16 +606,16 @@ class RealEstateAIApp:
                         else:
                             st.warning("No scenes detected. Try adjusting threshold settings or check video format compatibility.")
                             if use_enhanced:
-                                st.info("💡 Try switching to 'threshold' method for more sensitive detection")
+                                st.info(" Try switching to 'threshold' method for more sensitive detection")
                             else:
-                                st.info("💡 Install PySceneDetect for better scene detection accuracy")
+                                st.info(" Install PySceneDetect for better scene detection accuracy")
                     
                     except Exception as e:
                         st.error(f"Scene detection failed: {e}")
                         if "scenedetect" in str(e).lower():
-                            st.info("💡 Install PySceneDetect: `pip install scenedetect[opencv]`")
+                            st.info(" Install PySceneDetect: `pip install scenedetect[opencv]`")
         else:
-            st.info("📁 No courses found. Upload course materials first in the Documents tab.")
+            st.info(" No courses found. Upload course materials first in the Documents tab.")
     
     def _multimodal_processing_interface(self):
         """Comprehensive multimodal processing interface."""
@@ -639,7 +638,7 @@ class RealEstateAIApp:
                             for course in available_courses]
             
             selected_course_display = st.selectbox(
-                "📚 Select Course for Multimodal Processing",
+                " Select Course for Multimodal Processing",
                 options=course_options,
                 help="Choose a course for complete multimodal analysis"
             )
@@ -648,12 +647,12 @@ class RealEstateAIApp:
                 course_name = selected_course_display.split(' (')[0]
                 
                 # Processing options
-                st.subheader("🎯 Processing Options")
+                st.subheader(" Processing Options")
                 
                 col1, col2 = st.columns(2)
                 with col1:
-                    process_documents = st.checkbox("📄 Process Documents", value=True)
-                    process_transcriptions = st.checkbox("📝 Process Transcriptions", value=True)
+                    process_documents = st.checkbox(" Process Documents", value=True)
+                    process_transcriptions = st.checkbox(" Process Transcriptions", value=True)
                 
                 with col2:
                     process_transitions = st.checkbox("📸 Process Video Transitions", value=True)
@@ -661,14 +660,14 @@ class RealEstateAIApp:
                                                         value=bool(st.session_state.get('openai_api_key')))
                 
                 # Start multimodal processing
-                if st.button("🚀 Start Multimodal Processing", type="primary"):
+                if st.button(" Start Multimodal Processing", type="primary"):
                     try:
                         from multimodal_processor import MultimodalProcessor
                         
                         processor = MultimodalProcessor()
                         course_dir = self.config.raw_docs_dir / course_name
                         
-                        with st.spinner(f"🔄 Processing {course_name} with multimodal analysis..."):
+                        with st.spinner(f" Processing {course_name} with multimodal analysis..."):
                             results = processor.process_course_comprehensive(str(course_dir))
                         
                         if results:
@@ -689,9 +688,9 @@ class RealEstateAIApp:
                             
                             # Show embedding readiness
                             embedding_docs = results.get('embedding_documents', [])
-                            st.success(f"📊 **Ready for Vector Embedding**: {len(embedding_docs)} searchable content pieces")
+                            st.success(f" **Ready for Vector Embedding**: {len(embedding_docs)} searchable content pieces")
                             
-                            with st.expander("📋 Content Analysis Details"):
+                            with st.expander(" Content Analysis Details"):
                                 for content_type, data in content_types.items():
                                     if content_type != 'total_content_pieces' and isinstance(data, dict):
                                         st.write(f"**{content_type.title()}**: {data.get('count', 0)} items")
@@ -704,11 +703,11 @@ class RealEstateAIApp:
                     except Exception as e:
                         st.error(f"Error in multimodal processing: {e}")
         else:
-            st.info("📁 No courses found. Upload course materials first in the Documents tab.")
+            st.info(" No courses found. Upload course materials first in the Documents tab.")
 
     def refresh_available_courses(self):
         """Refresh the list of available courses - pure offline mode."""
-        print("🔄 Starting course refresh...")
+        print("Starting course refresh...")
         
         # Initialize session state if needed
         if 'available_courses' not in st.session_state:
@@ -720,10 +719,10 @@ class RealEstateAIApp:
         
         # Use the configured raw docs directory
         raw_docs_path = Path(self.config.raw_docs_dir)
-        print(f"📁 Scanning directory: {raw_docs_path}")
+        print(f"Scanning directory: {raw_docs_path}")
         
         if not raw_docs_path.exists():
-            print(f"❌ Directory not found: {raw_docs_path}")
+            print(f"Directory not found: {raw_docs_path}")
             st.session_state.available_courses = []
             return []
         
@@ -731,8 +730,8 @@ class RealEstateAIApp:
         indexed_path = Path(__file__).parent / "indexed_courses"
         indexed_path.mkdir(exist_ok=True)
         
-        print(f"📁 Raw courses: {raw_docs_path}")
-        print(f"📊 Indexed courses: {indexed_path}")
+        print(f"Raw courses: {raw_docs_path}")
+        print(f"Indexed courses: {indexed_path}")
         
         # Get already indexed courses with proper document counting
         indexed_courses = set()
@@ -758,7 +757,7 @@ class RealEstateAIApp:
                             'total_content_length': metadata.get('total_content_length', 0),
                             'document_types': metadata.get('document_types', {})
                         })
-                        print(f"📚 Indexed course: {item.name} ({doc_count} documents)")
+                        print(f"Indexed course: {item.name} ({doc_count} documents)")
                         
                     except Exception as e:
                         # Fallback to file counting if metadata is corrupted
@@ -769,7 +768,7 @@ class RealEstateAIApp:
                             'document_count': doc_count,
                             'last_indexed': 'Metadata error'
                         })
-                        print(f"📚 Indexed course: {item.name} ({doc_count} files, metadata error)")
+                        print(f"Indexed course: {item.name} ({doc_count} files, metadata error)")
                 else:
                     # Fallback to file counting
                     doc_count = len(list(item.rglob('*.json'))) + len(list(item.rglob('*.pkl')))
@@ -779,13 +778,13 @@ class RealEstateAIApp:
                         'document_count': doc_count,
                         'last_indexed': 'No metadata'
                     })
-                    print(f"📚 Indexed course: {item.name} ({doc_count} files, no metadata)")
+                    print(f"Indexed course: {item.name} ({doc_count} files, no metadata)")
         
         # Scan for courses in the directory
         course_count = 0
         
         try:
-            print(f"📂 Directory contents:")
+            print(f"Directory contents:")
             for item in raw_docs_path.iterdir():
                 print(f"  - {item.name} ({'DIR' if item.is_dir() else 'FILE'})")
                 
@@ -803,7 +802,7 @@ class RealEstateAIApp:
                     
                     # Check if already indexed
                     if course_name in indexed_courses:
-                        print(f"📚 Course {course_name} already indexed - skipping")
+                        print(f"Course {course_name} already indexed - skipping")
                         continue
                     
                     # Add as unprocessed course
@@ -814,18 +813,18 @@ class RealEstateAIApp:
                         'last_indexed': 'Not processed'
                     })
                     
-                    print(f"📁 Found course: {course_name} ({file_count} files)")
+                    print(f"Found course: {course_name} ({file_count} files)")
         
         except Exception as e:
-            print(f"❌ Error scanning directory: {e}")
+            print(f"Error scanning directory: {e}")
             st.error(f"Error accessing directory: {e}")
         
-        print(f"✅ Total courses found: {len(courses)} (scanned {course_count} directories)")
+        print(f"Total courses found: {len(courses)} (scanned {course_count} directories)")
         
         # Filter out ignored courses
         if self.ignore_manager:
             courses = self.ignore_manager.filter_courses(courses)
-            print(f"✂️ After filtering ignored courses: {len(courses)} remaining")
+            print(f"After filtering ignored courses: {len(courses)} remaining")
         
         # Store results
         st.session_state.available_courses = courses
@@ -833,16 +832,16 @@ class RealEstateAIApp:
 
     def sidebar_course_management(self):
         """Handle course management in the sidebar."""
-        st.sidebar.header("📚 Course Management")
+        st.sidebar.header(" Course Management")
         
         # Check for renamed courses and offer to fix indexes
         if self.rename_handler:
             try:
                 rename_suggestions = self.rename_handler.get_rename_suggestions()
                 if rename_suggestions:
-                    st.sidebar.warning(f"⚠️ Found {len(rename_suggestions)} renamed courses")
+                    st.sidebar.warning(f" Found {len(rename_suggestions)} renamed courses")
                     
-                    with st.sidebar.expander("🔄 Fix Renamed Courses"):
+                    with st.sidebar.expander(" Fix Renamed Courses"):
                         st.info("Detected courses that may have been renamed. Click to fix the indexes:")
                         
                         for suggestion in rename_suggestions:
@@ -855,7 +854,7 @@ class RealEstateAIApp:
                             
                             col1, col2 = st.columns(2)
                             with col1:
-                                if st.button(f"✅ Update", key=f"update_{old_name}"):
+                                if st.button(f" Update", key=f"update_{old_name}"):
                                     if self.rename_handler.apply_rename_suggestion(old_name, new_name):
                                         st.success(f"Updated: {old_name} → {new_name}")
                                         # Clear course cache and refresh
@@ -890,17 +889,17 @@ class RealEstateAIApp:
             st.rerun()
         
         # Directory Path Configuration 
-        st.sidebar.subheader("📁 Course Directory")
+        st.sidebar.subheader(" Course Directory")
         
         # Show current path
         current_path = str(self.config.raw_docs_dir)
         st.sidebar.text(f"Current: {current_path}")
         
         # Manual path input
-        with st.sidebar.expander("📝 Set Custom Directory Path"):
+        with st.sidebar.expander(" Set Custom Directory Path"):
             st.text("Current Master Directory:")
             st.code(self.config.MASTER_COURSE_DIRECTORY, language=None)
-            st.info("💡 This path cascades throughout the entire system")
+            st.info(" This path cascades throughout the entire system")
             
             custom_path = st.text_input(
                 "Enter full directory path:",
@@ -910,23 +909,23 @@ class RealEstateAIApp:
                 key="custom_path_input"
             )
             
-            if st.button("📂 Update Master Directory", key="update_master_directory_btn"):
+            if st.button(" Update Master Directory", key="update_master_directory_btn"):
                 try:
                     from directory_config import update_master_directory
                     
                     if update_master_directory(custom_path):
-                        st.success(f"✅ Master directory updated system-wide: {custom_path}")
-                        st.info("🔄 All components now use the new directory")
+                        st.success(f" Master directory updated system-wide: {custom_path}")
+                        st.info(" All components now use the new directory")
                         # Clear cache and refresh
                         st.session_state.clear()
                         st.rerun()
                     else:
-                        st.error(f"❌ Failed to update directory: {custom_path}")
+                        st.error(f" Failed to update directory: {custom_path}")
                 except Exception as e:
-                    st.error(f"❌ Error updating directory: {e}")
+                    st.error(f" Error updating directory: {e}")
         
         # File uploader for courses
-        st.sidebar.subheader("📁 Upload Course Directory")
+        st.sidebar.subheader(" Upload Course Directory")
         uploaded_files = st.sidebar.file_uploader(
             "Upload course files (PDF, DOCX, EPUB, etc.)",
             accept_multiple_files=True,
@@ -940,11 +939,11 @@ class RealEstateAIApp:
                 placeholder="e.g., Python Programming, Real Estate Finance"
             )
             
-            if course_name and st.sidebar.button("💾 Save Course Files", key="save_course_files_btn"):
+            if course_name and st.sidebar.button(" Save Course Files", key="save_course_files_btn"):
                 self.save_uploaded_course(uploaded_files, course_name)
         
         # Refresh courses button with debug info
-        if st.sidebar.button("🔄 Refresh Course List", key="refresh_course_list_btn"):
+        if st.sidebar.button(" Refresh Course List", key="refresh_course_list_btn"):
             with st.sidebar:
                 with st.spinner("Refreshing courses..."):
                     courses = self.refresh_available_courses()
@@ -954,7 +953,7 @@ class RealEstateAIApp:
                     st.rerun()
                     
                     # Show debug info in sidebar
-                    with st.expander("🔍 Debug Info"):
+                    with st.expander(" Debug Info"):
                         st.write(f"Raw docs dir: {self.config.raw_docs_dir}")
                         st.write(f"Indexed dir: {self.config.indexed_courses_dir}")
                         
@@ -980,7 +979,7 @@ class RealEstateAIApp:
             
             # Show indexed courses first
             if indexed_courses:
-                st.sidebar.markdown("**✅ Indexed Courses**")
+                st.sidebar.markdown("** Indexed Courses**")
                 for course in indexed_courses:
                     course_name = course['name']
                     doc_count = course['document_count']
@@ -1006,7 +1005,7 @@ class RealEstateAIApp:
                     
                     # Only show courses with files
                     if doc_count > 0:
-                        with st.sidebar.expander(f"📁 {course_name}"):
+                        with st.sidebar.expander(f" {course_name}"):
                             st.write(f"Files found: {doc_count}")
                             st.write(f"Status: Not processed")
                             
@@ -1016,7 +1015,7 @@ class RealEstateAIApp:
                                     self.process_raw_course(course_name)
                             with col2:
                                 if st.button(f"Select", key=f"select_unprocessed_{course_name}"):
-                                    st.warning("⚠️ This course isn't processed yet. Process it first to enable querying.")
+                                    st.warning(" This course isn't processed yet. Process it first to enable querying.")
                             with col3:
                                 if st.button(f"Ignore", key=f"ignore_raw_{course_name}"):
                                     if self.ignore_manager and self.ignore_manager.ignore_course(course_name):
@@ -1027,7 +1026,7 @@ class RealEstateAIApp:
 
     def file_upload_section(self):
         """Handle file uploads and processing."""
-        st.header("📁 Document Upload & Processing")
+        st.header(" Document Upload & Processing")
         
         # Course name input
         course_name = st.text_input(
@@ -1038,11 +1037,11 @@ class RealEstateAIApp:
         # Upload method selection
         upload_method = st.radio(
             "Upload Method:",
-            ["📄 Individual Files", "📁 Directory Path"],
+            [" Individual Files", " Directory Path"],
             horizontal=True
         )
         
-        if upload_method == "📄 Individual Files":
+        if upload_method == " Individual Files":
             # File uploader
             uploaded_files = st.file_uploader(
                 "Choose course files",
@@ -1059,12 +1058,12 @@ class RealEstateAIApp:
             
             if uploaded_files and course_name:
                 if not DOCUMENT_PROCESSOR_AVAILABLE or self.doc_processor is None:
-                    st.error("❌ Document processing dependencies are not installed. Please check the System Status tab.")
-                elif st.button("📊 Process Documents", key="process_documents_btn"):
+                    st.error(" Document processing dependencies are not installed. Please check the System Status tab.")
+                elif st.button(" Process Documents", key="process_documents_btn"):
                     self.process_uploaded_files(uploaded_files, course_name, is_syllabus)
         
         else:  # Directory Path
-            st.markdown("### 📁 Process Directory")
+            st.markdown("### Process Directory")
             
             # Directory path input
             directory_path = st.text_input(
@@ -1074,7 +1073,7 @@ class RealEstateAIApp:
             )
             
             # Course structure explanation
-            with st.expander("🎯 Course Structure & Auto-Detection"):
+            with st.expander(" Course Structure & Auto-Detection"):
                 st.markdown("""
                 **The system automatically detects:**
                 - **Syllabus files**: Files named with "syllabus", "outline", "curriculum" (gets 2x weight)
@@ -1114,8 +1113,8 @@ class RealEstateAIApp:
             
             if directory_path and course_name:
                 if not DOCUMENT_PROCESSOR_AVAILABLE or self.doc_processor is None:
-                    st.error("❌ Document processing dependencies are not installed. Please check the System Status tab.")
-                elif st.button("🚀 Process Directory", key="process_directory_btn"):
+                    st.error(" Document processing dependencies are not installed. Please check the System Status tab.")
+                elif st.button(" Process Directory", key="process_directory_btn"):
                     self.process_directory(directory_path, course_name)
 
     def process_uploaded_files(self, uploaded_files: List, course_name: str, is_syllabus: bool):
@@ -1149,7 +1148,7 @@ class RealEstateAIApp:
                     processed_files.append(processed_doc)
                     logger.info(f"Processed {uploaded_file.name}")
                 except Exception as e:
-                    st.warning(f"⚠️ Could not process {uploaded_file.name}: {str(e)}")
+                    st.warning(f" Could not process {uploaded_file.name}: {str(e)}")
                     logger.warning(f"Failed to process {uploaded_file.name}: {e}")
             
             if processed_files:
@@ -1160,15 +1159,15 @@ class RealEstateAIApp:
                 # Update available courses
                 self.refresh_available_courses()
                 
-                st.success(f"✅ Successfully processed {len(processed_files)} documents for {course_name}")
+                st.success(f" Successfully processed {len(processed_files)} documents for {course_name}")
                 progress_bar.empty()
                 status_text.empty()
                 st.rerun()
             else:
-                st.error("❌ No documents could be processed")
+                st.error(" No documents could be processed")
                 
         except Exception as e:
-            st.error(f"❌ Error processing files: {str(e)}")
+            st.error(f" Error processing files: {str(e)}")
             logger.error(f"File processing error: {e}")
 
     def reindex_course(self, course_name: str):
@@ -1182,19 +1181,19 @@ class RealEstateAIApp:
                 # Process the course
                 result = simple_indexer.process_course_simple(course_name)
                 
-                st.success(f"✅ Successfully re-indexed {course_name}: {result['document_count']} documents processed")
-                st.info(f"📄 Content: {result['total_content_length']:,} characters across {len(result['document_types'])} file types")
+                st.success(f" Successfully re-indexed {course_name}: {result['document_count']} documents processed")
+                st.info(f" Content: {result['total_content_length']:,} characters across {len(result['document_types'])} file types")
                 
                 # Show document type breakdown
                 if result['document_types']:
                     types_str = ", ".join([f"{ext}: {count}" for ext, count in result['document_types'].items()])
-                    st.info(f"📁 File types: {types_str}")
+                    st.info(f" File types: {types_str}")
                 
                 self.refresh_available_courses()
                 st.rerun()
                 
             except Exception as e:
-                st.error(f"❌ Failed to re-index {course_name}: {str(e)}")
+                st.error(f" Failed to re-index {course_name}: {str(e)}")
                 logger.error(f"Re-indexing error: {e}")
                 import traceback
                 logger.error(f"Full traceback: {traceback.format_exc()}")
@@ -1210,40 +1209,40 @@ class RealEstateAIApp:
             # Handle Windows paths
             dir_path = Path(directory_path)
             if not dir_path.exists():
-                st.error(f"❌ Directory not found: {directory_path}")
+                st.error(f" Directory not found: {directory_path}")
                 return
             
-            status_text.text("🔍 Scanning directory for supported files...")
+            status_text.text(" Scanning directory for supported files...")
             
             # Process all files in directory
             processed_files = self.doc_processor.process_directory(dir_path)
             
             if not processed_files:
-                st.warning("⚠️ No supported files found in directory.")
+                st.warning(" No supported files found in directory.")
                 return
             
             # Show processing progress
             progress_bar.progress(0.5)
-            status_text.text(f"📊 Indexing {len(processed_files)} documents...")
+            status_text.text(f" Indexing {len(processed_files)} documents...")
             
             # Index the documents
             self.course_indexer.index_course_documents(course_name, processed_files)
             progress_bar.progress(1.0)
             
             logger.info("Directory processing completed successfully")
-            st.success(f"✅ Successfully processed {len(processed_files)} documents from directory!")
+            st.success(f" Successfully processed {len(processed_files)} documents from directory!")
             
             # Show syllabus detection results
             syllabus_files = [f['file_name'] for f in processed_files if f['is_syllabus']]
             if syllabus_files:
-                st.info(f"🎯 Auto-detected syllabus files: {', '.join(syllabus_files)}")
+                st.info(f" Auto-detected syllabus files: {', '.join(syllabus_files)}")
             
             self.refresh_available_courses()
             st.rerun()
             
         except Exception as e:
             logger.error(f"Error processing directory: {e}")
-            st.error(f"❌ Error processing directory: {str(e)}")
+            st.error(f" Error processing directory: {str(e)}")
         finally:
             progress_bar.empty()
             status_text.empty()
@@ -1272,10 +1271,10 @@ class RealEstateAIApp:
         progress_bar.empty()
         
         if saved_files:
-            st.sidebar.success(f"✅ Saved {len(saved_files)} files to course: {course_name}")
+            st.sidebar.success(f" Saved {len(saved_files)} files to course: {course_name}")
             
             # Auto-process the course
-            if st.sidebar.button(f"🚀 Process {course_name} Now", key=f"process_now_{course_name}"):
+            if st.sidebar.button(f" Process {course_name} Now", key=f"process_now_{course_name}"):
                 self.process_directory(str(course_dir), course_name)
         
         # Refresh course list
@@ -1286,10 +1285,10 @@ class RealEstateAIApp:
         course_dir = self.config.raw_docs_dir / course_name
         
         if not course_dir.exists():
-            st.error(f"❌ Course directory not found: {course_name}")
+            st.error(f" Course directory not found: {course_name}")
             return
         
-        st.info(f"🔄 Processing course: {course_name}")
+        st.info(f" Processing course: {course_name}")
         self.process_directory(str(course_dir), course_name)
     
     def export_chat_history(self):
@@ -1316,7 +1315,7 @@ class RealEstateAIApp:
         filename = f"chat_history_{st.session_state.selected_course}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
         
         st.download_button(
-            label="💾 Download Chat History",
+            label=" Download Chat History",
             data=json_str.encode('utf-8'),
             file_name=filename,
             mime="application/json",
@@ -1427,7 +1426,7 @@ class RealEstateAIApp:
 
     def analytics_dashboard(self):
         """Advanced learning analytics dashboard with data science metrics."""
-        st.header("📈 Learning Analytics Dashboard")
+        st.header(" Learning Analytics Dashboard")
         
         try:
             from conversation_analytics import ConversationAnalytics
@@ -1490,7 +1489,7 @@ class RealEstateAIApp:
                 
                 # Quality metrics
                 if performance_data.get('quality_metrics'):
-                    st.subheader("📊 Response Quality Metrics")
+                    st.subheader(" Response Quality Metrics")
                     col1, col2 = st.columns(2)
                     
                     with col1:
@@ -1504,7 +1503,7 @@ class RealEstateAIApp:
             # Model comparison with grades
             model_comparison = evaluator.get_model_comparison()
             if model_comparison.get('model_comparison'):
-                st.subheader("🔍 Model Performance Comparison")
+                st.subheader(" Model Performance Comparison")
                 
                 comparison_data = []
                 for model, metrics in model_comparison['model_comparison'].items():
@@ -1524,11 +1523,11 @@ class RealEstateAIApp:
                 
                 # Best performer
                 if model_comparison.get('best_performer'):
-                    st.success(f"🏆 Best Performing Model: {model_comparison['best_performer']}")
+                    st.success(f" Best Performing Model: {model_comparison['best_performer']}")
                 
                 # Recommendations
                 if model_comparison.get('recommendations'):
-                    st.subheader("💡 Performance Optimization Recommendations")
+                    st.subheader(" Performance Optimization Recommendations")
                     for rec in model_comparison['recommendations']:
                         st.write(f"• {rec}")
             
@@ -1548,7 +1547,7 @@ class RealEstateAIApp:
             status = fine_tuner.get_fine_tuning_status()
             
             # Overview
-            st.subheader("📋 Learning Status Overview")
+            st.subheader(" Learning Status Overview")
             col1, col2, col3 = st.columns(3)
             
             with col1:
@@ -1560,7 +1559,7 @@ class RealEstateAIApp:
             
             # Ready courses
             if status['ready_courses']:
-                st.subheader("✅ Courses Ready for Learning")
+                st.subheader(" Courses Ready for Learning")
                 
                 ready_data = []
                 for course, data in status['ready_courses'].items():
@@ -1577,7 +1576,7 @@ class RealEstateAIApp:
                 st.dataframe(df)
                 
                 # Fine-tuning controls
-                st.subheader("🚀 Model Learning Controls")
+                st.subheader(" Model Learning Controls")
                 
                 course_options = list(status['ready_courses'].keys())
                 if course_options:
@@ -1587,7 +1586,7 @@ class RealEstateAIApp:
                     col1, col2 = st.columns(2)
                     
                     with col1:
-                        if st.button("🔍 Preview Training Data", key="preview_training_data_btn"):
+                        if st.button(" Preview Training Data", key="preview_training_data_btn"):
                             training_data = fine_tuner.prepare_training_data(selected_course)
                             if training_data:
                                 st.write(f"**Available Training Examples:** {len(training_data)}")
@@ -1598,7 +1597,7 @@ class RealEstateAIApp:
                                     st.write(f"**Answer:** {sample['output'][:100]}...")
                     
                     with col2:
-                        if st.button("🚀 Simulate Learning Process", key="simulate_learning_btn"):
+                        if st.button(" Simulate Learning Process", key="simulate_learning_btn"):
                             with st.spinner("Simulating model learning..."):
                                 result = fine_tuner.simulate_fine_tuning(selected_course, model_type)
                                 
@@ -1611,7 +1610,7 @@ class RealEstateAIApp:
                                     st.error(f"Simulation failed: {result.get('error', 'Unknown error')}")
             
             else:
-                st.info("🔄 Keep having conversations! Need at least 10 Q&As per course to enable learning.")
+                st.info(" Keep having conversations! Need at least 10 Q&As per course to enable learning.")
                 st.write("**How it works:**")
                 st.write("1. Every conversation is automatically saved")
                 st.write("2. After 10 conversations, the course becomes ready for learning")
@@ -1665,12 +1664,12 @@ class RealEstateAIApp:
         with col2:
             include_sources = st.checkbox("Include source references", value=True)
         
-        if query and st.button("🔍 Ask Question", key="ask_question_btn"):
+        if query and st.button(" Ask Question", key="ask_question_btn"):
             # Pure offline mode - no restrictions
             
             # Check if models are loaded before attempting query
             if not st.session_state.models_loaded:
-                st.error("❌ Models not loaded. Please set up HuggingFace authentication first.")
+                st.error(" Models not loaded. Please set up HuggingFace authentication first.")
                 with st.expander("🔐 Authentication Instructions"):
                     st.markdown("""
                     **Quick Setup:**
@@ -1729,21 +1728,21 @@ class RealEstateAIApp:
                             st.session_state.query_engine = self.query_engine
                             logger.info("Local query engine recreated successfully")
                         except Exception as e:
-                            st.error(f"❌ Failed to initialize query engine: {e}")
+                            st.error(f" Failed to initialize query engine: {e}")
                             logger.error(f"Query engine recreation failed: {e}")
                             return
                     else:
-                        st.error("❌ Model manager not available in session state")
+                        st.error(" Model manager not available in session state")
                         return
                 else:
                     # Models not loaded, try to load them
                     if not self.load_models():
-                        st.error("❌ Cannot load models. Q&A functionality unavailable.")
+                        st.error(" Cannot load models. Q&A functionality unavailable.")
                         return
         
         # Double check query engine is now available
         if not self.query_engine:
-            st.error("❌ Query engine still not available after initialization attempts.")
+            st.error(" Query engine still not available after initialization attempts.")
             st.markdown("""
             **Troubleshooting Steps:**
             1. Check if all dependencies are installed properly
@@ -1774,7 +1773,7 @@ class RealEstateAIApp:
             try:
                 # Final check to ensure query_engine is available
                 if self.query_engine is None:
-                    st.error("❌ Query engine not initialized. Please reload the page and try again.")
+                    st.error(" Query engine not initialized. Please reload the page and try again.")
                     logger.error("Query engine is None in final check")
                     return
                 
@@ -1814,7 +1813,7 @@ class RealEstateAIApp:
                 )
                 
                 # Display answer with performance indicator
-                st.subheader("📝 Answer")
+                st.subheader(" Answer")
                 st.write(answer)
                 
                 # Show performance metrics if enabled
@@ -1826,7 +1825,7 @@ class RealEstateAIApp:
                     time_color = "🟢" if response_time < 2000 else "🟡" if response_time < 5000 else "🔴"
                     quality_color = "🟢" if quality_score > 0.7 else "🟡" if quality_score > 0.4 else "🔴"
                     
-                    st.caption(f"{time_color} {response_time:.0f}ms | {quality_color} Quality: {quality_score:.2f} | 🚀 {metrics.get('tokens_per_second', 0):.1f} tokens/sec")
+                    st.caption(f"{time_color} {response_time:.0f}ms | {quality_color} Quality: {quality_score:.2f} | {metrics.get('tokens_per_second', 0):.1f} tokens/sec")
                 
                 # Save conversation for learning with enhanced metadata
                 if hasattr(st.session_state, 'model_manager') and st.session_state.model_manager:
@@ -1847,12 +1846,12 @@ class RealEstateAIApp:
                 
                 # Check if response contains spreadsheet/table data and offer Excel generation
                 if any(keyword in query.lower() for keyword in ['excel', 'spreadsheet', 'table', 'csv', 'financial analysis', 'budget', 'calculation']):
-                    if st.button("📊 Generate Excel File from Response", key="generate_excel_btn"):
+                    if st.button(" Generate Excel File from Response", key="generate_excel_btn"):
                         self.generate_excel_from_response(answer, query)
                 
                 # Display sources if requested
                 if include_sources and result.get('sources'):
-                    st.subheader("📚 Sources")
+                    st.subheader(" Sources")
                     for i, source in enumerate(result['sources'], 1):
                         st.write(f"{i}. {source}")
                 
@@ -1873,7 +1872,7 @@ class RealEstateAIApp:
                 # Check learning readiness
                 conversation_count = len([c for c in st.session_state.chat_history if c.get('course') == st.session_state.selected_course])
                 if conversation_count % 10 == 0:
-                    st.success(f"🎓 Course '{st.session_state.selected_course}' is ready for model learning! Check the Fine-tuning tab.")
+                    st.success(f" Course '{st.session_state.selected_course}' is ready for model learning! Check the Fine-tuning tab.")
                 
             except Exception as e:
                 error_occurred = str(e)
@@ -1889,17 +1888,17 @@ class RealEstateAIApp:
                 
                 # Provide helpful fallback response for embedding errors
                 if "Embedding model not loaded" in error_occurred:
-                    st.warning("⚠️ Local AI models not fully loaded")
+                    st.warning(" Local AI models not fully loaded")
                     
                     # Import and use fallback response
                     from simple_query_fix import create_fallback_response
                     fallback_result = create_fallback_response(query, st.session_state.selected_course)
                     
-                    st.subheader("💡 Recommended Solution")
+                    st.subheader(" Recommended Solution")
                     st.write(fallback_result['answer'])
                     
                     # Show quick setup options
-                    with st.expander("🚀 Quick Setup Options"):
+                    with st.expander(" Quick Setup Options"):
                         st.markdown("""
                         **Option 1: Cloud APIs (Fastest)**
                         1. Get OpenAI API key from https://platform.openai.com/api-keys
@@ -1917,7 +1916,7 @@ class RealEstateAIApp:
                         3. Query via ChatGPT/Perplexity for best responses
                         """)
                 else:
-                    st.error(f"❌ Error processing query: {error_occurred}")
+                    st.error(f" Error processing query: {error_occurred}")
                     logger.error(f"Query processing error: {e}")
                 
                 # Still save failed attempt for learning
@@ -1931,7 +1930,7 @@ class RealEstateAIApp:
 
     def analytics_section(self):
         """Display course analytics and visualizations."""
-        st.header("📊 Course Analytics")
+        st.header(" Course Analytics")
         
         # Check if any courses are available first - check multiple locations
         course_names = []
@@ -1967,14 +1966,14 @@ class RealEstateAIApp:
         if not course_names:
             st.info("**No courses available for analysis yet.**")
             
-            st.subheader("🚀 Get Started with Your Course Content")
+            st.subheader(" Get Started with Your Course Content")
             
             col1, col2 = st.columns(2)
             
             with col1:
                 st.markdown("""
                 **Option 1: Upload Documents**
-                1. Go to the **📚 Documents** tab
+                1. Go to the ** Documents** tab
                 2. Upload PDFs, DOCX, PPTX files
                 3. Select course name and process
                 4. Return here for analytics
@@ -1989,7 +1988,7 @@ class RealEstateAIApp:
                 4. Create vector embeddings for smart search
                 """)
             
-            st.subheader("💡 Why Use the Vector RAG Workflow?")
+            st.subheader(" Why Use the Vector RAG Workflow?")
             
             col1, col2, col3 = st.columns(3)
             with col1:
@@ -2005,8 +2004,8 @@ class RealEstateAIApp:
             st.markdown("""
             **Complete Workflow for Maximum Savings:**
             1. **🎥 Bulk Transcription**: Process your course videos locally with RTX 3060
-            2. **🔍 Vector RAG**: Generate embeddings locally, query with cloud APIs  
-            3. **📊 Analytics**: View insights here once content is processed
+            2. ** Vector RAG**: Generate embeddings locally, query with cloud APIs  
+            3. ** Analytics**: View insights here once content is processed
             
             This hybrid approach saves hundreds per year while providing better search accuracy than traditional methods.
             """)
@@ -2015,7 +2014,7 @@ class RealEstateAIApp:
         
         # If no course is selected, show course selection
         if not st.session_state.get('selected_course'):
-            st.subheader("📚 Select Course for Analytics")
+            st.subheader(" Select Course for Analytics")
             
             selected = st.selectbox(
                 "Choose a course to analyze:",
@@ -2029,7 +2028,7 @@ class RealEstateAIApp:
             return
         
         if self.course_indexer is None:
-            st.error("❌ Course indexer not available. Please install AI dependencies.")
+            st.error(" Course indexer not available. Please install AI dependencies.")
             return
         
         try:
@@ -2050,7 +2049,7 @@ class RealEstateAIApp:
                 
                 # Document type distribution
                 if analytics.get('document_types'):
-                    st.subheader("📄 Document Types")
+                    st.subheader(" Document Types")
                     if PANDAS_AVAILABLE and PLOTLY_AVAILABLE:
                         doc_types = analytics['document_types']
                         df_types = pd.DataFrame(list(doc_types.items()), 
@@ -2091,12 +2090,12 @@ class RealEstateAIApp:
                             self.generate_concept_map(st.session_state.selected_course)
                 
                 with col2:
-                    if st.button("📊 Visualize Embeddings", key="visualize_embeddings_btn"):
+                    if st.button(" Visualize Embeddings", key="visualize_embeddings_btn"):
                         with st.spinner("Analyzing document embeddings..."):
                             self.visualize_embeddings(st.session_state.selected_course)
                 
                 # Knowledge Graph Section
-                st.subheader("🔗 Knowledge Relationships")
+                st.subheader(" Knowledge Relationships")
                 if st.button("🌐 Show Knowledge Graph", key="show_knowledge_graph_btn"):
                     with st.spinner("Building knowledge graph..."):
                         self.show_knowledge_graph(st.session_state.selected_course)
@@ -2135,7 +2134,7 @@ class RealEstateAIApp:
                 st.info(network_data['message'])
                 return
             
-            st.success("✅ Concept Network Analysis Complete!")
+            st.success(" Concept Network Analysis Complete!")
             
             # Display metrics
             col1, col2, col3 = st.columns(3)
@@ -2169,7 +2168,7 @@ class RealEstateAIApp:
                     st.plotly_chart(fig, use_container_width=True)
                 
                 # Show concept details
-                st.subheader("📋 Concept Details")
+                st.subheader(" Concept Details")
                 for i, concept in enumerate(concepts[:8]):  # Show top 8
                     with st.expander(f"{concept['label']} ({concept['frequency']} mentions)"):
                         st.write(f"**Category**: {concept['category']}")
@@ -2228,7 +2227,7 @@ class RealEstateAIApp:
                 st.info(similarity_data['message'])
                 return
             
-            st.success("✅ Document Analysis Complete!")
+            st.success(" Document Analysis Complete!")
             
             # Display metrics
             col1, col2, col3 = st.columns(3)
@@ -2270,13 +2269,13 @@ class RealEstateAIApp:
                 st.plotly_chart(fig, use_container_width=True)
                 
                 # Show cluster breakdown
-                st.subheader("📊 Content Distribution")
+                st.subheader(" Content Distribution")
                 cluster_counts = df['cluster'].value_counts()
                 for cluster, count in cluster_counts.items():
                     st.write(f"**{cluster}**: {count} documents")
                     
             else:
-                st.write("📊 Analysis complete - Install plotly for enhanced visualization")
+                st.write(" Analysis complete - Install plotly for enhanced visualization")
                 
         except Exception as e:
             st.error(f"Error in document analysis: {str(e)}")
@@ -2435,7 +2434,7 @@ class RealEstateAIApp:
                 st.info(pathway_data['message'])
                 return
             
-            st.success("✅ Learning Pathway Analysis Complete!")
+            st.success(" Learning Pathway Analysis Complete!")
             
             # Display metrics
             col1, col2, col3 = st.columns(3)
@@ -2449,7 +2448,7 @@ class RealEstateAIApp:
                 st.metric("Beginner Friendly", beginner_docs)
             
             # Show recommended learning pathway
-            st.subheader("🎯 Recommended Learning Pathway")
+            st.subheader(" Recommended Learning Pathway")
             st.info("Documents ordered from basic to advanced concepts")
             
             pathway = pathway_data['pathway']
@@ -2467,11 +2466,11 @@ class RealEstateAIApp:
                     
                     # Learning recommendations
                     if doc['complexity'] < 1.0:
-                        st.success("✅ Great starting point - covers fundamental concepts")
+                        st.success(" Great starting point - covers fundamental concepts")
                     elif doc['complexity'] < 3.0:
-                        st.info("📚 Intermediate level - build on basic knowledge first")
+                        st.info(" Intermediate level - build on basic knowledge first")
                     else:
-                        st.warning("🎓 Advanced material - requires solid foundation")
+                        st.warning(" Advanced material - requires solid foundation")
             
             # Create complexity visualization
             if PLOTLY_AVAILABLE:
@@ -2503,7 +2502,7 @@ class RealEstateAIApp:
         st.header("🚫 Ignored Courses Management")
         
         if not self.ignore_manager:
-            st.error("❌ Ignore manager not available")
+            st.error(" Ignore manager not available")
             return
             
         # Get ignored courses stats
@@ -2513,10 +2512,10 @@ class RealEstateAIApp:
         with col1:
             st.metric("Total Ignored Courses", stats['total_ignored'])
         with col2:
-            st.metric("Config File Status", "✅ Exists" if stats['config_exists'] else "❌ Missing")
+            st.metric("Config File Status", " Exists" if stats['config_exists'] else " Missing")
         
         if stats['total_ignored'] == 0:
-            st.info("✅ No courses are currently ignored")
+            st.info(" No courses are currently ignored")
             st.markdown("""
             **How to ignore courses:**
             1. Go to the sidebar course list
@@ -2527,7 +2526,7 @@ class RealEstateAIApp:
             """)
             return
         
-        st.subheader("📋 Currently Ignored Courses")
+        st.subheader(" Currently Ignored Courses")
         
         # Show ignored courses with unignore option
         ignored_courses = stats['ignored_courses']
@@ -2536,56 +2535,56 @@ class RealEstateAIApp:
             col1, col2 = st.columns([3, 1])
             
             with col1:
-                st.write(f"📁 **{course_name}**")
+                st.write(f" **{course_name}**")
                 st.caption("Hidden from main course list")
                 
             with col2:
                 if st.button(f"Unignore", key=f"unignore_{i}"):
                     if self.ignore_manager.unignore_course(course_name):
-                        st.success(f"✅ Unignored '{course_name}'")
+                        st.success(f" Unignored '{course_name}'")
                         st.rerun()
                     else:
-                        st.error(f"❌ Failed to unignore '{course_name}'")
+                        st.error(f" Failed to unignore '{course_name}'")
         
         # Bulk actions
-        st.subheader("🔧 Bulk Actions")
+        st.subheader(" Bulk Actions")
         
         col1, col2 = st.columns(2)
         
         with col1:
-            if st.button("🔄 Unignore All Courses", key="unignore_all_courses_btn"):
+            if st.button(" Unignore All Courses", key="unignore_all_courses_btn"):
                 success_count = 0
                 for course_name in ignored_courses:
                     if self.ignore_manager.unignore_course(course_name):
                         success_count += 1
                 
                 if success_count > 0:
-                    st.success(f"✅ Unignored {success_count} courses")
+                    st.success(f" Unignored {success_count} courses")
                     st.rerun()
                 else:
-                    st.error("❌ Failed to unignore courses")
+                    st.error(" Failed to unignore courses")
         
         with col2:
-            if st.button("📄 Show Config File Path", key="show_config_path_btn"):
+            if st.button(" Show Config File Path", key="show_config_path_btn"):
                 st.code(stats['config_file'])
                 st.caption("You can manually edit this JSON file if needed")
         
         # Debug info
-        with st.expander("🔍 Debug Information"):
+        with st.expander(" Debug Information"):
             st.json(stats)
 
     def book_embeddings_section(self):
         """Manage individual book embeddings within course directories."""
-        st.header("📚 Individual Book Embeddings")
+        st.header(" Individual Book Embeddings")
         
         if not self.book_indexer:
-            st.error("❌ Book indexer not available")
+            st.error(" Book indexer not available")
             return
         
         st.info("Create separate vector embeddings for individual books/ebooks instead of entire course folders")
         
         # Directory selection
-        st.subheader("📁 Select Directory to Scan")
+        st.subheader(" Select Directory to Scan")
         
         # Use manual path input for offline operation
         directory_path = st.text_input(
@@ -2594,11 +2593,11 @@ class RealEstateAIApp:
             help="Enter the full path to a course directory containing books/ebooks"
         )
         
-        if directory_path and st.button("🔍 Scan for Books", key="scan_books_btn"):
+        if directory_path and st.button(" Scan for Books", key="scan_books_btn"):
             scan_path = Path(directory_path)
             
             if not scan_path.exists():
-                st.error(f"❌ Directory not found: {directory_path}")
+                st.error(f" Directory not found: {directory_path}")
                 return
             
             # Scan for books
@@ -2609,7 +2608,7 @@ class RealEstateAIApp:
                 st.info("Supported formats: PDF, EPUB, DOCX, TXT, MD")
                 return
             
-            st.success(f"📚 Found {len(books)} books in directory")
+            st.success(f" Found {len(books)} books in directory")
             
             # Store books in session state
             st.session_state.scanned_books = books
@@ -2625,14 +2624,14 @@ class RealEstateAIApp:
             # Embedding options
             col1, col2 = st.columns(2)
             with col1:
-                embed_all = st.checkbox("📊 Create embeddings for all books", value=False)
+                embed_all = st.checkbox(" Create embeddings for all books", value=False)
             with col2:
-                overwrite_existing = st.checkbox("🔄 Overwrite existing embeddings", value=False)
+                overwrite_existing = st.checkbox(" Overwrite existing embeddings", value=False)
             
             # Process all books button
-            if embed_all and st.button("🚀 Process All Books", key="process_all_books_btn"):
+            if embed_all and st.button(" Process All Books", key="process_all_books_btn"):
                 if not self.doc_processor or not self.course_indexer:
-                    st.error("❌ Document processor or course indexer not available")
+                    st.error(" Document processor or course indexer not available")
                     return
                 
                 progress_bar = st.progress(0)
@@ -2657,7 +2656,7 @@ class RealEstateAIApp:
                     if result['success']:
                         success_count += 1
                 
-                st.success(f"✅ Successfully processed {success_count} books")
+                st.success(f" Successfully processed {success_count} books")
                 st.rerun()
             
             # Individual book display
@@ -2671,7 +2670,7 @@ class RealEstateAIApp:
                         
                     with col2:
                         if book['is_indexed']:
-                            st.success("✅ Indexed")
+                            st.success(" Indexed")
                             st.write(f"**Chunks:** {book.get('chunk_count', 0)}")
                             st.write(f"**Date:** {book.get('indexed_date', 'Unknown')[:10]}")
                         else:
@@ -2681,7 +2680,7 @@ class RealEstateAIApp:
                         # Individual process button
                         if st.button(f"Process Book", key=f"process_book_{i}"):
                             if not self.doc_processor or not self.course_indexer:
-                                st.error("❌ Document processor or course indexer not available")
+                                st.error(" Document processor or course indexer not available")
                                 continue
                             
                             with st.spinner(f"Processing {book['name']}..."):
@@ -2692,13 +2691,13 @@ class RealEstateAIApp:
                                 )
                             
                             if result['success']:
-                                st.success(f"✅ Successfully processed {book['name']}")
+                                st.success(f" Successfully processed {book['name']}")
                                 st.rerun()
                             else:
-                                st.error(f"❌ Failed: {result.get('error', 'Unknown error')}")
+                                st.error(f" Failed: {result.get('error', 'Unknown error')}")
         
         # Show book statistics
-        st.subheader("📊 Book Embedding Statistics")
+        st.subheader(" Book Embedding Statistics")
         
         stats = self.book_indexer.get_book_stats()
         
@@ -2712,10 +2711,10 @@ class RealEstateAIApp:
         
         # Show books by course
         if stats['courses']:
-            st.subheader("📚 Books by Course")
+            st.subheader(" Books by Course")
             
             for course, course_stats in stats['courses'].items():
-                with st.expander(f"📁 {course} ({course_stats['books']} books)"):
+                with st.expander(f" {course} ({course_stats['books']} books)"):
                     st.write(f"**Books:** {course_stats['books']}")
                     st.write(f"**Chunks:** {course_stats['chunks']}")
                     
@@ -2741,7 +2740,7 @@ class RealEstateAIApp:
         # Skip duplicate sidebar call - it's called later
         
         # Title
-        st.title("📚 Local Course AI Assistant")
+        st.title(" Local Course AI Assistant")
         
         # Clear overview of app structure and billing
         with st.expander("📖 App Overview - Where Your Money Gets Charged", expanded=False):
@@ -2749,23 +2748,23 @@ class RealEstateAIApp:
             ### 🏗️ **App Structure & Billing Guide**
             
             **FREE TABS (No charges):**
-            - 📁 **Upload Documents**: Upload PDFs/DOCX - completely free local processing
-            - 📊 **Analytics**: View course insights - completely free 
+            - **Upload Documents**: Upload PDFs/DOCX - completely free local processing
+            - **Analytics**: View course insights - completely free 
             - 🎥 **Bulk Transcription**: Convert videos to text using RTX 3060 - free after setup
             - 💬 **Ask Questions**: Local AI responses - completely free (but slower/lower quality)
             - ⚙️ **System Status**: Check what's working - completely free
             
             **PAID TAB (Where you get charged):**
-            - 🔍 **Vector RAG**: THIS IS THE ONLY TAB THAT CHARGES YOU MONEY
+            - **Vector RAG**: THIS IS THE ONLY TAB THAT CHARGES YOU MONEY
               - Here you select OpenAI or Perplexity 
               - Each query costs ~$0.001-0.01 depending on length
               - Clear billing warnings shown before each query
               - Cost estimate displayed before charging
             
             **❓ How to Query Your Documents:**
-            1. Upload documents in 📁 Upload Documents tab (free)
+            1. Upload documents in Upload Documents tab (free)
             2. OR process videos in 🎥 Bulk Transcription tab (free) 
-            3. Go to 🔍 Vector RAG tab to ask questions (paid but higher quality)
+            3. Go to Vector RAG tab to ask questions (paid but higher quality)
             4. Select OpenAI or Perplexity (this selection determines who charges you)
             5. Submit query (billing happens here with clear warnings)
             """)
@@ -2776,8 +2775,8 @@ class RealEstateAIApp:
         try:
             self.load_models()
         except Exception as e:
-            st.warning(f"⚠️ Model loading failed: {e}")
-            st.info("💡 Interface will still work - some features may be limited")
+            st.warning(f" Model loading failed: {e}")
+            st.info(" Interface will still work - some features may be limited")
         
         # Initialize available courses
         if not st.session_state.available_courses:
@@ -2788,14 +2787,14 @@ class RealEstateAIApp:
         
         # Main content tabs with clear billing indicators
         tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
-            "📁 Upload Documents (FREE)", 
+            " Upload Documents (FREE)", 
             "🎥 Bulk Transcription (FREE)", 
-            "🔍 Vector RAG (💳 PAID)", 
+            " Vector RAG (💳 PAID)", 
             "💬 Ask Questions (FREE)", 
-            "📊 Analytics (FREE)", 
+            " Analytics (FREE)", 
             "⚙️ System Status (FREE)",
             "🚫 Manage Ignored (FREE)",
-            "📚 Book Embeddings (FREE)"
+            " Book Embeddings (FREE)"
         ])
         
         with tab1:
@@ -2824,7 +2823,7 @@ class RealEstateAIApp:
         
         # Add new analytics and learning tabs
         if st.session_state.get('show_advanced_tabs', False):
-            tab5, tab6 = st.tabs(["📈 Learning Analytics", "🧠 Fine-tuning"])
+            tab5, tab6 = st.tabs([" Learning Analytics", "🧠 Fine-tuning"])
             
             with tab5:
                 self.analytics_dashboard()
@@ -2851,7 +2850,7 @@ class RealEstateAIApp:
         st.info("**RTX 3060 Optimized**: Transcription + Screenshot Detection for Multimodal AI")
         
         # Create tabs for different processing modes
-        tab1, tab2, tab3 = st.tabs(["🎯 Bulk Transcription", "📸 Transition Screenshots", "🔄 Multimodal Processing"])
+        tab1, tab2, tab3 = st.tabs([" Bulk Transcription", "📸 Transition Screenshots", " Multimodal Processing"])
         
         with tab1:
             self._transcription_interface()
@@ -2867,7 +2866,7 @@ class RealEstateAIApp:
         st.subheader("Bulk Video Transcription")
         
         # Economic benefits and setup callout
-        with st.expander("💰 Cost Savings & Setup Requirements"):
+        with st.expander(" Cost Savings & Setup Requirements"):
             st.markdown("""
             **Your RTX 3060 saves $522/year vs cloud transcription:**
             - Local Whisper: $0.0002/minute 
@@ -2892,20 +2891,20 @@ class RealEstateAIApp:
         with col1:
             try:
                 import whisper
-                st.success("✅ Whisper installed")
+                st.success(" Whisper installed")
             except ImportError:
-                st.error("❌ Whisper not installed")
+                st.error(" Whisper not installed")
                 st.code("pip install openai-whisper")
                 
         with col2:
             try:
                 import torch
                 if hasattr(torch, 'cuda') and torch.cuda.is_available():
-                    st.success("✅ CUDA available for RTX 3060")
+                    st.success(" CUDA available for RTX 3060")
                 else:
-                    st.warning("⚠️ CUDA not available")
+                    st.warning(" CUDA not available")
             except ImportError:
-                st.error("❌ PyTorch not installed")
+                st.error(" PyTorch not installed")
                 st.code("pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118")
         
         # Import transcription manager with proper class name
@@ -2915,7 +2914,7 @@ class RealEstateAIApp:
             tm = WhisperTranscriptionManager()
         except Exception as e:
             st.error(f"Transcription manager not available: {e}")
-            st.info("💡 Install dependencies: pip install openai-whisper torch")
+            st.info(" Install dependencies: pip install openai-whisper torch")
             return
         
         # Show current transcription stats
@@ -2930,7 +2929,7 @@ class RealEstateAIApp:
             st.metric("Methods Used", len(stats['methods_used']))
         
         # Smart course selection for bulk processing
-        st.subheader("📚 Select Course for Transcription")
+        st.subheader(" Select Course for Transcription")
         
         # Initialize variables to avoid "possibly unbound" errors
         media_directory = ""
@@ -3002,7 +3001,7 @@ class RealEstateAIApp:
                         with col1:
                             st.metric("📹 Videos/Audio", len(media_files))
                         with col2:
-                            st.metric("📝 VTT/Subtitles", len(vtt_files))
+                            st.metric(" VTT/Subtitles", len(vtt_files))
                         with col3:
                             videos_with_vtt = 0
                             for media_file in media_files:
@@ -3014,10 +3013,10 @@ class RealEstateAIApp:
                             st.metric("⚡ Need Transcription", needs_transcription)
                         
                         if len(vtt_files) > 0:
-                            st.success(f"✅ Found {len(vtt_files)} existing subtitle files - these are already processed in your course index")
+                            st.success(f" Found {len(vtt_files)} existing subtitle files - these are already processed in your course index")
                         
                         if needs_transcription > 0:
-                            st.info(f"🎯 {needs_transcription} media files need transcription to complete your course")
+                            st.info(f" {needs_transcription} media files need transcription to complete your course")
                         else:
                             st.success("🎉 All media files already have transcriptions! Your course is complete.")
                             
@@ -3030,10 +3029,10 @@ class RealEstateAIApp:
                                     accessible_files += 1
                             
                             if accessible_files > 0:
-                                st.success("🚀 **Ready for RTX 3060 Transcription**: Media files detected and accessible for local Whisper processing.")
+                                st.success(" **Ready for RTX 3060 Transcription**: Media files detected and accessible for local Whisper processing.")
                             else:
-                                st.info("📋 **Course Structure Detected**: Files shown are from your course index. For actual transcription, ensure course files are accessible on your local system.")
-                                st.info("💡 **Development Note**: This environment shows course structure but actual media files are on your local H:\\ drive where transcription should be performed.")
+                                st.info(" **Course Structure Detected**: Files shown are from your course index. For actual transcription, ensure course files are accessible on your local system.")
+                                st.info(" **Development Note**: This environment shows course structure but actual media files are on your local H:\\ drive where transcription should be performed.")
                             
                     except Exception as e:
                         st.error(f"Error scanning course directory: {e}")
@@ -3046,7 +3045,7 @@ class RealEstateAIApp:
         else:
             st.warning("No courses detected. Please upload course materials first in the Documents tab.")
             # Fallback to manual input
-            st.subheader("📁 Manual Directory Input")
+            st.subheader(" Manual Directory Input")
             media_directory = st.text_input(
                 "Media Directory Path",
                 placeholder="C:\\Users\\YourName\\Documents\\Course Videos",
@@ -3059,7 +3058,7 @@ class RealEstateAIApp:
             )
         
         # Method selection
-        st.subheader("🔧 Transcription Method")
+        st.subheader(" Transcription Method")
         transcription_method = st.radio(
             "Choose Method:",
             ["🖥️ Local Whisper (RTX 3060)", "☁️ OpenAI Whisper API"],
@@ -3068,7 +3067,7 @@ class RealEstateAIApp:
         
         # FFmpeg configuration for local transcription
         if "Local Whisper" in transcription_method:
-            st.subheader("🔧 Audio Processing Configuration")
+            st.subheader(" Audio Processing Configuration")
             
             col1, col2 = st.columns([2, 1])
             with col1:
@@ -3081,7 +3080,7 @@ class RealEstateAIApp:
                 )
             
             with col2:
-                if st.button("🔍 Test FFmpeg", key="test_ffmpeg_btn"):
+                if st.button(" Test FFmpeg", key="test_ffmpeg_btn"):
                     self.test_ffmpeg_setup(ffmpeg_path)
             
             # Audio processing method selection
@@ -3104,17 +3103,17 @@ class RealEstateAIApp:
             st.session_state.audio_method = audio_method
             
             # Show current configuration
-            with st.expander("📋 Current Configuration"):
+            with st.expander(" Current Configuration"):
                 st.write(f"**FFmpeg Path**: {ffmpeg_path if ffmpeg_path else 'Auto-detect'}")
                 st.write(f"**Audio Method**: {audio_method}")
                 
                 if audio_method != "Auto-detect (Try FFmpeg first, fallback to alternatives)":
                     if "librosa" in audio_method:
-                        st.info("💡 Install librosa: `pip install librosa`")
+                        st.info(" Install librosa: `pip install librosa`")
                     elif "moviepy" in audio_method:
-                        st.info("💡 Install moviepy: `pip install moviepy`")
+                        st.info(" Install moviepy: `pip install moviepy`")
                     elif "pydub" in audio_method:
-                        st.info("💡 Install pydub: `pip install pydub`")
+                        st.info(" Install pydub: `pip install pydub`")
             
             # Audio processing method selection
             audio_method = st.selectbox(
@@ -3134,7 +3133,7 @@ class RealEstateAIApp:
             st.session_state.audio_method = audio_method
         
         # File type selection
-        st.subheader("🎬 File Types to Process")
+        st.subheader(" File Types to Process")
         file_types = st.multiselect(
             "Select media types:",
             ['.mp4', '.avi', '.mov', '.mkv', '.mp3', '.wav', '.flac', '.m4a'],
@@ -3153,7 +3152,7 @@ class RealEstateAIApp:
             show_progress = st.checkbox("Show detailed progress", value=True)
         
         # Explain batch processing for large courses
-        with st.expander("🎯 How Batch Processing Works for Large Courses (60+ videos)"):
+        with st.expander(" How Batch Processing Works for Large Courses (60+ videos)"):
             st.markdown("""
             **Automatic Batching for Your Apache Airflow Course (60 videos):**
             
@@ -3177,14 +3176,14 @@ class RealEstateAIApp:
         
         # Preview files to be processed
         if media_directory and course_name and file_types:
-            if st.button("🔍 Preview Files", key="preview_files_btn"):
+            if st.button(" Preview Files", key="preview_files_btn"):
                 self.preview_media_files(media_directory, file_types, tm, course_name, skip_existing)
         elif not media_directory or not course_name:
             st.info("Please select a course or enter directory path and course name first.")
         
         # Start bulk transcription
         if media_directory and course_name and file_types:
-            if st.button("🚀 Start Bulk Transcription", type="primary", key="start_bulk_transcription_btn"):
+            if st.button(" Start Bulk Transcription", type="primary", key="start_bulk_transcription_btn"):
                 # Get configuration from session state
                 ffmpeg_path = getattr(st.session_state, 'ffmpeg_path', '')
                 audio_method = getattr(st.session_state, 'audio_method', 'Auto-detect (Try FFmpeg first, fallback to alternatives)')
@@ -3198,11 +3197,11 @@ class RealEstateAIApp:
             st.info("Please complete course selection or manual input to start transcription.")
         
         # Management section
-        st.subheader("📋 Transcription Management")
+        st.subheader(" Transcription Management")
         
         col1, col2, col3 = st.columns(3)
         with col1:
-            if st.button("📊 View All Transcriptions", key="view_all_transcriptions_btn"):
+            if st.button(" View All Transcriptions", key="view_all_transcriptions_btn"):
                 self.show_all_transcriptions(tm)
         with col2:
             if st.button("🧹 Cleanup Orphaned Files", key="cleanup_orphaned_files_btn"):
@@ -3210,7 +3209,7 @@ class RealEstateAIApp:
                     tm.cleanup_orphaned_transcriptions()
                     st.success("Cleanup completed!")
         with col3:
-            if st.button("📁 Open Transcriptions Folder", key="open_transcriptions_folder_btn"):
+            if st.button(" Open Transcriptions Folder", key="open_transcriptions_folder_btn"):
                 st.info(f"Transcriptions stored in: `{stats['storage_location']}`")
     
     def preview_media_files(self, directory: str, file_types: list, tm, 
@@ -3270,7 +3269,7 @@ class RealEstateAIApp:
                         for file_path in files_to_process[:10]:  # Show first 10
                             relative_path = file_path.relative_to(media_dir)
                             file_size = file_path.stat().st_size / (1024*1024)  # MB
-                            st.write(f"📁 {relative_path} ({file_size:.1f} MB)")
+                            st.write(f" {relative_path} ({file_size:.1f} MB)")
                         if len(files_to_process) > 10:
                             st.write(f"... and {len(files_to_process) - 10} more files")
             
@@ -3280,14 +3279,14 @@ class RealEstateAIApp:
                     with st.expander(f"Already Transcribed ({len(already_transcribed)})"):
                         for file_path in already_transcribed[:10]:  # Show first 10
                             relative_path = file_path.relative_to(media_dir)
-                            st.write(f"✅ {relative_path}")
+                            st.write(f" {relative_path}")
                         if len(already_transcribed) > 10:
                             st.write(f"... and {len(already_transcribed) - 10} more files")
             
             # Estimate processing time and cost
             total_duration_estimate = len(files_to_process) * 10  # Assume 10 min average
             
-            st.subheader("📊 Processing Estimates")
+            st.subheader(" Processing Estimates")
             col1, col2, col3 = st.columns(3)
             with col1:
                 st.metric("Est. Processing Time", f"{total_duration_estimate // 60}h {total_duration_estimate % 60}m")
@@ -3298,7 +3297,7 @@ class RealEstateAIApp:
                 cloud_cost = total_duration_estimate * 0.006  # $0.006/minute
                 st.metric("Cloud Cost (OpenAI)", f"${cloud_cost:.2f}")
             
-            st.success(f"💰 **Savings with RTX 3060**: ${(cloud_cost - local_cost):.2f} ({((cloud_cost - local_cost) / cloud_cost * 100):.1f}% less)")
+            st.success(f" **Savings with RTX 3060**: ${(cloud_cost - local_cost):.2f} ({((cloud_cost - local_cost) / cloud_cost * 100):.1f}% less)")
             
         except Exception as e:
             st.error(f"Error previewing files: {e}")
@@ -3345,7 +3344,7 @@ class RealEstateAIApp:
                     st.error("OpenAI API key not found. Please add OPENAI_API_KEY to your secrets.")
                     return
             
-            st.info(f"🚀 Starting transcription of {len(files_to_process)} files...")
+            st.info(f" Starting transcription of {len(files_to_process)} files...")
             
             # Progress tracking
             progress_bar = st.progress(0)
@@ -3373,24 +3372,24 @@ class RealEstateAIApp:
                         successful += 1
                         if show_progress:
                             with results_container:
-                                st.success(f"✅ {media_file.name}")
+                                st.success(f" {media_file.name}")
                     else:
                         failed += 1
                         if show_progress:
                             with results_container:
-                                st.error(f"❌ {media_file.name}")
+                                st.error(f" {media_file.name}")
                 
                 except Exception as e:
                     failed += 1
                     if show_progress:
                         with results_container:
-                            st.error(f"❌ {media_file.name}: {str(e)}")
+                            st.error(f" {media_file.name}: {str(e)}")
             
             # Final results
             progress_bar.progress(1.0)
-            status_text.text("✅ Bulk transcription completed!")
+            status_text.text(" Bulk transcription completed!")
             
-            st.subheader("📊 Transcription Results")
+            st.subheader(" Transcription Results")
             col1, col2, col3 = st.columns(3)
             with col1:
                 st.metric("Successful", successful, delta=successful)
@@ -3404,7 +3403,7 @@ class RealEstateAIApp:
                 st.success(f"🎉 Successfully transcribed {successful} files! Transcriptions saved with preserved folder structure.")
                 
                 # Show next steps
-                with st.expander("🚀 Next Steps for Optimal Workflow"):
+                with st.expander(" Next Steps for Optimal Workflow"):
                     st.markdown("""
                     **Your RTX 3060 transcription is complete! Now for superior Q&A:**
                     
@@ -3438,29 +3437,29 @@ class RealEstateAIApp:
                     current_path = os.environ.get('PATH', '')
                     if ffmpeg_path not in current_path:
                         os.environ['PATH'] = ffmpeg_path + os.pathsep + current_path
-                        logger.info(f"✅ Added custom FFmpeg path: {ffmpeg_path}")
+                        logger.info(f" Added custom FFmpeg path: {ffmpeg_path}")
             
             # Configure audio processing method
             whisper_manager.audio_method = audio_method
             
             media_path = Path(media_file)
-            logger.info(f"🎯 Processing: {media_path.name}")
+            logger.info(f" Processing: {media_path.name}")
             
             # Validate file exists and is accessible
             if not media_path.exists():
-                logger.error(f"❌ File not found: {media_path}")
+                logger.error(f" File not found: {media_path}")
                 return False
             
             if not media_path.is_file():
-                logger.error(f"❌ Not a file: {media_path}")
+                logger.error(f" Not a file: {media_path}")
                 return False
                 
             if not os.access(str(media_path), os.R_OK):
-                logger.error(f"❌ File not readable: {media_path}")
+                logger.error(f" File not readable: {media_path}")
                 return False
             
-            logger.info(f"✅ File validation passed: {media_path.name}")
-            logger.info(f"📁 File size: {media_path.stat().st_size / (1024*1024):.1f} MB")
+            logger.info(f" File validation passed: {media_path.name}")
+            logger.info(f" File size: {media_path.stat().st_size / (1024*1024):.1f} MB")
             
             # Perform transcription
             result = whisper_manager.transcribe_audio(str(media_path))
@@ -3481,29 +3480,29 @@ class RealEstateAIApp:
                         f.write(transcription_text)
                         f.write("\n")
                     
-                    logger.info(f"✅ Transcription saved: {vtt_file}")
-                    logger.info(f"📊 Characters transcribed: {len(transcription_text)}")
+                    logger.info(f" Transcription saved: {vtt_file}")
+                    logger.info(f" Characters transcribed: {len(transcription_text)}")
                     return True
                     
                 except Exception as save_error:
-                    logger.error(f"❌ Failed to save transcription: {save_error}")
+                    logger.error(f" Failed to save transcription: {save_error}")
                     return False
             else:
-                logger.error("❌ Transcription failed - no text returned")
+                logger.error(" Transcription failed - no text returned")
                 if result:
-                    logger.error(f"🔍 Result keys: {list(result.keys())}")
-                    logger.error(f"🔍 Text length: {len(result.get('text', ''))}")
+                    logger.error(f" Result keys: {list(result.keys())}")
+                    logger.error(f" Text length: {len(result.get('text', ''))}")
                 return False
         
         except ImportError as ie:
-            logger.error(f"❌ Import error: {ie}")
-            logger.error("💡 Install Whisper with: pip install openai-whisper")
+            logger.error(f" Import error: {ie}")
+            logger.error(" Install Whisper with: pip install openai-whisper")
             return False
         except Exception as e:
-            logger.error(f"❌ Transcription failed for {media_file}: {e}")
-            logger.error(f"🔧 Error type: {type(e).__name__}")
+            logger.error(f" Transcription failed for {media_file}: {e}")
+            logger.error(f" Error type: {type(e).__name__}")
             import traceback
-            logger.error(f"🔍 Full traceback: {traceback.format_exc()}")
+            logger.error(f" Full traceback: {traceback.format_exc()}")
             return False
     
     def test_ffmpeg_setup(self, ffmpeg_path: str = ''):
@@ -3526,14 +3525,14 @@ class RealEstateAIApp:
                                       text=True, 
                                       timeout=10)
                 if result.returncode == 0:
-                    st.success("✅ FFmpeg is available and working!")
+                    st.success(" FFmpeg is available and working!")
                     
                     # Show version info
                     version_lines = result.stdout.split('\n')[:3]
                     st.code('\n'.join(version_lines))
                     
                     # Test audio processing capabilities
-                    st.info("🔧 Testing audio processing capabilities...")
+                    st.info(" Testing audio processing capabilities...")
                     
                     # Check for common audio codecs
                     codec_result = subprocess.run(['ffmpeg', '-codecs'], 
@@ -3542,22 +3541,22 @@ class RealEstateAIApp:
                                                 timeout=10)
                     
                     if 'mp3' in codec_result.stdout.lower():
-                        st.success("✅ MP3 codec support detected")
+                        st.success(" MP3 codec support detected")
                     if 'aac' in codec_result.stdout.lower():
-                        st.success("✅ AAC codec support detected")
+                        st.success(" AAC codec support detected")
                     if 'wav' in codec_result.stdout.lower():
-                        st.success("✅ WAV codec support detected")
+                        st.success(" WAV codec support detected")
                         
                 else:
-                    st.error(f"❌ FFmpeg command failed with return code: {result.returncode}")
+                    st.error(f" FFmpeg command failed with return code: {result.returncode}")
                     st.error(f"Error output: {result.stderr}")
                     
             except FileNotFoundError:
-                st.error("❌ FFmpeg not found in system PATH")
+                st.error(" FFmpeg not found in system PATH")
                 self._show_ffmpeg_installation_help()
                 
             except subprocess.TimeoutExpired:
-                st.error("❌ FFmpeg command timed out")
+                st.error(" FFmpeg command timed out")
                 
             finally:
                 # Restore original PATH if modified
@@ -3565,14 +3564,14 @@ class RealEstateAIApp:
                     os.environ['PATH'] = original_path
                     
         except Exception as e:
-            st.error(f"❌ Error testing FFmpeg: {e}")
+            st.error(f" Error testing FFmpeg: {e}")
             self._show_ffmpeg_installation_help()
     
     def _show_ffmpeg_installation_help(self):
         """Show FFmpeg installation instructions."""
-        st.info("💡 FFmpeg Installation Instructions:")
+        st.info(" FFmpeg Installation Instructions:")
         
-        with st.expander("🔧 How to Install FFmpeg on Windows"):
+        with st.expander(" How to Install FFmpeg on Windows"):
             st.markdown("""
             **Method 1: Download from Official Site**
             1. Go to https://ffmpeg.org/download.html#build-windows
@@ -3604,7 +3603,7 @@ class RealEstateAIApp:
             - pydub: `pip install pydub`
             """)
         
-        st.warning("⚠️ Without FFmpeg or alternative libraries, video transcription will fail.")
+        st.warning(" Without FFmpeg or alternative libraries, video transcription will fail.")
         st.info("""
         **Recommended Setup for Your RTX 3060:**
         1. Install FFmpeg for fastest processing
@@ -3669,7 +3668,7 @@ class RealEstateAIApp:
     
     def show_all_transcriptions(self, tm):
         """Display all transcriptions with management options."""
-        st.subheader("📋 All Transcriptions")
+        st.subheader(" All Transcriptions")
         
         # Get all courses with transcriptions
         all_transcriptions = {}
@@ -3685,13 +3684,13 @@ class RealEstateAIApp:
         
         # Display by course
         for course_name, transcriptions in all_transcriptions.items():
-            with st.expander(f"📚 {course_name} ({len(transcriptions)} files)"):
+            with st.expander(f" {course_name} ({len(transcriptions)} files)"):
                 for info in transcriptions:
                     col1, col2, col3 = st.columns([3, 1, 1])
                     
                     with col1:
                         original_file = Path(info.get("original_file", ""))
-                        st.write(f"🎬 {original_file.name}")
+                        st.write(f" {original_file.name}")
                         st.caption(f"Method: {info.get('method', 'unknown')} | "
                                  f"Characters: {info.get('character_count', 0):,}")
                     
@@ -3723,11 +3722,11 @@ class RealEstateAIApp:
     
     def vector_rag_section(self):
         """Vector RAG system for cost-efficient querying with embeddings."""
-        st.header("🔍 Vector RAG - Cost-Efficient AI Querying")
+        st.header(" Vector RAG - Cost-Efficient AI Querying")
         st.info("**Save $400+/year**: Use local embeddings + cloud APIs for precise, cost-effective responses")
         
         # Cost comparison
-        with st.expander("💰 Cost Savings Analysis"):
+        with st.expander(" Cost Savings Analysis"):
             col1, col2 = st.columns(2)
             with col1:
                 st.markdown("**Current Approach (Flat Rate)**")
@@ -3758,7 +3757,7 @@ class RealEstateAIApp:
             
             if (cache_stats and cache_stats.get('total_cached_responses', 0) > 0) or \
                (history_stats and history_stats.get('total_queries', 0) > 0):
-                with st.expander("📊 Cache & Query History Status"):
+                with st.expander(" Cache & Query History Status"):
                     col1, col2, col3, col4 = st.columns(4)
                     
                     with col1:
@@ -3795,7 +3794,7 @@ class RealEstateAIApp:
                     from datetime import datetime
                     for i, entry in enumerate(recent_queries):
                         timestamp = datetime.fromisoformat(entry['timestamp']).strftime("%Y-%m-%d %H:%M")
-                        cache_indicator = "📋" if entry.get('cached') else "🔥"
+                        cache_indicator = " " if entry.get('cached') else "🔥"
                         st.write(f"**{cache_indicator} {entry['course']}** ({timestamp})")
                         st.write(f"Q: {entry['query'][:80]}...")
                         st.write(f"A: {entry['response'][:100]}...")
@@ -3807,7 +3806,7 @@ class RealEstateAIApp:
             return
         
         # Step 1: Process ALL Course Content into Vectors
-        st.subheader("🔧 Step 1: Process All Course Materials into Vector Embeddings")
+        st.subheader(" Step 1: Process All Course Materials into Vector Embeddings")
         st.info("**Comprehensive Processing**: Combines PDFs, Word docs, PowerPoints, transcriptions, and indexed materials")
         
         # Course selection
@@ -3860,7 +3859,7 @@ class RealEstateAIApp:
                         true_doc_count = analytics.get('total_documents', 0)
                         if true_doc_count > 0:
                             doc_count = true_doc_count
-                            st.info(f"📊 Analytics detected {true_doc_count} documents (using comprehensive count)")
+                            st.info(f" Analytics detected {true_doc_count} documents (using comprehensive count)")
                 except Exception:
                     pass
             
@@ -3875,7 +3874,7 @@ class RealEstateAIApp:
             with col4:
                 # Check if vectors exist
                 vectors_file = rag_engine.vectors_dir / f"{selected_course}_vectors.json"
-                vector_status = "✅ Ready" if vectors_file.exists() else "❌ Not Created"
+                vector_status = " Ready" if vectors_file.exists() else " Not Created"
                 st.metric("Vector Status", vector_status)
             
             # Process button - available if any content exists (documents OR transcriptions)
@@ -3888,12 +3887,12 @@ class RealEstateAIApp:
                     analytics = self._get_comprehensive_analytics(selected_course)
                     if analytics and analytics.get('total_documents', 0) > 0:
                         has_content = True
-                        st.info(f"✅ Detected {analytics['total_documents']} documents in course analytics - enabling vector processing")
+                        st.info(f" Detected {analytics['total_documents']} documents in course analytics - enabling vector processing")
                 except Exception:
                     pass
             
             if has_content:
-                if st.button("🔄 Generate Vector Embeddings from ALL Course Materials", type="primary", key="generate_vector_embeddings_btn"):
+                if st.button(" Generate Vector Embeddings from ALL Course Materials", type="primary", key="generate_vector_embeddings_btn"):
                     with st.spinner("Processing documents, transcriptions, and indexed materials..."):
                         try:
                             # Check if embedding model is loaded properly
@@ -3903,8 +3902,8 @@ class RealEstateAIApp:
                                 # Check if using CPU fallback
                                 device = getattr(model_mgr.embedding_model, 'device', 'unknown')
                                 if 'cpu' in str(device).lower():
-                                    st.error("⚠️ **PERFORMANCE WARNING**: Using CPU for embeddings - this will be 5-10x slower than GPU!")
-                                    st.info("💡 Consider restarting the application to retry GPU initialization")
+                                    st.error(" **PERFORMANCE WARNING**: Using CPU for embeddings - this will be 5-10x slower than GPU!")
+                                    st.info(" Consider restarting the application to retry GPU initialization")
 
                             
                             # Process ALL course content
@@ -3912,7 +3911,7 @@ class RealEstateAIApp:
                                 selected_course, chunking_method
                             )
                             
-                            st.success(f"✅ Created {vector_data['total_chunks']} vector embeddings from {vector_data['total_sources']} sources!")
+                            st.success(f" Created {vector_data['total_chunks']} vector embeddings from {vector_data['total_sources']} sources!")
                             
                             # Show comprehensive processing results
                             col1, col2 = st.columns(2)
@@ -3925,7 +3924,7 @@ class RealEstateAIApp:
                                 st.write(f"**Created**: {vector_data['created'][:19]}")
                             
                             # Show detailed source breakdown
-                            with st.expander("📄 Processed Sources"):
+                            with st.expander(" Processed Sources"):
                                 for source in vector_data['processed_sources']:
                                     st.write(f"• {source}")
                             
@@ -3934,18 +3933,18 @@ class RealEstateAIApp:
                         except Exception as e:
                             st.error(f"Error generating embeddings: {e}")
             else:
-                st.warning("⚠️ No content found for this course in this environment.")
+                st.warning(" No content found for this course in this environment.")
                 st.info("**To add content**: Use Upload Documents tab for PDFs/DOCX, or Bulk Transcription tab for videos/audio.")
                 
                 # Show how the system will work
-                with st.expander("💡 How Vector RAG Works with Your Content"):
+                with st.expander(" How Vector RAG Works with Your Content"):
                     st.markdown("""
                     **When you have course materials, the system will:**
                     
                     1. **Extract ALL content** from your course materials:
-                       - 📄 PDFs, DOCX, PowerPoint slides  
-                       - 🎬 Video/audio transcriptions
-                       - 📝 Any indexed documents
+                       - PDFs, DOCX, PowerPoint slides  
+                       - Video/audio transcriptions
+                       - Any indexed documents
                     
                     2. **Create vector embeddings** using local models (free)
                     
@@ -3989,8 +3988,8 @@ class RealEstateAIApp:
         active_openai_key = st.session_state.manual_openai_key or env_openai_key
         active_perplexity_key = st.session_state.manual_perplexity_key or env_perplexity_key
         
-        openai_key_status = "✅ Set" if active_openai_key and len(active_openai_key.strip()) > 0 else "❌ Missing"
-        perplexity_key_status = "✅ Set" if active_perplexity_key and len(active_perplexity_key.strip()) > 0 else "❌ Missing"
+        openai_key_status = " Set" if active_openai_key and len(active_openai_key.strip()) > 0 else " Missing"
+        perplexity_key_status = " Set" if active_perplexity_key and len(active_perplexity_key.strip()) > 0 else " Missing"
         
         # Manual API key input with storage
         col1, col2 = st.columns(2)
@@ -4031,7 +4030,7 @@ class RealEstateAIApp:
         # Key management buttons
         col1, col2, col3 = st.columns(3)
         with col1:
-            if st.button("💾 Save Current Keys", key="save_current_keys_btn"):
+            if st.button(" Save Current Keys", key="save_current_keys_btn"):
                 success = key_storage.save_keys(
                     openai_key=st.session_state.manual_openai_key,
                     perplexity_key=st.session_state.manual_perplexity_key
@@ -4042,7 +4041,7 @@ class RealEstateAIApp:
                     st.error("Failed to save keys")
         
         with col2:
-            if st.button("🔄 Reload Stored Keys", key="reload_stored_keys_btn"):
+            if st.button(" Reload Stored Keys", key="reload_stored_keys_btn"):
                 stored_keys = key_storage.load_keys()
                 st.session_state.manual_openai_key = stored_keys.get('openai', '')
                 st.session_state.manual_perplexity_key = stored_keys.get('perplexity', '')
@@ -4060,13 +4059,13 @@ class RealEstateAIApp:
         # Show key sources and status
         if active_openai_key:
             source = "Local Storage" if st.session_state.manual_openai_key else "Environment"
-            st.info(f"✅ OpenAI key active from: {source}")
+            st.info(f" OpenAI key active from: {source}")
         if active_perplexity_key:
             source = "Local Storage" if st.session_state.manual_perplexity_key else "Environment"  
-            st.info(f"✅ Perplexity key active from: {source}")
+            st.info(f" Perplexity key active from: {source}")
         
         # Generated Files Section
-        st.subheader("📊 Generated Excel Files")
+        st.subheader(" Generated Excel Files")
         
         # Check for generated files in temp directory
         import os
@@ -4083,7 +4082,7 @@ class RealEstateAIApp:
                     col1, col2, col3 = st.columns([3, 2, 1])
                     
                     with col1:
-                        st.write(f"📊 **{file_path.name}**")
+                        st.write(f" **{file_path.name}**")
                     
                     with col2:
                         from datetime import datetime
@@ -4101,12 +4100,12 @@ class RealEstateAIApp:
                                 key=f"download_{file_path.name}"
                             )
             else:
-                st.info("💡 **Excel Auto-Generation**: When you ask for valuations, tables, or financial analysis, the AI responses with structured data are automatically converted to downloadable Excel files")
+                st.info(" **Excel Auto-Generation**: When you ask for valuations, tables, or financial analysis, the AI responses with structured data are automatically converted to downloadable Excel files")
         else:
-            st.info("💡 **Excel Auto-Generation**: When you ask for valuations, tables, or financial analysis, the AI responses with structured data are automatically converted to downloadable Excel files")
+            st.info(" **Excel Auto-Generation**: When you ask for valuations, tables, or financial analysis, the AI responses with structured data are automatically converted to downloadable Excel files")
         
         # Step 2: Query with Vector Search
-        st.subheader("🔍 Step 2: Query with Vector Search")
+        st.subheader(" Step 2: Query with Vector Search")
         
         if selected_course:
             vectors_file = rag_engine.vectors_dir / f"{selected_course}_vectors.json"
@@ -4129,24 +4128,24 @@ class RealEstateAIApp:
                 
                 if fresh_openai_key and len(fresh_openai_key.strip()) > 0:
                     providers.append("openai")
-                    provider_labels["openai"] = "OpenAI GPT-4 ✅"
+                    provider_labels["openai"] = "OpenAI GPT-4 "
                 else:
-                    provider_labels["openai"] = "OpenAI GPT-4 ❌ (Key Missing)"
+                    provider_labels["openai"] = "OpenAI GPT-4 (Key Missing)"
                 
                 if fresh_perplexity_key and len(fresh_perplexity_key.strip()) > 0:
                     providers.append("perplexity") 
-                    provider_labels["perplexity"] = "Perplexity Sonar ✅"
+                    provider_labels["perplexity"] = "Perplexity Sonar "
                 else:
-                    provider_labels["perplexity"] = "Perplexity Sonar ❌ (Key Missing)"
+                    provider_labels["perplexity"] = "Perplexity Sonar (Key Missing)"
                 
                 if not providers:
-                    st.warning("⚠️ No API keys available. Please add API keys above to enable LLM responses.")
+                    st.warning(" No API keys available. Please add API keys above to enable LLM responses.")
                     st.stop()
                 
-                st.warning("⚠️ **BILLING ALERT**: The selection below determines which service charges you for AI responses")
+                st.warning(" **BILLING ALERT**: The selection below determines which service charges you for AI responses")
                 
                 api_provider = st.radio(
-                    "💰 Choose AI provider (THIS CHARGES YOU):",
+                    " Choose AI provider (THIS CHARGES YOU):",
                     providers,
                     format_func=lambda x: provider_labels[x],
                     help="⚡ IMPORTANT: Each query you submit will charge your selected API account. OpenAI charges ~$0.001-0.01 per query, Perplexity similar rates."
@@ -4160,7 +4159,7 @@ class RealEstateAIApp:
                 
                 # Process query
                 if query:
-                    if st.button("🚀 Search & Generate Response", key="search_generate_response_btn"):
+                    if st.button(" Search & Generate Response", key="search_generate_response_btn"):
                         with st.spinner("Searching relevant content and generating response..."):
                             try:
                                 # Step 1: Vector search
@@ -4204,7 +4203,7 @@ class RealEstateAIApp:
                                 
                                 # Show sources if requested
                                 if show_sources:
-                                    st.subheader("📚 Source Chunks")
+                                    st.subheader(" Source Chunks")
                                     for i, result in enumerate(search_results):
                                         with st.expander(f"Source {i+1}: {result['source_file']} (Similarity: {result['similarity']:.3f})"):
                                             st.write(result['content'])
@@ -4215,7 +4214,7 @@ class RealEstateAIApp:
                 
                 # Search across all courses
                 st.subheader("🌐 Search All Courses")
-                if st.button("🔍 Search Across All Courses", key="search_all_courses_btn"):
+                if st.button(" Search Across All Courses", key="search_all_courses_btn"):
                     if query:
                         with st.spinner("Searching all courses..."):
                             try:
@@ -4223,7 +4222,7 @@ class RealEstateAIApp:
                                 
                                 if all_results:
                                     for course, results in all_results.items():
-                                        with st.expander(f"📚 {course} ({len(results)} results)"):
+                                        with st.expander(f" {course} ({len(results)} results)"):
                                             for result in results[:3]:  # Show top 3 per course
                                                 st.write(f"**Score: {result['similarity']:.3f}** - {result['content'][:200]}...")
                                 else:
@@ -4236,11 +4235,11 @@ class RealEstateAIApp:
                 st.warning("No vector embeddings found. Please generate embeddings first.")
         
         # Management tools
-        st.subheader("📊 Vector Database Management")
+        st.subheader(" Vector Database Management")
         
         col1, col2, col3 = st.columns(3)
         with col1:
-            if st.button("📋 View All Vector Databases", key="view_vector_databases_btn"):
+            if st.button(" View All Vector Databases", key="view_vector_databases_btn"):
                 vector_files = list(rag_engine.vectors_dir.glob("*_vectors.json"))
                 if vector_files:
                     for vector_file in vector_files:
@@ -4264,12 +4263,12 @@ class RealEstateAIApp:
                     st.error(f"Error clearing cache: {e}")
         
         with col3:
-            if st.button("📁 Open Vectors Folder", key="open_vectors_folder_btn"):
+            if st.button(" Open Vectors Folder", key="open_vectors_folder_btn"):
                 st.info(f"Vector files stored in: `{rag_engine.vectors_dir}`")
 
         # Footer
         st.markdown("---")
-        st.markdown("🔒 **100% Local Processing** - No data leaves your machine")
+        st.markdown(" **100% Local Processing** - No data leaves your machine")
 
     def system_status_section(self):
         """Display system status and dependency information."""
@@ -4281,43 +4280,43 @@ class RealEstateAIApp:
         # Overall status
         all_core_available = all(dependencies['core'].values())
         if all_core_available:
-            st.success("✅ All core dependencies are available")
+            st.success(" All core dependencies are available")
         else:
-            st.warning("⚠️ Some core dependencies are missing")
+            st.warning(" Some core dependencies are missing")
         
         # Core dependencies status
-        st.subheader("🔧 Core Dependencies")
+        st.subheader(" Core Dependencies")
         col1, col2 = st.columns(2)
         
         with col1:
             st.write("**Required for basic functionality:**")
             for dep, available in dependencies['core'].items():
-                status = "✅" if available else "❌"
+                status = " " if available else " "
                 st.write(f"{status} {dep}")
         
         with col2:
             st.write("**AI/ML Dependencies:**")
             for dep, available in dependencies['ai'].items():
-                status = "✅" if available else "❌"
+                status = " " if available else " "
                 st.write(f"{status} {dep}")
         
         # Document processing status
-        st.subheader("📄 Document Processing")
+        st.subheader(" Document Processing")
         for dep, available in dependencies['documents'].items():
-            status = "✅" if available else "❌"
+            status = " " if available else " "
             st.write(f"{status} {dep}")
         
         # System information
-        st.subheader("💻 System Information")
+        st.subheader(" System Information")
         gpu_available = self.config.has_gpu()
-        st.write(f"🔧 GPU Available: {'✅ Yes' if gpu_available else '❌ No'}")
+        st.write(f" GPU Available: {' Yes' if gpu_available else ' No'}")
         
         # Authentication requirements
         st.subheader("🔐 Hugging Face Authentication")
         st.markdown("""
         **This app uses only Mistral 7B and Llama 2 7B models - both require authentication:**
         
-        **🎯 Quick Setup (Required for both models):**
+        ** Quick Setup (Required for both models):**
         
         **Step 1: Get Hugging Face Token**
         1. Create free account at https://huggingface.co
@@ -4348,7 +4347,7 @@ class RealEstateAIApp:
         
         # Installation instructions
         if not all_core_available:
-            st.subheader("📦 Installation Instructions")
+            st.subheader(" Installation Instructions")
             st.markdown("""
             Install required dependencies:
             ```bash
@@ -4402,14 +4401,14 @@ class RealEstateAIApp:
         st.markdown("""
         **This app is designed for 100% offline operation:**
         
-        **✅ What works offline:**
+        ** What works offline:**
         - Document processing (PDFs, Word docs, PowerPoints, EPUBs)
         - Video/audio transcription with Whisper
         - AI question answering with local Mistral 7B model
         - Course indexing and search
         - All data processing and storage
         
-        **📋 Steps for complete offline setup:**
+        ** Steps for complete offline setup:**
         1. **Install dependencies** (requires internet once):
            ```bash
            python install_dependencies.py
@@ -4424,12 +4423,12 @@ class RealEstateAIApp:
         
         3. **Disconnect from internet** - The app will work completely offline!
         
-        **💾 Local storage locations:**
+        ** Local storage locations:**
         - Models: `./models/` directory
         - Course indexes: `./indexed_courses/` directory
         - Raw documents: `./raw_docs/` directory
         
-        **🔧 Using GGUF models:**
+        ** Using GGUF models:**
         For better performance and lower memory usage, download GGUF models:
         
         **Step 1: Download GGUF models from these sources (NO AUTH REQUIRED):**
@@ -4455,14 +4454,14 @@ class RealEstateAIApp:
         wget -P ./models/gguf/ https://huggingface.co/TheBloke/stablelm-zephyr-3b-GGUF/resolve/main/stablelm-zephyr-3b.Q4_K_M.gguf
         ```
         
-        **⚠️ Note about GGUF usage:**
+        ** Note about GGUF usage:**
         Currently the app uses standard transformers library. To use GGUF models, you'd need:
         - `pip install llama-cpp-python` for GGUF support
         - The app will need updates to use llama-cpp-python instead of transformers
         
         The app will automatically detect and use GGUF models if available.
         
-        **🔒 Privacy benefits:**
+        ** Privacy benefits:**
         - No external API calls
         - No data sent to third parties
         - Complete control over your course materials
@@ -4474,7 +4473,7 @@ class RealEstateAIApp:
         if internet_required:
             st.info("🌐 Internet currently required for initial setup and model downloads")
         else:
-            st.success("✅ Ready for offline operation once models are downloaded")
+            st.success(" Ready for offline operation once models are downloaded")
 
     def _check_all_dependencies(self) -> Dict[str, Dict[str, bool]]:
         """Check status of all dependencies."""

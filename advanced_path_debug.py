@@ -25,7 +25,7 @@ class AdvancedPathDebugger:
     
     def analyze_path_issue(self, problematic_path: str) -> dict:
         """Analyze a specific path that's causing issues."""
-        logger.info(f"🔍 Analyzing problematic path: {problematic_path}")
+        logger.info(f" Analyzing problematic path: {problematic_path}")
         
         analysis = {
             "original_path": problematic_path,
@@ -51,7 +51,7 @@ class AdvancedPathDebugger:
             analysis["path_strategies"].append(result)
             
             if result["accessible"]:
-                logger.info(f"✅ WORKING STRATEGY: {strategy_name}")
+                logger.info(f" WORKING STRATEGY: {strategy_name}")
                 analysis["recommendations"].append(f"Use {strategy_name} strategy: {test_path}")
         
         # Analyze file system context
@@ -89,11 +89,11 @@ class AdvancedPathDebugger:
                     result["accessible"] = True
                     result["size_bytes"] = os.path.getsize(test_path)
                     
-                    logger.info(f"✅ {strategy_name}: {test_path} - ACCESSIBLE ({result['size_bytes']} bytes)")
+                    logger.info(f" {strategy_name}: {test_path} - ACCESSIBLE ({result['size_bytes']} bytes)")
                 else:
-                    logger.warning(f"❌ {strategy_name}: {test_path} - EXISTS but not a file")
+                    logger.warning(f" {strategy_name}: {test_path} - EXISTS but not a file")
             else:
-                logger.warning(f"❌ {strategy_name}: {test_path} - Does not exist")
+                logger.warning(f" {strategy_name}: {test_path} - Does not exist")
                 
         except Exception as e:
             result["error"] = str(e)
@@ -181,25 +181,25 @@ class AdvancedPathDebugger:
         inaccessible_parents = [d for d in parent_dirs if d["exists"] and not d.get("accessible", True)]
         
         if inaccessible_parents:
-            recommendations.append("📁 Some parent directories exist but are not accessible - check permissions")
+            recommendations.append(" Some parent directories exist but are not accessible - check permissions")
         
         return recommendations
     
     def debug_transcription_paths(self, base_directory: str = "archived_courses") -> None:
         """Debug common transcription path issues."""
-        logger.info(f"🎯 Debugging transcription paths in: {base_directory}")
+        logger.info(f" Debugging transcription paths in: {base_directory}")
         
         base_path = Path(base_directory)
         
         if not base_path.exists():
-            logger.error(f"❌ Base directory does not exist: {base_path}")
+            logger.error(f" Base directory does not exist: {base_path}")
             return
         
         # Find video files with potential path issues
         video_extensions = ['.mp4', '.avi', '.mov', '.mkv', '.wmv', '.flv']
         problem_patterns = ['[', ']', '(', ')', '&', '%']
         
-        logger.info("🔍 Scanning for video files with potential path issues...")
+        logger.info(" Scanning for video files with potential path issues...")
         
         problem_files = []
         total_videos = 0
@@ -213,7 +213,7 @@ class AdvancedPathDebugger:
                 if any(pattern in path_str for pattern in problem_patterns):
                     problem_files.append(video_file)
         
-        logger.info(f"📊 Found {total_videos} video files, {len(problem_files)} with potential path issues")
+        logger.info(f" Found {total_videos} video files, {len(problem_files)} with potential path issues")
         
         # Analyze first few problematic files
         for i, problem_file in enumerate(problem_files[:5]):  # Limit to first 5
@@ -222,7 +222,7 @@ class AdvancedPathDebugger:
             
             # Print recommendations
             if analysis["recommendations"]:
-                logger.info("💡 Recommendations:")
+                logger.info(" Recommendations:")
                 for rec in analysis["recommendations"]:
                     logger.info(f"  • {rec}")
 
@@ -232,27 +232,27 @@ if __name__ == "__main__":
     # Debug the specific path from the user's error log
     problematic_path = r"archived_courses\udemy The_Complete_Hands-On_Introduction_to_Apache_Airflow_3\4 - Coding Your First Data Pipeline with Airflow\20 - Define a DAG.mp4"
     
-    print("🔍 ADVANCED PATH DEBUGGING")
+    print(" ADVANCED PATH DEBUGGING")
     print("=" * 60)
     
     analysis = debugger.analyze_path_issue(problematic_path)
     
-    print(f"\n📋 ANALYSIS SUMMARY:")
+    print(f"\n ANALYSIS SUMMARY:")
     print(f"Original path: {analysis['original_path']}")
     print(f"Working directory: {analysis['working_directory']}")
     
-    print(f"\n📊 PATH STRATEGY RESULTS:")
+    print(f"\n PATH STRATEGY RESULTS:")
     for strategy in analysis["path_strategies"]:
-        status = "✅ ACCESSIBLE" if strategy["accessible"] else "❌ FAILED"
+        status = " ACCESSIBLE" if strategy["accessible"] else " FAILED"
         print(f"  {strategy['strategy']}: {status}")
         if strategy["error"]:
             print(f"    Error: {strategy['error']}")
     
-    print(f"\n💡 RECOMMENDATIONS:")
+    print(f"\n RECOMMENDATIONS:")
     for rec in analysis["recommendations"]:
         print(f"  • {rec}")
     
     # Also run general debugging
-    print(f"\n🎯 GENERAL TRANSCRIPTION PATH DEBUGGING")
+    print(f"\n GENERAL TRANSCRIPTION PATH DEBUGGING")
     print("=" * 60)
     debugger.debug_transcription_paths()

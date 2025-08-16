@@ -23,39 +23,39 @@ def test_course_detection():
     indexer = CourseIndexer()
     
     # Test directory existence
-    print(f"📁 Raw docs directory: {config.raw_docs_dir}")
+    print(f" Raw docs directory: {config.raw_docs_dir}")
     print(f"   Exists: {config.raw_docs_dir.exists()}")
     
-    print(f"📊 Indexed courses directory: {config.indexed_courses_dir}")  
+    print(f" Indexed courses directory: {config.indexed_courses_dir}")  
     print(f"   Exists: {config.indexed_courses_dir.exists()}")
     
     # List contents of raw_docs
     if config.raw_docs_dir.exists():
-        print("\n📂 Contents of raw_docs:")
+        print("\n Contents of raw_docs:")
         for item in config.raw_docs_dir.iterdir():
             if item.is_dir():
                 files = list(item.iterdir())
-                print(f"  📁 {item.name}/ ({len(files)} files)")
+                print(f" {item.name}/ ({len(files)} files)")
                 for file in files:
                     print(f"    - {file.name}")
             else:
-                print(f"  📄 {item.name}")
+                print(f" {item.name}")
     
     # List contents of indexed_courses
     if config.indexed_courses_dir.exists():
-        print("\n📊 Contents of indexed_courses:")
+        print("\n Contents of indexed_courses:")
         for item in config.indexed_courses_dir.iterdir():
             if item.is_dir():
                 files = list(item.iterdir())
-                print(f"  📁 {item.name}/ ({len(files)} files)")
+                print(f" {item.name}/ ({len(files)} files)")
                 for file in files:
                     print(f"    - {file.name}")
     
     # Test course detection
-    print("\n🔍 Running course detection...")
+    print("\n Running course detection...")
     courses = indexer.get_available_courses()
     
-    print(f"\n✅ Detection Result: {len(courses)} courses found")
+    print(f"\n Detection Result: {len(courses)} courses found")
     for course in courses:
         print(f"  - {course['name']} ({course['status']}) - {course['document_count']} docs")
     

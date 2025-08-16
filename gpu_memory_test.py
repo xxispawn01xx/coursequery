@@ -26,7 +26,7 @@ class GPUMemoryTester:
         print()
         
         if not torch.cuda.is_available():
-            print("❌ CUDA not available")
+            print(" CUDA not available")
             return False
             
         self.device = torch.device('cuda:0')
@@ -34,8 +34,8 @@ class GPUMemoryTester:
         self.total_memory = torch.cuda.get_device_properties(0).total_memory
         
         print(f"🖥️  GPU: {gpu_name}")
-        print(f"💾 Total VRAM: {self.total_memory / (1024**3):.1f} GB")
-        print(f"🔧 CUDA Version: {torch.version.cuda}")
+        print(f" Total VRAM: {self.total_memory / (1024**3):.1f} GB")
+        print(f" CUDA Version: {torch.version.cuda}")
         print(f"🐍 PyTorch Version: {torch.__version__}")
         print()
         
@@ -43,7 +43,7 @@ class GPUMemoryTester:
     
     def test_basic_allocation(self):
         """Test basic memory allocation patterns"""
-        print("🔍 Test 1: Basic Memory Allocation")
+        print(" Test 1: Basic Memory Allocation")
         
         try:
             # Start with small allocations
@@ -59,7 +59,7 @@ class GPUMemoryTester:
                 result = tensor.sum()
                 tensor_copy = tensor.clone()
                 
-                print(f" ✅ Success (Sum: {result.item():.2e})")
+                print(f" Success (Sum: {result.item():.2e})")
                 
                 # Clean up
                 del tensor, tensor_copy, result
@@ -70,7 +70,7 @@ class GPUMemoryTester:
             return True
             
         except Exception as e:
-            print(f" ❌ Failed: {e}")
+            print(f" Failed: {e}")
             self.results.append(f"Basic allocation: FAILED - {e}")
             return False
     
@@ -95,7 +95,7 @@ class GPUMemoryTester:
                 checksum = tensor.sum().item()
                 
                 tensors.append((tensor, checksum))
-                print(f" ✅ (checksum: {checksum:.2e})")
+                print(f" (checksum: {checksum:.2e})")
                 
             # Verify all tensors still have correct checksums
             print("   Verifying memory integrity...", end='')
@@ -104,7 +104,7 @@ class GPUMemoryTester:
                 if abs(current_checksum - original_checksum) > 1e-3:
                     raise RuntimeError(f"Memory corruption detected in tensor {i}")
             
-            print(" ✅ All checksums verified")
+            print(" All checksums verified")
             
             # Clean up
             del tensors
@@ -114,7 +114,7 @@ class GPUMemoryTester:
             return True
             
         except Exception as e:
-            print(f" ❌ Failed: {e}")
+            print(f" Failed: {e}")
             self.results.append(f"Memory stress: FAILED - {e}")
             torch.cuda.empty_cache()
             return False
@@ -156,7 +156,7 @@ class GPUMemoryTester:
             assert sentence_embeddings.shape == (batch_size, hidden_dim)
             assert not torch.isnan(sentence_embeddings).any()
             
-            print(f" ✅ Generated {batch_size} embeddings")
+            print(f" Generated {batch_size} embeddings")
             
             # Clean up
             del input_ids, embedding_weights, embeddings, attention_weights, sentence_embeddings
@@ -166,7 +166,7 @@ class GPUMemoryTester:
             return True
             
         except Exception as e:
-            print(f" ❌ Failed: {e}")
+            print(f" Failed: {e}")
             self.results.append(f"Embedding simulation: FAILED - {e}")
             torch.cuda.empty_cache()
             return False
@@ -186,7 +186,7 @@ class GPUMemoryTester:
                 if i % 20 == 0:
                     print(".", end='')
             
-            print(" ✅")
+            print(" ")
             
             # Free every other tensor (create fragmentation)
             print("   Creating fragmentation...", end='')
@@ -195,7 +195,7 @@ class GPUMemoryTester:
                 tensors[i] = None
             
             torch.cuda.empty_cache()
-            print(" ✅")
+            print(" ")
             
             # Try to allocate a large tensor (should work if defragmentation works)
             print("   Testing large allocation after fragmentation...", end='')
@@ -203,7 +203,7 @@ class GPUMemoryTester:
             
             # Verify
             checksum = large_tensor.sum().item()
-            print(f" ✅ (checksum: {checksum:.2e})")
+            print(f" (checksum: {checksum:.2e})")
             
             # Clean up
             del tensors, large_tensor
@@ -213,7 +213,7 @@ class GPUMemoryTester:
             return True
             
         except Exception as e:
-            print(f" ❌ Failed: {e}")
+            print(f" Failed: {e}")
             self.results.append(f"Memory fragmentation: FAILED - {e}")
             torch.cuda.empty_cache()
             return False
@@ -250,7 +250,7 @@ class GPUMemoryTester:
             
             # Final verification
             final_result = torch.matmul(a, b).sum().item()
-            print(f"   ✅ Completed {iteration} iterations (final result: {final_result:.2e})")
+            print(f" Completed {iteration} iterations (final result: {final_result:.2e})")
             
             # Clean up
             del a, b, c
@@ -260,14 +260,14 @@ class GPUMemoryTester:
             return True
             
         except Exception as e:
-            print(f" ❌ Failed: {e}")
+            print(f" Failed: {e}")
             self.results.append(f"Temperature stability: FAILED - {e}")
             torch.cuda.empty_cache()
             return False
     
     def print_system_info(self):
         """Print additional system information"""
-        print("\n📊 System Information:")
+        print("\n System Information:")
         
         # Memory info
         memory = psutil.virtual_memory()
@@ -307,7 +307,7 @@ class GPUMemoryTester:
                 if test():
                     passed += 1
             except Exception as e:
-                print(f"❌ Test failed with exception: {e}")
+                print(f" Test failed with exception: {e}")
         
         # Print results
         print("\n" + "="*50)
@@ -315,7 +315,7 @@ class GPUMemoryTester:
         print("="*50)
         
         for result in self.results:
-            status = "✅" if "PASSED" in result else "❌"
+            status = " " if "PASSED" in result else " "
             print(f"{status} {result}")
         
         print(f"\nOverall: {passed}/{len(tests)} tests passed")
@@ -323,7 +323,7 @@ class GPUMemoryTester:
         if passed == len(tests):
             print("🎉 All tests passed! Your GPU memory appears healthy.")
         elif passed >= len(tests) * 0.8:
-            print("⚠️  Most tests passed, but some issues detected. Monitor GPU carefully.")
+            print(" Most tests passed, but some issues detected. Monitor GPU carefully.")
         else:
             print("🚨 Multiple test failures. GPU may have hardware issues.")
             print("   Consider:\n   - Checking GPU temperature\n   - Testing in a different system\n   - Running manufacturer diagnostics")

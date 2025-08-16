@@ -15,7 +15,7 @@ except ImportError:
             for key, value in kwargs.items():
                 setattr(self, key, value)
     PYDANTIC_AVAILABLE = False
-    print("⚠️ Pydantic not available - using minimal mock for offline mode")
+    print(" Pydantic not available - using minimal mock for offline mode")
 
 # Handle internal pydantic issues
 try:
@@ -220,34 +220,34 @@ class CourseIndexer:
             VectorStoreIndex or None if not found
         """
         try:
-            logger.info(f"🔍 DEBUG: Starting index load for course: {course_name}")
+            logger.info(f" DEBUG: Starting index load for course: {course_name}")
             
             course_index_dir = self.config.indexed_courses_dir / course_name
             index_path = course_index_dir / "index"
             
-            logger.info(f"📁 DEBUG: Course index directory: {course_index_dir}")
-            logger.info(f"📂 DEBUG: Index path: {index_path}")
-            logger.info(f"📋 DEBUG: Index path exists: {index_path.exists()}")
+            logger.info(f" DEBUG: Course index directory: {course_index_dir}")
+            logger.info(f" DEBUG: Index path: {index_path}")
+            logger.info(f" DEBUG: Index path exists: {index_path.exists()}")
             
             if not index_path.exists():
-                logger.warning(f"❌ No index found for course: {course_name}")
+                logger.warning(f" No index found for course: {course_name}")
                 return None
             
             # Check directory contents
             if index_path.exists():
                 try:
                     contents = list(index_path.iterdir())
-                    logger.info(f"📄 DEBUG: Index directory contains {len(contents)} files:")
+                    logger.info(f" DEBUG: Index directory contains {len(contents)} files:")
                     for item in contents[:5]:  # Show first 5 files
                         logger.info(f"  - {item.name}")
                     if len(contents) > 5:
                         logger.info(f"  ... and {len(contents) - 5} more files")
                 except Exception as dir_error:
-                    logger.error(f"❌ DEBUG: Cannot read index directory: {dir_error}")
+                    logger.error(f" DEBUG: Cannot read index directory: {dir_error}")
             
             logger.info(f"⏳ DEBUG: Creating storage context from {index_path}")
             storage_context = StorageContext.from_defaults(persist_dir=str(index_path))
-            logger.info(f"✅ DEBUG: Storage context created successfully")
+            logger.info(f" DEBUG: Storage context created successfully")
             
             # Check embedding configuration
             logger.info(f"🤖 DEBUG: Embedding wrapper available: {self.embedding_wrapper is not None}")
@@ -267,13 +267,13 @@ class CourseIndexer:
                 try:
                     # Load with custom embeddings if available
                     if self.embedding_wrapper:
-                        logger.info(f"🔧 DEBUG: Loading with custom embedding wrapper")
+                        logger.info(f" DEBUG: Loading with custom embedding wrapper")
                         result = load_index_from_storage(
                             storage_context,
                             embed_model=self.embedding_wrapper
                         )
                     else:
-                        logger.info(f"🔧 DEBUG: Loading with default embeddings")
+                        logger.info(f" DEBUG: Loading with default embeddings")
                         result = load_index_from_storage(storage_context)
                     
                     index_result[0] = result
@@ -298,20 +298,20 @@ class CourseIndexer:
             
             index = index_result[0]
             load_time = time.time() - start_time
-            logger.info(f"✅ DEBUG: Index loaded successfully in {load_time:.2f} seconds")
+            logger.info(f" DEBUG: Index loaded successfully in {load_time:.2f} seconds")
             
-            logger.info(f"✅ Loaded index for course: {course_name}")
+            logger.info(f" Loaded index for course: {course_name}")
             return index
             
         except TimeoutError as e:
             logger.error(f"⏰ TIMEOUT: Index loading for course {course_name} timed out after 30 seconds")
-            logger.error("💡 SUGGESTION: This course index may be corrupted or too large")
+            logger.error(" SUGGESTION: This course index may be corrupted or too large")
             return None
         except Exception as e:
-            logger.error(f"❌ Error loading index for course {course_name}: {e}")
-            logger.error(f"🔍 DEBUG: Exception type: {type(e).__name__}")
+            logger.error(f" Error loading index for course {course_name}: {e}")
+            logger.error(f" DEBUG: Exception type: {type(e).__name__}")
             import traceback
-            logger.error(f"📋 DEBUG: Full traceback:\n{traceback.format_exc()}")
+            logger.error(f" DEBUG: Full traceback:\n{traceback.format_exc()}")
             return None
     
     def get_available_courses(self) -> List[Dict[str, Any]]:
@@ -324,38 +324,38 @@ class CourseIndexer:
         courses = []
         course_names = set()
         
-        logger.info("🔍 Starting course detection...")
-        logger.info(f"📁 Raw docs directory: {self.config.raw_docs_dir}")
-        logger.info(f"📊 Indexed courses directory: {self.config.indexed_courses_dir}")
+        logger.info(" Starting course detection...")
+        logger.info(f" Raw docs directory: {self.config.raw_docs_dir}")
+        logger.info(f" Indexed courses directory: {self.config.indexed_courses_dir}")
         
         try:
             # First, get indexed courses from indexed_courses_dir
             indexed_count = 0
             if self.config.indexed_courses_dir.exists():
-                logger.info("📊 Checking indexed courses directory...")
-                logger.info(f"📁 DEBUG: Indexed courses path: {self.config.indexed_courses_dir}")
+                logger.info(" Checking indexed courses directory...")
+                logger.info(f" DEBUG: Indexed courses path: {self.config.indexed_courses_dir}")
                 
                 try:
                     dirs = list(self.config.indexed_courses_dir.iterdir())
-                    logger.info(f"🔍 DEBUG: Found {len(dirs)} items in indexed courses directory")
+                    logger.info(f" DEBUG: Found {len(dirs)} items in indexed courses directory")
                 except Exception as dir_error:
-                    logger.error(f"❌ DEBUG: Cannot read indexed courses directory: {dir_error}")
+                    logger.error(f" DEBUG: Cannot read indexed courses directory: {dir_error}")
                     dirs = []
                 
                 for course_dir in dirs:
                     if course_dir.is_dir():
-                        logger.info(f"  📂 Found indexed directory: {course_dir.name}")
+                        logger.info(f" Found indexed directory: {course_dir.name}")
                         
                         # Check if this directory actually contains an index
                         index_path = course_dir / "index"
                         metadata_path = course_dir / "metadata.json"
                         
-                        logger.info(f"    🔍 Index exists: {index_path.exists()}")
-                        logger.info(f"    🔍 Metadata exists: {metadata_path.exists()}")
+                        logger.info(f" Index exists: {index_path.exists()}")
+                        logger.info(f" Metadata exists: {metadata_path.exists()}")
                         metadata_path = course_dir / "metadata.json"
                         
                         if metadata_path.exists():
-                            logger.info(f"    ✅ Has metadata file")
+                            logger.info(f" Has metadata file")
                             with open(metadata_path, 'r') as f:
                                 metadata = json.load(f)
                             
@@ -372,7 +372,7 @@ class CourseIndexer:
                             course_names.add(course_info['name'])
                             indexed_count += 1
                         else:
-                            logger.info(f"    ⚠️ Missing metadata file")
+                            logger.info(f" Missing metadata file")
                             # Course directory exists but no metadata
                             course_info = {
                                 'name': course_dir.name,
@@ -386,14 +386,14 @@ class CourseIndexer:
                             courses.append(course_info)
                             course_names.add(course_info['name'])
                             indexed_count += 1
-                logger.info(f"📊 Found {indexed_count} indexed courses")
+                logger.info(f" Found {indexed_count} indexed courses")
             else:
-                logger.info("📊 Indexed courses directory does not exist")
+                logger.info(" Indexed courses directory does not exist")
             
             # Then, check for unprocessed courses in raw_docs_dir
             unprocessed_count = 0
             if self.config.raw_docs_dir.exists():
-                logger.info("📁 Checking raw docs directory...")
+                logger.info(" Checking raw docs directory...")
                 for course_dir in self.config.raw_docs_dir.iterdir():
                     if course_dir.is_dir() and course_dir.name not in course_names:
                         logger.info(f"  Found raw directory: {course_dir.name}")
@@ -424,12 +424,12 @@ class CourseIndexer:
                             }
                             courses.append(course_info)
                             unprocessed_count += 1
-                            logger.info(f"    ✅ Added as unprocessed course ({len(supported_files)} files)")
+                            logger.info(f" Added as unprocessed course ({len(supported_files)} files)")
                         else:
-                            logger.info(f"    ❌ No supported files found")
-                logger.info(f"📁 Found {unprocessed_count} unprocessed courses")
+                            logger.info(f" No supported files found")
+                logger.info(f" Found {unprocessed_count} unprocessed courses")
             else:
-                logger.info("📁 Raw docs directory does not exist")
+                logger.info(" Raw docs directory does not exist")
             
             # Sort: indexed courses first (by last indexed date), then unprocessed courses
             def sort_key(course):
@@ -440,12 +440,12 @@ class CourseIndexer:
             
             courses.sort(key=sort_key, reverse=False)
             
-            logger.info(f"🎯 Final result: {len(courses)} total courses")
+            logger.info(f" Final result: {len(courses)} total courses")
             for course in courses:
                 logger.info(f"  - {course['name']}: {course['status']} ({course['document_count']} docs)")
             
         except Exception as e:
-            logger.error(f"❌ Error getting available courses: {e}")
+            logger.error(f" Error getting available courses: {e}")
             import traceback
             logger.error(f"Full traceback: {traceback.format_exc()}")
         
@@ -544,25 +544,25 @@ class CourseIndexer:
             
             # First, scan and log all files found
             all_files_found = []
-            logger.info(f"🔍 Scanning for files in: {course_raw_dir}")
+            logger.info(f" Scanning for files in: {course_raw_dir}")
             
             try:
                 for file_path in course_raw_dir.rglob('*'):
                     if file_path.is_file():
                         all_files_found.append(file_path)
                         
-                logger.info(f"📁 Found {len(all_files_found)} total files in course directory")
+                logger.info(f" Found {len(all_files_found)} total files in course directory")
                 
                 # Log file type breakdown
                 from collections import Counter
                 extensions = Counter(f.suffix.lower() for f in all_files_found)
-                logger.info(f"📊 File types found:")
+                logger.info(f" File types found:")
                 for ext, count in extensions.most_common(10):
-                    status = "✅" if ext in doc_processor.get_supported_formats() else "❌"
+                    status = " " if ext in doc_processor.get_supported_formats() else " "
                     logger.info(f"  {status} {ext}: {count} files")
                 
             except Exception as e:
-                logger.error(f"❌ Error scanning directory: {e}")
+                logger.error(f" Error scanning directory: {e}")
                 all_files_found = []
             
             # Now process supported files
@@ -571,34 +571,34 @@ class CourseIndexer:
                     try:
                         # Check if file exists and is accessible before processing
                         if not file_path.exists():
-                            logger.warning(f"⚠️ File not found during processing: {file_path}")
+                            logger.warning(f" File not found during processing: {file_path}")
                             failed_count += 1
                             continue
                         
                         # Test file accessibility with more detailed error info
                         try:
                             file_stat = file_path.stat()
-                            logger.debug(f"📄 Processing: {file_path.name} ({file_stat.st_size} bytes)")
+                            logger.debug(f" Processing: {file_path.name} ({file_stat.st_size} bytes)")
                         except (OSError, PermissionError) as access_error:
-                            logger.warning(f"⚠️ File not accessible: {file_path} - {access_error}")
+                            logger.warning(f" File not accessible: {file_path} - {access_error}")
                             failed_count += 1
                             continue
                         
                         # Assume syllabus files contain 'syllabus' in the name
                         is_syllabus = 'syllabus' in file_path.name.lower()
                         
-                        logger.info(f"🔄 Processing {file_path.suffix}: {file_path.name}")
+                        logger.info(f" Processing {file_path.suffix}: {file_path.name}")
                         processed_doc = doc_processor.process_file(file_path, is_syllabus)
                         documents.append(processed_doc)
                         processed_count += 1
-                        logger.info(f"✅ Successfully processed: {file_path.name}")
+                        logger.info(f" Successfully processed: {file_path.name}")
                         
                     except Exception as e:
-                        logger.warning(f"⚠️ Failed to process file {file_path.name}: {e}")
+                        logger.warning(f" Failed to process file {file_path.name}: {e}")
                         failed_count += 1
                         continue
             
-            logger.info(f"📊 Re-indexing summary: {processed_count} processed, {failed_count} failed")
+            logger.info(f" Re-indexing summary: {processed_count} processed, {failed_count} failed")
             
             if documents:
                 # Remove existing index
@@ -609,10 +609,10 @@ class CourseIndexer:
                 
                 # Re-index
                 self.index_course_documents(course_name, documents)
-                logger.info(f"✅ Successfully re-indexed course: {course_name} ({processed_count} documents)")
+                logger.info(f" Successfully re-indexed course: {course_name} ({processed_count} documents)")
                 
                 if failed_count > 0:
-                    logger.info(f"⚠️ Note: {failed_count} files could not be processed due to access issues")
+                    logger.info(f" Note: {failed_count} files could not be processed due to access issues")
                     
             else:
                 raise ValueError(f"No processable documents found for course: {course_name} (all {failed_count} files failed)")

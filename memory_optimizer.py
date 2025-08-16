@@ -96,7 +96,7 @@ class MemoryOptimizer:
     def increase_virtual_memory_suggestions():
         """Provide suggestions for increasing virtual memory on Windows."""
         return """
-💡 To fix memory issues on Windows:
+To fix memory issues on Windows:
 
 1. **Increase Virtual Memory (Paging File):**
    - Press Windows + R, type "sysdm.cpl"

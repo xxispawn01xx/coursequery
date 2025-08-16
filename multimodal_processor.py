@@ -39,7 +39,7 @@ class MultimodalProcessor:
             logger.error(f"Course directory not found: {course_dir}")
             return {}
         
-        logger.info(f"🎯 Starting comprehensive multimodal processing: {course_dir.name}")
+        logger.info(f" Starting comprehensive multimodal processing: {course_dir.name}")
         
         results = {
             'course_name': course_dir.name,
@@ -54,19 +54,19 @@ class MultimodalProcessor:
         }
         
         # 1. Process traditional documents (PDFs, DOCX, PPTX, etc.)
-        logger.info("📄 Processing documents...")
+        logger.info(" Processing documents...")
         doc_results = self._process_documents(course_dir)
         results['content_types']['documents'] = doc_results
         results['embedding_documents'].extend(doc_results['embedding_docs'])
         
         # 2. Process existing transcriptions (VTT, SRT files)
-        logger.info("📝 Processing existing transcriptions...")
+        logger.info(" Processing existing transcriptions...")
         transcript_results = self._process_transcriptions(course_dir)
         results['content_types']['transcriptions'] = transcript_results
         results['embedding_documents'].extend(transcript_results['embedding_docs'])
         
         # 3. Process video transitions and screenshots
-        logger.info("🎬 Processing video transitions...")
+        logger.info(" Processing video transitions...")
         transition_results = self._process_video_transitions(course_dir)
         results['content_types']['video_transitions'] = transition_results
         results['embedding_documents'].extend(transition_results['embedding_docs'])
@@ -82,7 +82,7 @@ class MultimodalProcessor:
         # 5. Save comprehensive results
         self._save_multimodal_results(course_dir, results)
         
-        logger.info(f"✅ Multimodal processing complete: {total_pieces} content pieces")
+        logger.info(f" Multimodal processing complete: {total_pieces} content pieces")
         return results
     
     def _process_documents(self, course_dir: Path) -> Dict[str, Any]:
@@ -121,7 +121,7 @@ class MultimodalProcessor:
                     'documents_extracted': len(documents)
                 })
                 
-                logger.info(f"📄 Processed {doc_file.name}: {len(documents)} documents")
+                logger.info(f" Processed {doc_file.name}: {len(documents)} documents")
                 
             except Exception as e:
                 logger.error(f"Failed to process {doc_file.name}: {e}")
@@ -174,7 +174,7 @@ class MultimodalProcessor:
                         'character_count': len(content)
                     })
                     
-                    logger.info(f"📝 Processed {transcript_file.name}: {len(content)} characters")
+                    logger.info(f" Processed {transcript_file.name}: {len(content)} characters")
                 
             except Exception as e:
                 logger.error(f"Failed to process {transcript_file.name}: {e}")
@@ -192,11 +192,11 @@ class MultimodalProcessor:
         transition_file = course_dir / "transition_analysis.json"
         
         if transition_file.exists():
-            logger.info("📋 Loading existing transition analysis...")
+            logger.info(" Loading existing transition analysis...")
             with open(transition_file, 'r') as f:
                 transition_results = json.load(f)
         else:
-            logger.info("🎬 Generating new transition analysis...")
+            logger.info(" Generating new transition analysis...")
             transition_results = self.transition_detector.process_course_videos(str(course_dir))
         
         # Extract embedding documents from transitions
@@ -247,7 +247,7 @@ class MultimodalProcessor:
         with open(results_file, 'w') as f:
             json.dump(summary, f, indent=2, default=str)
         
-        logger.info(f"📄 Multimodal analysis saved to: {results_file}")
+        logger.info(f" Multimodal analysis saved to: {results_file}")
     
     def get_embedding_documents(self, course_directory: str) -> List[Dict[str, Any]]:
         """

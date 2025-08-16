@@ -718,7 +718,7 @@ Please provide a comprehensive answer based on the context provided. If the cont
             if self._should_convert_to_excel(content):
                 excel_file = self._convert_response_to_excel(content, "OpenAI_Analysis")
                 if excel_file:
-                    content += f"\n\n📊 **Excel file generated**: {excel_file}\n*Download available in the file explorer*"
+                    content += f"\n\n **Excel file generated**: {excel_file}\n*Download available in the file explorer*"
             
             # Auto-create Google Sheets for financial models
             from google_sheets_creator import detect_and_create_financial_sheet
@@ -776,7 +776,7 @@ Please provide a comprehensive answer based on the context provided. If the cont
                 if self._should_convert_to_excel(content):
                     excel_file = self._convert_response_to_excel(content, "Perplexity_Analysis")
                     if excel_file:
-                        content += f"\n\n📊 **Excel file generated**: {excel_file}\n*Download available in the file explorer*"
+                        content += f"\n\n **Excel file generated**: {excel_file}\n*Download available in the file explorer*"
                 
                 # Auto-create Google Sheets for financial models
                 from google_sheets_creator import detect_and_create_financial_sheet

@@ -20,10 +20,10 @@ def install_package(package):
     """Install a package using pip."""
     try:
         subprocess.check_call([sys.executable, "-m", "pip", "install", package])
-        print(f"✅ Successfully installed {package}")
+        print(f" Successfully installed {package}")
         return True
     except subprocess.CalledProcessError:
-        print(f"❌ Failed to install {package}")
+        print(f" Failed to install {package}")
         return False
 
 def main():
@@ -79,7 +79,7 @@ def main():
     ]
     
     for category, packages in all_packages:
-        print(f"\n📦 Installing {category}...")
+        print(f"\n Installing {category}...")
         for package in packages:
             install_package(package)
     

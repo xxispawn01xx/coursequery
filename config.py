@@ -34,9 +34,9 @@ class Config:
         self.MASTER_COURSE_DIRECTORY = dir_config.MASTER_COURSE_DIRECTORY
         self.raw_docs_dir = dir_config.raw_docs_dir
         
-        print("💡 Running in pure offline mode with centralized directory config")
-        print(f"📁 Master directory: {self.MASTER_COURSE_DIRECTORY}")
-        print(f"📁 Active directory: {self.raw_docs_dir}")
+        print("Running in pure offline mode with centralized directory config")
+        print(f"Master directory: {self.MASTER_COURSE_DIRECTORY}")
+        print(f"Active directory: {self.raw_docs_dir}")
         
         # Use centralized directory paths for processed data
         self.indexed_courses_dir = dir_config.indexed_courses_dir

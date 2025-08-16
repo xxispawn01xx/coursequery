@@ -78,7 +78,7 @@ class LocalQueryEngine:
             Dictionary containing answer and optional sources
         """
         query_start_time = time.time()
-        logger.info(f"🔍 Processing query for course '{course_name}': {query[:100]}... - Start: {datetime.now().strftime('%H:%M:%S.%f')[:-3]}")
+        logger.info(f" Processing query for course '{course_name}': {query[:100]}... - Start: {datetime.now().strftime('%H:%M:%S.%f')[:-3]}")
         
         try:
             # Get course index

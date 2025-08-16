@@ -44,7 +44,7 @@ def safe_import_with_fallback(module_name, fallback_class=None):
         return module
         
     except Exception as e:
-        print(f"⚠️ Import warning for {module_name}: {e}")
+        print(f" Import warning for {module_name}: {e}")
         
         if fallback_class:
             return fallback_class

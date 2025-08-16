@@ -59,7 +59,7 @@ class CourseVectorExporter:
             course_export_dir.mkdir()
             
             # 1. Copy the entire LlamaIndex storage
-            logger.info("📦 Copying vector index and text data...")
+            logger.info(" Copying vector index and text data...")
             index_source = course_index_path / "index"
             index_dest = course_export_dir / "index"
             
@@ -124,9 +124,9 @@ class CourseVectorExporter:
                 }
             }
             
-            logger.info(f"✅ Course exported successfully")
-            logger.info(f"📁 ZIP file: {zip_path}")
-            logger.info(f"📊 Size: {export_info['file_size_mb']} MB")
+            logger.info(f" Course exported successfully")
+            logger.info(f" ZIP file: {zip_path}")
+            logger.info(f" Size: {export_info['file_size_mb']} MB")
             
             return export_info
             
@@ -151,9 +151,9 @@ try:
     from llama_index.core import StorageContext, load_index_from_storage
     from llama_index.embeddings.huggingface import HuggingFaceEmbedding
     from llama_index.core import Settings
-    print("✅ LlamaIndex available")
+    print(" LlamaIndex available")
 except ImportError:
-    print("❌ Please install: pip install llama-index sentence-transformers")
+    print(" Please install: pip install llama-index sentence-transformers")
     exit(1)
 
 class SharedCourseQuery:
@@ -181,11 +181,11 @@ class SharedCourseQuery:
             storage_context = StorageContext.from_defaults(persist_dir="index")
             self.index = load_index_from_storage(storage_context)
             
-            print(f"✅ Loaded course: {{self.course_name}}")
-            print("💡 You can now ask questions about this course content!")
+            print(f" Loaded course: {{self.course_name}}")
+            print(" You can now ask questions about this course content!")
             
         except Exception as e:
-            print(f"❌ Error loading course: {{e}}")
+            print(f" Error loading course: {{e}}")
             print("Make sure you have the required dependencies installed")
     
     def query(self, question: str, num_results: int = 3) -> str:
@@ -208,7 +208,7 @@ class SharedCourseQuery:
     
     def interactive_mode(self):
         """Start interactive question-answer session."""
-        print(f"\\n🎓 Interactive Query Mode for {{self.course_name}}")
+        print(f"\\n Interactive Query Mode for {{self.course_name}}")
         print("Ask questions about the course content (type 'quit' to exit)\\n")
         
         while True:
@@ -221,9 +221,9 @@ class SharedCourseQuery:
             if not question:
                 continue
             
-            print("🔍 Searching course content...")
+            print(" Searching course content...")
             answer = self.query(question)
-            print(f"\\n💡 Answer:\\n{{answer}}\\n")
+            print(f"\\n Answer:\\n{{answer}}\\n")
             print("-" * 50)
 
 def main():
@@ -254,9 +254,9 @@ if __name__ == "__main__":
         instructions = f"""# {course_name} - Shared Course Content
 
 Your friend has shared processed course content with you! This includes:
-- 📚 All lecture transcriptions and content
-- 🔍 Vector embeddings for semantic search
-- 💡 AI-powered question answering
+- All lecture transcriptions and content
+- Vector embeddings for semantic search
+- AI-powered question answering
 
 ## What's Included
 
@@ -319,10 +319,10 @@ Some AI services accept file uploads. You can upload the generated text files di
 
 ## Privacy & Usage
 
-- ✅ All content runs locally on your computer
-- ✅ No data sent to external services unless you choose to
-- ✅ You can modify and extend the query interface
-- ⚠️ Respect the original course's copyright and sharing policies
+- All content runs locally on your computer
+- No data sent to external services unless you choose to
+- You can modify and extend the query interface
+- Respect the original course's copyright and sharing policies
 
 ## Troubleshooting
 
@@ -330,8 +330,7 @@ Some AI services accept file uploads. You can upload the generated text files di
 **"No matching documents"**: Try rephrasing your question or asking about more general topics
 **"Index loading failed"**: Make sure all files were extracted from the ZIP properly
 
-Enjoy exploring the course content! 🎓
-"""
+Enjoy exploring the course content! """
         
         readme_path = export_dir / "README.md"
         with open(readme_path, 'w', encoding='utf-8') as f:
@@ -389,12 +388,12 @@ def main():
     result = exporter.export_course_for_sharing("python_course")
     
     if "error" not in result:
-        print(f"✅ Course exported successfully!")
-        print(f"📁 Send this file to your friend: {result['zip_file']}")
-        print(f"📊 File size: {result['file_size_mb']} MB")
-        print(f"🎯 They can run: python query_course.py")
+        print(f" Course exported successfully!")
+        print(f" Send this file to your friend: {result['zip_file']}")
+        print(f" File size: {result['file_size_mb']} MB")
+        print(f" They can run: python query_course.py")
     else:
-        print(f"❌ Export failed: {result['error']}")
+        print(f" Export failed: {result['error']}")
 
 if __name__ == "__main__":
     main()

@@ -24,43 +24,43 @@ sys.modules['pandas'] = Mock()
 
 def test_imports():
     """Test if all required modules can be imported."""
-    print("🔧 Testing imports...")
+    print(" Testing imports...")
     
     try:
         from config import Config
-        print("✅ Config imported successfully")
+        print(" Config imported successfully")
         
         from local_models import LocalModelManager
-        print("✅ LocalModelManager imported successfully")
+        print(" LocalModelManager imported successfully")
         
         from query_engine import LocalQueryEngine
-        print("✅ LocalQueryEngine imported successfully")
+        print(" LocalQueryEngine imported successfully")
         
         from course_indexer import CourseIndexer
-        print("✅ CourseIndexer imported successfully")
+        print(" CourseIndexer imported successfully")
         
         return True
     except Exception as e:
-        print(f"❌ Import failed: {e}")
+        print(f" Import failed: {e}")
         traceback.print_exc()
         return False
 
 def test_config_initialization():
     """Test config initialization."""
-    print("\n📝 Testing config initialization...")
+    print("\n Testing config initialization...")
     
     try:
         from config import Config
         config = Config()
         
-        print(f"✅ Config initialized")
+        print(f" Config initialized")
         print(f"   - Base dir: {config.base_dir}")
         print(f"   - Is Replit: {config.is_replit}")
         print(f"   - Skip model loading: {config.skip_model_loading}")
         
         return config
     except Exception as e:
-        print(f"❌ Config initialization failed: {e}")
+        print(f" Config initialization failed: {e}")
         traceback.print_exc()
         return None
 
@@ -97,15 +97,15 @@ def test_mock_model_manager():
             
             # Test initialization
             model_manager = LocalModelManager()
-            print("✅ Model manager initialized")
+            print(" Model manager initialized")
             
             # Test model loading
             model_manager.load_models()
-            print("✅ Mock models loaded")
+            print(" Mock models loaded")
             
             # Test response generation
             response = model_manager.generate_response("Test prompt", max_new_tokens=50)
-            print(f"✅ Mock response generated: {response}")
+            print(f" Mock response generated: {response}")
             
             # Restore original methods
             LocalModelManager._load_mistral_model = original_load_mistral
@@ -114,37 +114,37 @@ def test_mock_model_manager():
             return model_manager
             
     except Exception as e:
-        print(f"❌ Model manager test failed: {e}")
+        print(f" Model manager test failed: {e}")
         traceback.print_exc()
         return None
 
 def test_course_indexer():
     """Test course indexer initialization."""
-    print("\n📚 Testing course indexer...")
+    print("\n Testing course indexer...")
     
     try:
         from course_indexer import CourseIndexer
         
         indexer = CourseIndexer()
-        print("✅ Course indexer initialized")
+        print(" Course indexer initialized")
         
         # Test with mock model manager
         mock_model_manager = Mock()
         mock_model_manager.generate_embeddings.return_value = [[0.1, 0.2, 0.3]]
         
         indexer.set_model_manager(mock_model_manager)
-        print("✅ Model manager set on indexer")
+        print(" Model manager set on indexer")
         
         return indexer
         
     except Exception as e:
-        print(f"❌ Course indexer test failed: {e}")
+        print(f" Course indexer test failed: {e}")
         traceback.print_exc()
         return None
 
 def test_query_engine():
     """Test query engine initialization with mocks."""
-    print("\n🔍 Testing query engine...")
+    print("\n Testing query engine...")
     
     try:
         from query_engine import LocalQueryEngine
@@ -156,19 +156,19 @@ def test_query_engine():
         
         # Test initialization
         query_engine = LocalQueryEngine(mock_model_manager)
-        print("✅ Query engine initialized")
+        print(" Query engine initialized")
         
         # Test if it's properly set up
         if hasattr(query_engine, 'model_manager') and query_engine.model_manager:
-            print("✅ Model manager properly set")
+            print(" Model manager properly set")
         else:
-            print("❌ Model manager not set properly")
+            print(" Model manager not set properly")
             return None
             
         return query_engine
         
     except Exception as e:
-        print(f"❌ Query engine test failed: {e}")
+        print(f" Query engine test failed: {e}")
         traceback.print_exc()
         return None
 
@@ -189,63 +189,63 @@ def test_app_flow_simulation():
         mock_model_manager = Mock()
         mock_model_manager.generate_response.return_value = "Test response"
         mock_session_state['model_manager'] = mock_model_manager
-        print("   ✅ Model manager created")
+        print(" Model manager created")
         
         print("   🔹 Step 2: Initialize query engine...")
         from query_engine import LocalQueryEngine
         query_engine = LocalQueryEngine(mock_model_manager)
         mock_session_state['query_engine'] = query_engine
-        print("   ✅ Query engine created")
+        print(" Query engine created")
         
         print("   🔹 Step 3: Check if query engine is ready...")
         if mock_session_state['query_engine'] and hasattr(mock_session_state['query_engine'], 'model_manager'):
-            print("   ✅ Query engine is properly initialized")
+            print(" Query engine is properly initialized")
             return True
         else:
-            print("   ❌ Query engine missing or not properly set up")
+            print(" Query engine missing or not properly set up")
             return False
             
     except Exception as e:
-        print(f"❌ App flow simulation failed: {e}")
+        print(f" App flow simulation failed: {e}")
         traceback.print_exc()
         return False
 
 def main():
     """Run all tests."""
-    print("🚀 Starting automated query engine diagnostics...\n")
+    print(" Starting automated query engine diagnostics...\n")
     
     # Test 1: Imports
     if not test_imports():
-        print("\n❌ Import test failed - stopping here")
+        print("\n Import test failed - stopping here")
         return False
     
     # Test 2: Config
     config = test_config_initialization()
     if not config:
-        print("\n❌ Config test failed - stopping here") 
+        print("\n Config test failed - stopping here") 
         return False
     
     # Test 3: Model Manager
     model_manager = test_mock_model_manager()
     if not model_manager:
-        print("\n❌ Model manager test failed - stopping here")
+        print("\n Model manager test failed - stopping here")
         return False
     
     # Test 4: Course Indexer
     indexer = test_course_indexer()
     if not indexer:
-        print("\n❌ Course indexer test failed - stopping here")
+        print("\n Course indexer test failed - stopping here")
         return False
     
     # Test 5: Query Engine
     query_engine = test_query_engine()
     if not query_engine:
-        print("\n❌ Query engine test failed - stopping here")
+        print("\n Query engine test failed - stopping here")
         return False
     
     # Test 6: App Flow
     if not test_app_flow_simulation():
-        print("\n❌ App flow simulation failed - stopping here")
+        print("\n App flow simulation failed - stopping here")
         return False
     
     print("\n🎉 All tests passed! The issue might be in the Streamlit app logic.")

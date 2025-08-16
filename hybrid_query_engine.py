@@ -58,10 +58,10 @@ class HybridQueryEngine:
         try:
             import whisper
             available["whisper"] = True
-            logger.info("✅ Whisper available for local transcription")
+            logger.info(" Whisper available for local transcription")
         except ImportError:
-            logger.info("📦 Whisper not installed - install locally with: pip install openai-whisper")
-            logger.info("💡 Once installed locally, Whisper will run on your RTX 3060 for offline transcription")
+            logger.info(" Whisper not installed - install locally with: pip install openai-whisper")
+            logger.info(" Once installed locally, Whisper will run on your RTX 3060 for offline transcription")
         
         logger.info(f"Available models: {available}")
         return available
@@ -192,7 +192,7 @@ class HybridQueryEngine:
             result = self._query_local(query, course_name)
         else:
             result = {
-                "response": "❌ No AI models available. Please configure OpenAI or Perplexity API keys for querying.",
+                "response": " No AI models available. Please configure OpenAI or Perplexity API keys for querying.",
                 "cached": False,
                 "method": "error",
                 "response_time": 0.0
@@ -222,7 +222,7 @@ class HybridQueryEngine:
         except Exception as e:
             logger.error(f"Cloud API query failed: {e}")
             return {
-                "response": f"❌ Cloud API error: {e}",
+                "response": f" Cloud API error: {e}",
                 "cached": False,
                 "method": "cloud_error",
                 "response_time": 0.0
@@ -372,7 +372,7 @@ class HybridQueryEngine:
         except Exception as e:
             logger.error(f"Local query failed: {e}")
             return {
-                "response": "❌ Local models not available. Please configure cloud API keys.",
+                "response": " Local models not available. Please configure cloud API keys.",
                 "cached": False,
                 "method": "local_error",
                 "response_time": 0.0

@@ -24,18 +24,18 @@ def test_offline_manager():
         manager = OfflineCourseManager(raw_docs, indexed_courses)
         
         # Test course detection
-        logger.info("📚 Testing course detection...")
+        logger.info(" Testing course detection...")
         courses = manager.get_available_courses()
         
-        logger.info(f"✅ Found {len(courses)} courses:")
+        logger.info(f" Found {len(courses)} courses:")
         for course in courses:
             logger.info(f"  - {course['name']} ({course['status']}) - {course.get('document_count', 0)} docs")
         
-        logger.info("✅ Offline course manager test completed successfully")
+        logger.info(" Offline course manager test completed successfully")
         return True
         
     except Exception as e:
-        logger.error(f"❌ Offline course manager test failed: {e}")
+        logger.error(f" Offline course manager test failed: {e}")
         import traceback
         logger.error(traceback.format_exc())
         return False

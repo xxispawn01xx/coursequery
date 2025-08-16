@@ -65,7 +65,7 @@ class VideoTransitionDetector:
             logger.error(f"Video file not found: {video_path}")
             return []
         
-        logger.info(f"🎬 Analyzing transitions in: {video_path.name}")
+        logger.info(f" Analyzing transitions in: {video_path.name}")
         
         # Open video
         cap = cv2.VideoCapture(str(video_path))
@@ -114,7 +114,7 @@ class VideoTransitionDetector:
                     )
                     
                     if is_transition and len(transitions) < self.max_screenshots_per_video:
-                        logger.info(f"🎯 Transition detected at {current_time:.1f}s (diff: {difference:.3f})")
+                        logger.info(f" Transition detected at {current_time:.1f}s (diff: {difference:.3f})")
                         
                         # Capture screenshot
                         screenshot_data = self._capture_screenshot(
@@ -136,7 +136,7 @@ class VideoTransitionDetector:
         
         cap.release()
         
-        logger.info(f"✅ Found {len(transitions)} transitions in {video_path.name}")
+        logger.info(f" Found {len(transitions)} transitions in {video_path.name}")
         return transitions
     
     def _capture_screenshot(self, frame: np.ndarray, video_path: Path, 
@@ -247,7 +247,7 @@ class VideoTransitionDetector:
             logger.warning(f"No video files found in: {course_dir}")
             return {}
         
-        logger.info(f"🎬 Processing {len(video_files)} videos for transitions...")
+        logger.info(f" Processing {len(video_files)} videos for transitions...")
         
         course_results = {
             'course_name': course_dir.name,
@@ -274,7 +274,7 @@ class VideoTransitionDetector:
                 course_results['videos'][video_file.stem] = video_results
                 course_results['total_transitions'] += len(transitions)
                 
-                logger.info(f"✅ {video_file.name}: {len(transitions)} transitions")
+                logger.info(f" {video_file.name}: {len(transitions)} transitions")
                 
             except Exception as e:
                 logger.error(f"Failed to process {video_file.name}: {e}")
@@ -285,8 +285,8 @@ class VideoTransitionDetector:
         with open(results_file, 'w') as f:
             json.dump(course_results, f, indent=2, default=str)
         
-        logger.info(f"🎯 Course analysis complete: {course_results['total_transitions']} total transitions")
-        logger.info(f"📄 Results saved to: {results_file}")
+        logger.info(f" Course analysis complete: {course_results['total_transitions']} total transitions")
+        logger.info(f" Results saved to: {results_file}")
         
         return course_results
     

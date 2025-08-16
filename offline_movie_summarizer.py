@@ -83,7 +83,7 @@ class OfflineMovieSummarizer:
                     if tokenizer.pad_token is None:
                         tokenizer.pad_token = tokenizer.eos_token
                     
-                    logger.info(f"✅ Successfully loaded {model_name} for offline summarization")
+                    logger.info(f" Successfully loaded {model_name} for offline summarization")
                     return {"model": model, "tokenizer": tokenizer, "name": model_name}
                     
                 except Exception as e:
@@ -102,7 +102,7 @@ class OfflineMovieSummarizer:
         try:
             import whisper
             model = whisper.load_model("medium", device="cuda" if self.config.has_gpu() else "cpu")
-            logger.info("✅ Local Whisper loaded for audio analysis")
+            logger.info(" Local Whisper loaded for audio analysis")
             return model
         except ImportError:
             logger.warning("Whisper not available - install with: pip install openai-whisper")
@@ -200,26 +200,26 @@ Format as 2 short lines suitable for subtitles (max 50 chars each):
     
     def process_single_movie(self, movie_path: Path) -> Dict[str, Any]:
         """Process a single movie file completely offline"""
-        logger.info(f"🎬 Processing movie: {movie_path.name}")
+        logger.info(f" Processing movie: {movie_path.name}")
         
         movie_title = movie_path.stem
         start_time = time.time()
         
         # 1. Scene Detection (PySceneDetect)
-        logger.info("🔍 Detecting scenes...")
+        logger.info(" Detecting scenes...")
         try:
             scene_results = self.scene_detector.process_videos(
                 [str(movie_path)], 
                 settings=self.movie_settings
             )
             scenes = scene_results.get("scenes", [])
-            logger.info(f"✅ Detected {len(scenes)} scenes")
+            logger.info(f" Detected {len(scenes)} scenes")
         except Exception as e:
             logger.error(f"Scene detection failed: {e}")
             return {"error": str(e), "movie": movie_title}
         
         # 2. Generate summaries for each scene
-        logger.info("📝 Generating scene summaries...")
+        logger.info(" Generating scene summaries...")
         scene_summaries = []
         
         for i, scene in enumerate(scenes):
@@ -247,7 +247,7 @@ Format as 2 short lines suitable for subtitles (max 50 chars each):
             })
             
             if i % 10 == 0:
-                logger.info(f"📊 Processed {i+1}/{len(scenes)} scenes")
+                logger.info(f" Processed {i+1}/{len(scenes)} scenes")
         
         processing_time = time.time() - start_time
         
@@ -272,7 +272,7 @@ Format as 2 short lines suitable for subtitles (max 50 chars each):
         with open(output_file, 'w', encoding='utf-8') as f:
             json.dump(movie_analysis, f, indent=2, ensure_ascii=False)
         
-        logger.info(f"✅ Movie analysis saved: {output_file}")
+        logger.info(f" Movie analysis saved: {output_file}")
         return movie_analysis
     
     def _calculate_scene_importance(self, scene: Dict, summary: str) -> str:
@@ -312,7 +312,7 @@ Format as 2 short lines suitable for subtitles (max 50 chars each):
     
     def batch_process_movies(self, max_movies: Optional[int] = None) -> Dict[str, Any]:
         """Process all movies in directory completely offline"""
-        logger.info(f"🎬 Starting batch movie processing: {self.movies_dir}")
+        logger.info(f" Starting batch movie processing: {self.movies_dir}")
         
         # Find all movie files
         movie_extensions = {'.mp4', '.mkv', '.avi', '.mov', '.wmv', '.flv', '.webm'}
@@ -324,7 +324,7 @@ Format as 2 short lines suitable for subtitles (max 50 chars each):
         if max_movies:
             movie_files = movie_files[:max_movies]
         
-        logger.info(f"📊 Found {len(movie_files)} movies to process")
+        logger.info(f" Found {len(movie_files)} movies to process")
         
         batch_results = {
             'total_movies': len(movie_files),
@@ -336,7 +336,7 @@ Format as 2 short lines suitable for subtitles (max 50 chars each):
         }
         
         for i, movie_path in enumerate(movie_files):
-            logger.info(f"🎬 Processing {i+1}/{len(movie_files)}: {movie_path.name}")
+            logger.info(f" Processing {i+1}/{len(movie_files)}: {movie_path.name}")
             
             try:
                 result = self.process_single_movie(movie_path)
@@ -364,9 +364,9 @@ Format as 2 short lines suitable for subtitles (max 50 chars each):
         with open(batch_file, 'w', encoding='utf-8') as f:
             json.dump(batch_results, f, indent=2, ensure_ascii=False)
         
-        logger.info(f"✅ Batch processing complete: {batch_file}")
-        logger.info(f"📊 Success: {batch_results['processed_movies']}/{batch_results['total_movies']} movies")
-        logger.info(f"🎬 Total scenes detected: {batch_results['total_scenes']}")
+        logger.info(f" Batch processing complete: {batch_file}")
+        logger.info(f" Success: {batch_results['processed_movies']}/{batch_results['total_movies']} movies")
+        logger.info(f" Total scenes detected: {batch_results['total_scenes']}")
         
         return batch_results
 
@@ -379,9 +379,9 @@ def main():
     # Process all movies (or limit for testing)
     results = summarizer.batch_process_movies(max_movies=5)  # Remove limit for all 400
     
-    print(f"✅ Processed {results['processed_movies']} movies")
-    print(f"🎬 Total scenes: {results['total_scenes']}")
-    print(f"📁 Results saved in: movie_analysis/")
+    print(f" Processed {results['processed_movies']} movies")
+    print(f" Total scenes: {results['total_scenes']}")
+    print(f" Results saved in: movie_analysis/")
 
 if __name__ == "__main__":
     main()

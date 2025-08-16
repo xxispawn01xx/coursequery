@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 def apply_rtx_3060_forum_fixes():
     """Apply exact RTX 3060 fixes from HuggingFace forums."""
-    logger.info("🔧 Applying RTX 3060 forum fixes...")
+    logger.info(" Applying RTX 3060 forum fixes...")
     
     # Fix 1: Set RTX 3060 compute capability (8.6 for Ampere)
     os.environ['TORCH_CUDA_ARCH_LIST'] = '8.6'
@@ -29,14 +29,14 @@ def apply_rtx_3060_forum_fixes():
     os.environ.pop('CUDA_LAUNCH_BLOCKING', None)
     os.environ.pop('TORCH_USE_CUDA_DSA', None)
     
-    logger.info("✅ RTX 3060 environment configured")
+    logger.info(" RTX 3060 environment configured")
 
 def test_simple_model_loading():
     """Test simple model loading without complex device mapping."""
     apply_rtx_3060_forum_fixes()
     
     try:
-        logger.info("🔍 Testing simple model loading (forum method)...")
+        logger.info(" Testing simple model loading (forum method)...")
         
         # Use small model first
         model_name = "gpt2"
@@ -69,7 +69,7 @@ def test_simple_model_loading():
         )
         
         result = pipe("Hello, world!", max_length=20, do_sample=False)
-        logger.info(f"✅ Success: {result[0]['generated_text']}")
+        logger.info(f" Success: {result[0]['generated_text']}")
         
         # Cleanup
         del model, tokenizer, pipe
@@ -78,7 +78,7 @@ def test_simple_model_loading():
         return True
         
     except Exception as e:
-        logger.error(f"❌ Forum fix failed: {e}")
+        logger.error(f" Forum fix failed: {e}")
         if "device-side assert" in str(e):
             logger.error("Device-side assert still occurring - may need driver update")
         return False

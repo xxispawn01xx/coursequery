@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 def test_minimal_model_loading():
     """Test minimal model loading to isolate the software issue."""
-    logger.info("🔍 Testing minimal model loading on healthy RTX 3060...")
+    logger.info(" Testing minimal model loading on healthy RTX 3060...")
     
     # Conservative environment setup
     os.environ['CUDA_VISIBLE_DEVICES'] = '0'
@@ -37,7 +37,7 @@ def test_minimal_model_loading():
         logger.info("Step 2: Testing tensor operations...")
         x = torch.randn(10, 10).to(device)
         y = x @ x.T
-        logger.info(f"✅ Tensor ops successful: {y.shape}")
+        logger.info(f" Tensor ops successful: {y.shape}")
         
         # Test 3: Try loading a tiny model
         logger.info("Step 3: Testing tiny model loading...")
@@ -57,7 +57,7 @@ def test_minimal_model_loading():
             trust_remote_code=False
         )
         
-        logger.info(f"✅ Model loaded successfully: {model.config.model_type}")
+        logger.info(f" Model loaded successfully: {model.config.model_type}")
         
         # Test 4: Try inference
         logger.info("Step 4: Testing inference...")
@@ -74,7 +74,7 @@ def test_minimal_model_loading():
             )
         
         result = tokenizer.decode(outputs[0], skip_special_tokens=True)
-        logger.info(f"✅ Inference successful: {result}")
+        logger.info(f" Inference successful: {result}")
         
         # Clean up
         del model, tokenizer, inputs, outputs
@@ -84,7 +84,7 @@ def test_minimal_model_loading():
         return True
         
     except Exception as e:
-        logger.error(f"❌ Test failed: {e}")
+        logger.error(f" Test failed: {e}")
         logger.error(f"Error type: {type(e).__name__}")
         
         if "device-side assert" in str(e):
@@ -92,7 +92,7 @@ def test_minimal_model_loading():
             logger.error("This is NOT hardware failure (memtest passed)")
             
             # Try diagnostics
-            logger.info("🔧 Trying alternative configurations...")
+            logger.info(" Trying alternative configurations...")
             
             # Alternative 1: Force CPU offloading
             try:
@@ -102,7 +102,7 @@ def test_minimal_model_loading():
                     device_map="cpu",
                     torch_dtype=torch.float32
                 )
-                logger.info("✅ CPU loading works - issue is GPU config")
+                logger.info(" CPU loading works - issue is GPU config")
                 del model
                 return False
             except Exception as e2:
@@ -112,7 +112,7 @@ def test_minimal_model_loading():
 
 def suggest_fixes():
     """Suggest potential fixes for the software configuration."""
-    logger.info("💡 Suggested fixes for RTX 3060 software configuration:")
+    logger.info(" Suggested fixes for RTX 3060 software configuration:")
     logger.info("1. Update PyTorch to latest version")
     logger.info("2. Update transformers library")
     logger.info("3. Clear CUDA cache completely")

@@ -28,9 +28,9 @@ class SimpleCourseIndexer:
         # Initialize document processor
         self.doc_processor = DocumentProcessor()
         
-        logger.info(f"📁 Simple indexer initialized")
-        logger.info(f"📚 Source: {self.master_dir}")
-        logger.info(f"📊 Indexed: {self.indexed_dir}")
+        logger.info(f" Simple indexer initialized")
+        logger.info(f" Source: {self.master_dir}")
+        logger.info(f" Indexed: {self.indexed_dir}")
     
     def process_course_simple(self, course_name: str) -> Dict[str, Any]:
         """
@@ -42,7 +42,7 @@ class SimpleCourseIndexer:
         Returns:
             Course processing results
         """
-        logger.info(f"🔄 Processing course: {course_name}")
+        logger.info(f" Processing course: {course_name}")
         
         course_path = self.master_dir / course_name
         if not course_path.exists():
@@ -65,7 +65,7 @@ class SimpleCourseIndexer:
                 if file_path.suffix.lower() in ['.pdf', '.docx', '.pptx', '.vtt', '.srt', '.txt', '.md', '.py', '.js', '.json', '.yaml', '.yml', '.csv', '.mp4', '.mp3', '.wav', '.m4a']:
                     all_files.append(file_path)
         
-        logger.info(f"📄 Found {len(all_files)} files to process")
+        logger.info(f" Found {len(all_files)} files to process")
         
         # Process each file
         for file_path in all_files:
@@ -91,12 +91,12 @@ class SimpleCourseIndexer:
                     file_type = file_path.suffix.lower()
                     document_types[file_type] = document_types.get(file_type, 0) + 1
                     
-                    logger.info(f"✅ Processed: {file_path.name} ({len(content)} chars)")
+                    logger.info(f" Processed: {file_path.name} ({len(content)} chars)")
                 else:
-                    logger.warning(f"⚠️ No content extracted from: {file_path.name}")
+                    logger.warning(f" No content extracted from: {file_path.name}")
                     
             except Exception as e:
-                logger.error(f"❌ Error processing {file_path.name}: {e}")
+                logger.error(f" Error processing {file_path.name}: {e}")
                 continue
         
         # Save processed documents
@@ -125,7 +125,7 @@ class SimpleCourseIndexer:
         with open(metadata_file, 'w', encoding='utf-8') as f:
             json.dump(metadata, f, indent=2, ensure_ascii=False)
         
-        logger.info(f"✅ Course '{course_name}' indexed: {len(processed_docs)} documents, {total_chars} characters")
+        logger.info(f" Course '{course_name}' indexed: {len(processed_docs)} documents, {total_chars} characters")
         
         return metadata
     

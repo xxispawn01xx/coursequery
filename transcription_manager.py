@@ -47,10 +47,10 @@ class WhisperTranscriptionManager:
                              capture_output=True, 
                              check=True, 
                              timeout=5)
-                logger.info("✅ FFmpeg already available in PATH")
+                logger.info(" FFmpeg already available in PATH")
                 return
             except (FileNotFoundError, subprocess.CalledProcessError, subprocess.TimeoutExpired):
-                logger.info("🔍 FFmpeg not in PATH, searching for local installation...")
+                logger.info(" FFmpeg not in PATH, searching for local installation...")
             
             # Common FFmpeg installation paths on Windows
             ffmpeg_paths = [
@@ -66,13 +66,13 @@ class WhisperTranscriptionManager:
             for path in ffmpeg_paths:
                 ffmpeg_exe = os.path.join(path, "ffmpeg.exe")
                 if os.path.exists(ffmpeg_exe):
-                    logger.info(f"✅ Found FFmpeg at: {ffmpeg_exe}")
+                    logger.info(f" Found FFmpeg at: {ffmpeg_exe}")
                     
                     # Add to PATH for current session
                     current_path = os.environ.get('PATH', '')
                     if path not in current_path:
                         os.environ['PATH'] = path + os.pathsep + current_path
-                        logger.info(f"✅ Added FFmpeg to PATH: {path}")
+                        logger.info(f" Added FFmpeg to PATH: {path}")
                     
                     # Verify it's now available
                     try:
@@ -80,17 +80,17 @@ class WhisperTranscriptionManager:
                                      capture_output=True, 
                                      check=True, 
                                      timeout=5)
-                        logger.info("✅ FFmpeg now available after PATH update")
+                        logger.info(" FFmpeg now available after PATH update")
                         return
                     except Exception:
-                        logger.warning("⚠️ FFmpeg found but still not accessible")
+                        logger.warning(" FFmpeg found but still not accessible")
                         continue
             
-            logger.warning("⚠️ FFmpeg not found in common locations")
-            logger.info("💡 Install FFmpeg or use librosa fallback for audio processing")
+            logger.warning(" FFmpeg not found in common locations")
+            logger.info(" Install FFmpeg or use librosa fallback for audio processing")
             
         except Exception as e:
-            logger.error(f"❌ Error setting up FFmpeg environment: {e}")
+            logger.error(f" Error setting up FFmpeg environment: {e}")
         
     def load_whisper_model(self, model_size: str = "base") -> bool:
         """Load Whisper model for transcription.
@@ -108,7 +108,7 @@ class WhisperTranscriptionManager:
             
             # RTX 3060 optimization - start with smaller models
             if self.device == "cuda":
-                logger.info("🚀 RTX 3060 detected - optimizing Whisper for GPU")
+                logger.info(" RTX 3060 detected - optimizing Whisper for GPU")
                 
                 # Check GPU memory before loading
                 if torch.cuda.is_available():
@@ -130,7 +130,7 @@ class WhisperTranscriptionManager:
             self.whisper_model = whisper.load_model(model_size, device=self.device)
             self.model_name = model_size
             
-            logger.info(f"✅ Whisper {model_size} loaded successfully on {self.device}")
+            logger.info(f" Whisper {model_size} loaded successfully on {self.device}")
             return True
             
         except Exception as e:
@@ -162,8 +162,8 @@ class WhisperTranscriptionManager:
             if not self.is_supported_format(str(audio_file)):
                 raise ValueError(f"Unsupported format: {audio_file.suffix}")
             
-            logger.info(f"🎯 Transcribing: {audio_file.name}")
-            logger.info(f"📁 File size: {audio_file.stat().st_size / (1024*1024):.1f} MB")
+            logger.info(f" Transcribing: {audio_file.name}")
+            logger.info(f" File size: {audio_file.stat().st_size / (1024*1024):.1f} MB")
             
             # Set transcription options
             options = {
@@ -173,7 +173,7 @@ class WhisperTranscriptionManager:
             }
             
             # Perform transcription with FFmpeg fallback handling
-            logger.info(f"🔄 Starting Whisper transcription on {self.device}...")
+            logger.info(f" Starting Whisper transcription on {self.device}...")
             
             # Check audio processing method and handle accordingly
             if self.audio_method == "Force FFmpeg (Fastest, requires FFmpeg installation)":
@@ -182,7 +182,7 @@ class WhisperTranscriptionManager:
                     result = self.whisper_model.transcribe(str(audio_file), **options)
                 except FileNotFoundError as ffmpeg_error:
                     if "ffmpeg" in str(ffmpeg_error).lower() or "WinError 2" in str(ffmpeg_error):
-                        logger.error("❌ FFmpeg not found but Force FFmpeg mode selected")
+                        logger.error(" FFmpeg not found but Force FFmpeg mode selected")
                         raise Exception("FFmpeg not found. Please install FFmpeg or change audio processing method.")
                     else:
                         raise ffmpeg_error
@@ -205,8 +205,8 @@ class WhisperTranscriptionManager:
                     result = self.whisper_model.transcribe(str(audio_file), **options)
                 except FileNotFoundError as ffmpeg_error:
                     if "ffmpeg" in str(ffmpeg_error).lower() or "WinError 2" in str(ffmpeg_error):
-                        logger.error("❌ FFmpeg not found or not accessible")
-                        logger.info("🔧 Attempting direct audio loading with multiple fallbacks...")
+                        logger.error(" FFmpeg not found or not accessible")
+                        logger.info(" Attempting direct audio loading with multiple fallbacks...")
                         
                         # Try multiple audio loading approaches
                         audio_array = None
@@ -216,15 +216,15 @@ class WhisperTranscriptionManager:
                             import librosa
                             import numpy as np
                             
-                            logger.info("🎵 Trying librosa for audio loading...")
+                            logger.info(" Trying librosa for audio loading...")
                             audio_data, sr = librosa.load(str(audio_file), sr=16000)
                             audio_array = np.array(audio_data, dtype=np.float32)
-                            logger.info(f"✅ Librosa loading successful: {len(audio_array)} samples at {sr}Hz")
+                            logger.info(f" Librosa loading successful: {len(audio_array)} samples at {sr}Hz")
                             
                         except ImportError:
-                            logger.info("❌ librosa not available, trying other methods...")
+                            logger.info(" librosa not available, trying other methods...")
                         except Exception as librosa_error:
-                            logger.error(f"❌ Librosa loading failed: {librosa_error}")
+                            logger.error(f" Librosa loading failed: {librosa_error}")
                         
                         # Method 2: Try moviepy if librosa failed
                         if audio_array is None:
@@ -232,7 +232,7 @@ class WhisperTranscriptionManager:
                                 from moviepy.editor import VideoFileClip
                                 import numpy as np
                                 
-                                logger.info("🎬 Trying moviepy for audio extraction...")
+                                logger.info(" Trying moviepy for audio extraction...")
                                 with VideoFileClip(str(audio_file)) as video:
                                     audio = video.audio
                                     if audio is not None:
@@ -241,14 +241,14 @@ class WhisperTranscriptionManager:
                                         if len(audio_array.shape) > 1:
                                             audio_array = audio_array.mean(axis=1)  # Convert to mono
                                         audio_array = audio_array.astype(np.float32)
-                                        logger.info(f"✅ Moviepy loading successful: {len(audio_array)} samples")
+                                        logger.info(f" Moviepy loading successful: {len(audio_array)} samples")
                                     else:
                                         raise Exception("No audio track found in video")
                                         
                             except ImportError:
-                                logger.info("❌ moviepy not available, trying other methods...")
+                                logger.info(" moviepy not available, trying other methods...")
                             except Exception as moviepy_error:
-                                logger.error(f"❌ Moviepy loading failed: {moviepy_error}")
+                                logger.error(f" Moviepy loading failed: {moviepy_error}")
                         
                         # Method 3: Try pydub if others failed
                         if audio_array is None:
@@ -266,27 +266,27 @@ class WhisperTranscriptionManager:
                                 audio_array = np.array(audio.get_array_of_samples(), dtype=np.float32)
                                 audio_array = audio_array / 32768.0  # Normalize to [-1, 1]
                                 
-                                logger.info(f"✅ Pydub loading successful: {len(audio_array)} samples")
+                                logger.info(f" Pydub loading successful: {len(audio_array)} samples")
                                 
                             except ImportError:
-                                logger.info("❌ pydub not available")
+                                logger.info(" pydub not available")
                             except Exception as pydub_error:
-                                logger.error(f"❌ Pydub loading failed: {pydub_error}")
+                                logger.error(f" Pydub loading failed: {pydub_error}")
                         
                         # If we got audio data, try transcribing
                         if audio_array is not None:
                             try:
-                                logger.info("🎯 Transcribing with directly loaded audio...")
+                                logger.info(" Transcribing with directly loaded audio...")
                                 result = self.whisper_model.transcribe(audio_array, **options)
-                                logger.info("✅ Direct audio transcription successful!")
+                                logger.info(" Direct audio transcription successful!")
                             except Exception as transcribe_error:
-                                logger.error(f"❌ Direct audio transcription failed: {transcribe_error}")
+                                logger.error(f" Direct audio transcription failed: {transcribe_error}")
                                 raise Exception(f"Direct audio loading successful but transcription failed: {transcribe_error}")
                         else:
                             # All methods failed
-                            logger.error("❌ All audio loading methods failed")
-                            logger.info("💡 Install one of: librosa, moviepy, or pydub for audio processing")
-                            logger.info("💡 Or install FFmpeg: https://ffmpeg.org/download.html")
+                            logger.error(" All audio loading methods failed")
+                            logger.info(" Install one of: librosa, moviepy, or pydub for audio processing")
+                            logger.info(" Or install FFmpeg: https://ffmpeg.org/download.html")
                             raise Exception("FFmpeg not found and no alternative audio libraries available. Install FFmpeg, librosa, moviepy, or pydub.")
                     else:
                         raise ffmpeg_error
@@ -306,26 +306,26 @@ class WhisperTranscriptionManager:
             }
             
             char_count = len(transcription["text"])
-            logger.info(f"✅ Transcription complete: {char_count} characters")
+            logger.info(f" Transcription complete: {char_count} characters")
             
             if char_count < 10:
-                logger.warning("⚠️ Very short transcription - might indicate audio issue")
+                logger.warning(" Very short transcription - might indicate audio issue")
             
             return transcription
             
         except Exception as e:
-            logger.error(f"❌ Transcription failed for {audio_path}: {e}")
-            logger.error(f"🔧 Error type: {type(e).__name__}")
+            logger.error(f" Transcription failed for {audio_path}: {e}")
+            logger.error(f" Error type: {type(e).__name__}")
             
             # Additional debugging info
             try:
                 from pathlib import Path
                 file_path = Path(audio_path)
-                logger.error(f"📁 File exists: {file_path.exists()}")
-                logger.error(f"📁 File readable: {os.access(audio_path, os.R_OK)}")
-                logger.error(f"📁 Full path: {file_path.absolute()}")
+                logger.error(f" File exists: {file_path.exists()}")
+                logger.error(f" File readable: {os.access(audio_path, os.R_OK)}")
+                logger.error(f" Full path: {file_path.absolute()}")
             except Exception as debug_error:
-                logger.error(f"📁 Debug info error: {debug_error}")
+                logger.error(f" Debug info error: {debug_error}")
             
             raise
     
@@ -341,15 +341,15 @@ class WhisperTranscriptionManager:
         import os
         
         # Enhanced debugging for path resolution
-        logger.info(f"🔍 Resolving path: {audio_path}")
-        logger.info(f"📁 Current working directory: {os.getcwd()}")
+        logger.info(f" Resolving path: {audio_path}")
+        logger.info(f" Current working directory: {os.getcwd()}")
         
         # Convert to Path object for manipulation
         path_obj = Path(audio_path)
         
         # Log original path status
-        logger.info(f"📂 Original path exists: {path_obj.exists()}")
-        logger.info(f"📄 Original path is file: {path_obj.is_file() if path_obj.exists() else 'Unknown'}")
+        logger.info(f" Original path exists: {path_obj.exists()}")
+        logger.info(f" Original path is file: {path_obj.is_file() if path_obj.exists() else 'Unknown'}")
         
         # Try different path resolution strategies
         strategies = [
@@ -370,29 +370,29 @@ class WhisperTranscriptionManager:
                     with open(resolved_path, 'rb') as f:
                         f.read(1024)  # Read first KB to verify access
                     
-                    logger.info(f"✅ {strategy_name} strategy successful: {resolved_path}")
+                    logger.info(f" {strategy_name} strategy successful: {resolved_path}")
                     return resolved_path
                 except Exception as access_error:
-                    logger.warning(f"❌ {strategy_name} exists but not accessible: {access_error}")
+                    logger.warning(f" {strategy_name} exists but not accessible: {access_error}")
             else:
-                logger.warning(f"❌ {strategy_name} file not found: {resolved_path}")
+                logger.warning(f" {strategy_name} file not found: {resolved_path}")
         
         # If all strategies fail, log comprehensive debugging info
         logger.error(f"🚨 All path resolution strategies failed for: {audio_path}")
-        logger.error(f"📁 Working directory: {os.getcwd()}")
-        logger.error(f"📂 Original exists check: {os.path.exists(audio_path)}")
-        logger.error(f"📄 Original file check: {os.path.isfile(audio_path) if os.path.exists(audio_path) else 'N/A'}")
+        logger.error(f" Working directory: {os.getcwd()}")
+        logger.error(f" Original exists check: {os.path.exists(audio_path)}")
+        logger.error(f" Original file check: {os.path.isfile(audio_path) if os.path.exists(audio_path) else 'N/A'}")
         
         # Try to provide helpful debugging information
         if os.path.exists(audio_path):
             try:
                 stat = os.stat(audio_path)
-                logger.error(f"📊 File stats - Size: {stat.st_size} bytes, Mode: {oct(stat.st_mode)}")
+                logger.error(f" File stats - Size: {stat.st_size} bytes, Mode: {oct(stat.st_mode)}")
             except Exception as stat_error:
-                logger.error(f"📊 Cannot get file stats: {stat_error}")
+                logger.error(f" Cannot get file stats: {stat_error}")
         
         # Return original path as last resort (let Whisper handle the error)
-        logger.warning(f"⚠️ Using original path as fallback: {audio_path}")
+        logger.warning(f" Using original path as fallback: {audio_path}")
         return audio_path
     
     def _format_path_for_whisper(self, resolved_path: str) -> str:
@@ -406,7 +406,7 @@ class WhisperTranscriptionManager:
         """
         import os
         
-        logger.info(f"🎯 Formatting path for Whisper: {resolved_path}")
+        logger.info(f" Formatting path for Whisper: {resolved_path}")
         
         # Try multiple Whisper-specific path formats
         whisper_formats = [
@@ -426,11 +426,11 @@ class WhisperTranscriptionManager:
                 with open(test_path, 'rb') as f:
                     f.read(1024)  # Read first KB to verify access
                 
-                logger.info(f"✅ Whisper format {format_name} accessible: {test_path}")
+                logger.info(f" Whisper format {format_name} accessible: {test_path}")
                 return test_path
                 
             except Exception as format_error:
-                logger.warning(f"❌ Whisper format {format_name} failed: {format_error}")
+                logger.warning(f" Whisper format {format_name} failed: {format_error}")
                 continue
         
         # If all formats fail, try Windows short path as last resort
@@ -449,17 +449,17 @@ class WhisperTranscriptionManager:
             
             if ret:
                 short_path = buffer.value
-                logger.info(f"🔧 Using Windows short path: {short_path}")
+                logger.info(f" Using Windows short path: {short_path}")
                 
                 # Test short path access
                 with open(short_path, 'rb') as f:
                     f.read(1024)
                 
-                logger.info(f"✅ Windows short path accessible: {short_path}")
+                logger.info(f" Windows short path accessible: {short_path}")
                 return short_path
                 
         except Exception as short_path_error:
-            logger.warning(f"❌ Windows short path failed: {short_path_error}")
+            logger.warning(f" Windows short path failed: {short_path_error}")
         
         # Final fallback - return original resolved path
         logger.error(f"🚨 All Whisper path formats failed, using original: {resolved_path}")
@@ -483,8 +483,8 @@ class WhisperTranscriptionManager:
             # Resolve path to absolute format for Windows compatibility
             resolved_path = self._resolve_absolute_path(audio_path)
             
-            logger.info(f"🎵 Transcribing with Whisper {self.model_name}...")
-            logger.info(f"📂 Using resolved path: {resolved_path}")
+            logger.info(f" Transcribing with Whisper {self.model_name}...")
+            logger.info(f" Using resolved path: {resolved_path}")
             
             # RTX 3060 memory optimization
             if self.device == "cuda":
@@ -493,13 +493,13 @@ class WhisperTranscriptionManager:
             # Final file size check before transcription
             try:
                 file_size = os.path.getsize(resolved_path) / (1024 * 1024)  # MB
-                logger.info(f"📊 File size: {file_size:.1f} MB")
+                logger.info(f" File size: {file_size:.1f} MB")
             except Exception as size_error:
-                logger.warning(f"⚠️ Cannot get file size: {size_error}")
+                logger.warning(f" Cannot get file size: {size_error}")
             
             # Additional Whisper path formatting for Windows
             whisper_path = self._format_path_for_whisper(resolved_path)
-            logger.info(f"🎯 Final Whisper path: {whisper_path}")
+            logger.info(f" Final Whisper path: {whisper_path}")
             
             # Transcribe with optimizations
             result = self.whisper_model.transcribe(
@@ -509,7 +509,7 @@ class WhisperTranscriptionManager:
                 verbose=False
             )
             
-            logger.info(f"✅ Transcription completed - {len(result['text'])} characters")
+            logger.info(f" Transcription completed - {len(result['text'])} characters")
             
             return {
                 "text": result["text"],
@@ -522,12 +522,12 @@ class WhisperTranscriptionManager:
             
         except Exception as e:
             logger.error(f"🚨 Transcription failed for {audio_path}: {e}")
-            logger.error(f"🔧 Error type: {type(e).__name__}")
-            logger.error(f"📁 Current working directory: {os.getcwd()}")
+            logger.error(f" Error type: {type(e).__name__}")
+            logger.error(f" Current working directory: {os.getcwd()}")
             
             # Additional debugging for file access errors
             if "No such file or directory" in str(e) or "cannot find the file" in str(e):
-                logger.error(f"🔍 File access error - investigating...")
+                logger.error(f" File access error - investigating...")
                 
                 # Check if it's a path encoding issue
                 try:
@@ -644,7 +644,7 @@ class WhisperTranscriptionManager:
             # Save the transcription
             transcription_file.write_text(vtt_content, encoding='utf-8')
             
-            logger.info(f"✅ Saved transcription: {transcription_file}")
+            logger.info(f" Saved transcription: {transcription_file}")
             return True
             
         except Exception as e:
@@ -662,10 +662,10 @@ class WhisperTranscriptionManager:
             import librosa
             import numpy as np
             
-            logger.info("🎵 Using librosa for audio processing...")
+            logger.info(" Using librosa for audio processing...")
             audio_data, sr = librosa.load(str(audio_file), sr=16000)
             audio_array = np.array(audio_data, dtype=np.float32)
-            logger.info(f"✅ Librosa loading successful: {len(audio_array)} samples at {sr}Hz")
+            logger.info(f" Librosa loading successful: {len(audio_array)} samples at {sr}Hz")
             
             return self.whisper_model.transcribe(audio_array, **options)
             
@@ -680,7 +680,7 @@ class WhisperTranscriptionManager:
             from moviepy.editor import VideoFileClip
             import numpy as np
             
-            logger.info("🎬 Using moviepy for audio processing...")
+            logger.info(" Using moviepy for audio processing...")
             with VideoFileClip(str(audio_file)) as video:
                 audio = video.audio
                 if audio is not None:
@@ -688,7 +688,7 @@ class WhisperTranscriptionManager:
                     if len(audio_array.shape) > 1:
                         audio_array = audio_array.mean(axis=1)  # Convert to mono
                     audio_array = audio_array.astype(np.float32)
-                    logger.info(f"✅ Moviepy loading successful: {len(audio_array)} samples")
+                    logger.info(f" Moviepy loading successful: {len(audio_array)} samples")
                     
                     return self.whisper_model.transcribe(audio_array, **options)
                 else:
@@ -715,7 +715,7 @@ class WhisperTranscriptionManager:
             audio_array = np.array(audio.get_array_of_samples(), dtype=np.float32)
             audio_array = audio_array / 32768.0  # Normalize to [-1, 1]
             
-            logger.info(f"✅ Pydub loading successful: {len(audio_array)} samples")
+            logger.info(f" Pydub loading successful: {len(audio_array)} samples")
             
             return self.whisper_model.transcribe(audio_array, **options)
             

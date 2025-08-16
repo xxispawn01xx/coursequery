@@ -12,22 +12,22 @@ from unittest.mock import Mock, MagicMock
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-print("🔧 Testing Local App Flow...")
+print(" Testing Local App Flow...")
 
 # Test 1: Config initialization
 print("\n1️⃣ Testing Config...")
 try:
     from config import Config
     config = Config()
-    print(f"✅ Config created - skip_model_loading: {config.skip_model_loading}")
+    print(f" Config created - skip_model_loading: {config.skip_model_loading}")
     if config.skip_model_loading:
-        print("❌ FOUND THE ISSUE! skip_model_loading is True")
+        print(" FOUND THE ISSUE! skip_model_loading is True")
         print("   This means the app thinks it should skip models")
         exit(1)
     else:
-        print("✅ Config correctly set to load models")
+        print(" Config correctly set to load models")
 except Exception as e:
-    print(f"❌ Config failed: {e}")
+    print(f" Config failed: {e}")
     exit(1)
 
 # Test 2: Mock model manager
@@ -42,22 +42,22 @@ try:
     
     # Create model manager but don't load heavy models
     model_manager = LocalModelManager()
-    print("✅ Model manager created successfully")
+    print(" Model manager created successfully")
     
     # Mock the load_models method
     original_load = model_manager.load_models
     def mock_load_models():
-        print("   📦 Mock loading models...")
+        print(" Mock loading models...")
         model_manager.mistral_pipeline = Mock()
         model_manager.embedding_model = Mock()
         return True
     
     model_manager.load_models = mock_load_models
     model_manager.load_models()
-    print("✅ Mock models loaded")
+    print(" Mock models loaded")
     
 except Exception as e:
-    print(f"❌ Model manager failed: {e}")
+    print(f" Model manager failed: {e}")
     import traceback
     traceback.print_exc()
     exit(1)
@@ -77,17 +77,17 @@ try:
     
     # This is the critical test - can we create the query engine?
     query_engine = LocalQueryEngine(model_manager)
-    print("✅ Query engine created successfully")
+    print(" Query engine created successfully")
     
     # Test if it has the required attributes
     if hasattr(query_engine, 'model_manager') and query_engine.model_manager:
-        print("✅ Query engine has model manager")
+        print(" Query engine has model manager")
     else:
-        print("❌ Query engine missing model manager")
+        print(" Query engine missing model manager")
         exit(1)
         
 except Exception as e:
-    print(f"❌ Query engine creation failed: {e}")
+    print(f" Query engine creation failed: {e}")
     import traceback
     traceback.print_exc()
     exit(1)
@@ -102,39 +102,39 @@ try:
     }
     
     # Simulate the app's model loading logic
-    print("   🔄 Simulating app.load_models()...")
+    print(" Simulating app.load_models()...")
     
     # This simulates the load_models method
     if not mock_session_state['models_loaded']:
-        print("   📦 Models not loaded, attempting to load...")
+        print(" Models not loaded, attempting to load...")
         
         # Mock the model loading process
         try:
             model_manager.load_models()  # Our mocked version
             app_query_engine = LocalQueryEngine(model_manager)  # This should work
             mock_session_state['models_loaded'] = True
-            print("   ✅ Models loaded and query engine created")
+            print(" Models loaded and query engine created")
         except Exception as e:
-            print(f"   ❌ Model loading simulation failed: {e}")
+            print(f" Model loading simulation failed: {e}")
             exit(1)
     
     # Test the final check that was failing
     if app_query_engine is None:
-        print("❌ FOUND THE ISSUE! Query engine is None after creation")
+        print(" FOUND THE ISSUE! Query engine is None after creation")
         exit(1)
     else:
-        print("✅ Query engine properly initialized")
+        print(" Query engine properly initialized")
         
 except Exception as e:
-    print(f"❌ App flow simulation failed: {e}")
+    print(f" App flow simulation failed: {e}")
     import traceback
     traceback.print_exc()
     exit(1)
 
 print("\n🎉 All tests passed! The query engine initialization should work.")
 print("\nThe issue was likely:")
-print("1. ❌ skip_model_loading was True (now fixed)")
-print("2. ❌ Missing import handling (now mocked)")
-print("3. ✅ Core logic is working properly")
+print("1. skip_model_loading was True (now fixed)")
+print("2. Missing import handling (now mocked)")
+print("3. Core logic is working properly")
 
-print("\n🚀 Ready to test locally with real models!")
+print("\n Ready to test locally with real models!")

@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 def debug_specific_error():
     """Debug the specific error you reported."""
-    print("🔍 Debugging Specific Transcription Error")
+    print(" Debugging Specific Transcription Error")
     print("=" * 50)
     
     # The error path from your logs
@@ -63,7 +63,7 @@ def debug_specific_error():
             print(f"Alternative {i}: {alt_path}")
             print(f"  Exists: {alt_path.exists()}")
             if alt_path.exists():
-                print(f"  ✅ FOUND! This path works")
+                print(f" FOUND! This path works")
                 break
                 
     except Exception as e:
@@ -71,7 +71,7 @@ def debug_specific_error():
 
 def debug_directory_structure():
     """Debug the actual directory structure."""
-    print("\n🗂️  Debugging Directory Structure")  
+    print("\n Debugging Directory Structure")  
     print("=" * 50)
     
     try:
@@ -85,7 +85,7 @@ def debug_directory_structure():
             print("\nCourse directories:")
             for item in config.raw_docs_dir.iterdir():
                 if item.is_dir():
-                    print(f"  📁 {item.name}")
+                    print(f" {item.name}")
                     
                     # Check for the specific Apache Airflow course
                     if "Apache Airflow" in item.name:
@@ -114,12 +114,12 @@ def test_whisper_installation():
     
     try:
         import whisper
-        print("✅ Whisper imported successfully")
+        print(" Whisper imported successfully")
         
         # Test CUDA availability
         try:
             import torch
-            print(f"✅ PyTorch imported successfully")
+            print(f" PyTorch imported successfully")
             print(f"CUDA available: {torch.cuda.is_available()}")
             if torch.cuda.is_available():
                 print(f"CUDA device count: {torch.cuda.device_count()}")
@@ -132,31 +132,31 @@ def test_whisper_installation():
                 print(f"GPU memory: {memory_allocated:.1f}GB / {memory_total:.1f}GB")
                 
         except ImportError:
-            print("❌ PyTorch not available")
+            print(" PyTorch not available")
             
         # Test loading a small model
         print("Testing Whisper model loading...")
         try:
             model = whisper.load_model("tiny")
-            print("✅ Whisper tiny model loaded successfully")
+            print(" Whisper tiny model loaded successfully")
             del model  # Free memory
         except Exception as e:
-            print(f"❌ Failed to load Whisper model: {e}")
+            print(f" Failed to load Whisper model: {e}")
             
     except ImportError:
-        print("❌ Whisper not installed")
+        print(" Whisper not installed")
         print("Install with: pip install openai-whisper")
 
 def check_transcription_manager():
     """Check transcription manager functionality."""
-    print("\n🔧 Testing Transcription Manager")
+    print("\n Testing Transcription Manager")
     print("=" * 50)
     
     try:
         from transcription_manager import TranscriptionManager
         tm = TranscriptionManager()
         
-        print("✅ TranscriptionManager imported successfully")
+        print(" TranscriptionManager imported successfully")
         
         # Test stats
         stats = tm.get_stats()
@@ -170,7 +170,7 @@ def check_transcription_manager():
         print(f"has_transcription for non-existent file: {has_transcription}")
         
     except Exception as e:
-        print(f"❌ Error testing TranscriptionManager: {e}")
+        print(f" Error testing TranscriptionManager: {e}")
         import traceback
         traceback.print_exc()
 
@@ -186,7 +186,7 @@ def run_comprehensive_debug():
     test_whisper_installation()
     check_transcription_manager()
     
-    print("\n📋 Debug Summary:")
+    print("\n Debug Summary:")
     print("Check the output above for specific issues.")
     print("Common fixes:")
     print("1. Path issues - ensure course directories are accessible")

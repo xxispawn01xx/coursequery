@@ -26,49 +26,49 @@ def test_valuation_query():
         # Test simple query that should trigger Excel generation
         test_query = "Create a simple business valuation framework with key metrics"
         
-        print(f"📝 Test query: {test_query}")
-        print("🔄 Loading models (this may take a moment)...")
+        print(f" Test query: {test_query}")
+        print(" Loading models (this may take a moment)...")
         
         # Load models
         model_manager.load_models()
         
-        print("✅ Models loaded successfully")
+        print(" Models loaded successfully")
         print("🤔 Generating response...")
         
         # Generate response with CUDA error handling
         response = model_manager.generate_response(test_query)
         
-        print("✅ Response generated successfully!")
-        print(f"📄 Response preview: {response[:200]}...")
+        print(" Response generated successfully!")
+        print(f" Response preview: {response[:200]}...")
         
         # Check if response contains valuation content
         valuation_keywords = ['valuation', 'financial', 'dcf', 'cash flow', 'analysis']
         found_keywords = [kw for kw in valuation_keywords if kw.lower() in response.lower()]
         
         if found_keywords:
-            print(f"✅ Valuation content detected: {found_keywords}")
-            print("📊 Excel generation feature should be available in the app")
+            print(f" Valuation content detected: {found_keywords}")
+            print(" Excel generation feature should be available in the app")
         else:
-            print("⚠️ No specific valuation content detected")
+            print(" No specific valuation content detected")
         
         return True
         
     except Exception as e:
-        print(f"❌ Test failed: {e}")
+        print(f" Test failed: {e}")
         if "CUDA" in str(e):
-            print("🔧 CUDA error - the error handling should have prevented this")
+            print(" CUDA error - the error handling should have prevented this")
         return False
 
 if __name__ == "__main__":
-    print("🎯 RTX 3060 Business Valuation Test")
+    print(" RTX 3060 Business Valuation Test")
     print("=" * 50)
     
     success = test_valuation_query()
     
     if success:
-        print("\n✅ Test completed successfully!")
-        print("🚀 Your valuation feature should work in the main app")
-        print("📊 Look for the 'Generate Excel File' button after responses")
+        print("\n Test completed successfully!")
+        print(" Your valuation feature should work in the main app")
+        print(" Look for the 'Generate Excel File' button after responses")
     else:
-        print("\n❌ Test failed - check the error messages above")
-        print("🔄 Try restarting the application or using shorter queries")
+        print("\n Test failed - check the error messages above")
+        print(" Try restarting the application or using shorter queries")

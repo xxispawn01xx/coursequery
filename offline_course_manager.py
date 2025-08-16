@@ -23,33 +23,33 @@ class OfflineCourseManager:
         self.raw_docs_dir.mkdir(exist_ok=True)
         self.indexed_courses_dir.mkdir(exist_ok=True)
         
-        logger.info(f"📁 Offline course manager initialized")
-        logger.info(f"📚 Raw docs: {self.raw_docs_dir}")
-        logger.info(f"📊 Indexed: {self.indexed_courses_dir}")
+        logger.info(f" Offline course manager initialized")
+        logger.info(f" Raw docs: {self.raw_docs_dir}")
+        logger.info(f" Indexed: {self.indexed_courses_dir}")
     
     def get_available_courses(self) -> List[Dict[str, Any]]:
         """Get list of available courses without complex imports"""
         courses = []
         course_names = set()
         
-        logger.info("🔍 OFFLINE: Starting simple course detection...")
+        logger.info(" OFFLINE: Starting simple course detection...")
         
         try:
             # Check indexed courses first
             indexed_count = 0
             if self.indexed_courses_dir.exists():
-                logger.info("📊 Checking indexed courses...")
+                logger.info(" Checking indexed courses...")
                 
                 try:
                     course_dirs = list(self.indexed_courses_dir.iterdir())
                 except (OSError, PermissionError) as e:
-                    logger.error(f"❌ Cannot access indexed courses directory: {e}")
+                    logger.error(f" Cannot access indexed courses directory: {e}")
                     course_dirs = []
                 
                 for course_dir in course_dirs:
                     if course_dir.is_dir():
                         course_name = course_dir.name
-                        logger.info(f"  📂 Found indexed: {course_name}")
+                        logger.info(f" Found indexed: {course_name}")
                         
                         # Validate course directory accessibility
                         try:
@@ -62,7 +62,7 @@ class OfflineCourseManager:
                             try:
                                 list(course_dir.iterdir())
                             except (OSError, PermissionError) as access_error:
-                                logger.warning(f"⚠️ Course directory not accessible: {course_name} - {access_error}")
+                                logger.warning(f" Course directory not accessible: {course_name} - {access_error}")
                                 accessible = False
                             
                             if not accessible:
@@ -89,7 +89,7 @@ class OfflineCourseManager:
                                     }
                                     
                                 except Exception as e:
-                                    logger.warning(f"⚠️ Cannot read metadata for {course_name}: {e}")
+                                    logger.warning(f" Cannot read metadata for {course_name}: {e}")
                                     course_info = {
                                         'name': course_name,
                                         'status': 'indexed_no_metadata',
@@ -110,7 +110,7 @@ class OfflineCourseManager:
                             indexed_count += 1
                             
                         except Exception as e:
-                            logger.error(f"❌ Error processing course {course_name}: {e}")
+                            logger.error(f" Error processing course {course_name}: {e}")
                             # Still add it to the list but mark as problematic
                             courses.append({
                                 'name': course_name,
@@ -122,17 +122,17 @@ class OfflineCourseManager:
                             course_names.add(course_name)
                             indexed_count += 1
             
-            logger.info(f"✅ Found {indexed_count} indexed courses")
+            logger.info(f" Found {indexed_count} indexed courses")
             
             # Check raw courses (unprocessed)
             unprocessed_count = 0
             if self.raw_docs_dir.exists():
-                logger.info("📚 Checking raw courses...")
+                logger.info(" Checking raw courses...")
                 
                 for course_dir in self.raw_docs_dir.iterdir():
                     if course_dir.is_dir() and course_dir.name not in course_names:
                         course_name = course_dir.name
-                        logger.info(f"  📁 Found unprocessed: {course_name}")
+                        logger.info(f" Found unprocessed: {course_name}")
                         
                         # Count documents in the directory
                         doc_count = 0
@@ -143,7 +143,7 @@ class OfflineCourseManager:
                                 if file_path.is_file() and file_path.suffix.lower() in supported_extensions:
                                     doc_count += 1
                         except Exception as e:
-                            logger.warning(f"⚠️ Cannot count documents in {course_name}: {e}")
+                            logger.warning(f" Cannot count documents in {course_name}: {e}")
                         
                         course_info = {
                             'name': course_name,
@@ -156,13 +156,13 @@ class OfflineCourseManager:
                         course_names.add(course_name)
                         unprocessed_count += 1
             
-            logger.info(f"✅ Found {unprocessed_count} unprocessed courses")
-            logger.info(f"📊 Total courses detected: {len(courses)}")
+            logger.info(f" Found {unprocessed_count} unprocessed courses")
+            logger.info(f" Total courses detected: {len(courses)}")
             
             return courses
         
         except Exception as e:
-            logger.error(f"❌ Error in offline course detection: {e}")
+            logger.error(f" Error in offline course detection: {e}")
             return []
     
     def get_course_analytics(self, course_name):
@@ -226,7 +226,7 @@ class OfflineCourseManager:
         with open(metadata_path, 'w') as f:
             json.dump(metadata, f, indent=2)
         
-        logger.info(f"✅ Created simple course info for: {course_name}")
+        logger.info(f" Created simple course info for: {course_name}")
         return metadata
     
     def get_course_status(self, course_name: str) -> str:

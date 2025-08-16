@@ -10,7 +10,7 @@ from config import Config
 
 def setup_course_directory():
     """Configure the course directory path."""
-    print("🔧 Course Directory Setup")
+    print(" Course Directory Setup")
     print("=" * 40)
     
     # User's actual course directory
@@ -19,7 +19,7 @@ def setup_course_directory():
     print(f"Checking for course directory: {user_path}")
     
     if Path(user_path).exists():
-        print(f"✅ Found your course directory!")
+        print(f" Found your course directory!")
         
         # List courses found
         course_path = Path(user_path)
@@ -41,7 +41,7 @@ def setup_course_directory():
                         'files': len(supported_files)
                     })
         
-        print(f"\n📚 Found {len(courses)} courses with supported files:")
+        print(f"\n Found {len(courses)} courses with supported files:")
         for course in courses[:10]:  # Show first 10
             print(f"  - {course['name']} ({course['files']} files)")
         
@@ -50,17 +50,17 @@ def setup_course_directory():
         
         # Test configuration
         config = Config()
-        print(f"\n🎯 Configuration test:")
+        print(f"\n Configuration test:")
         print(f"  Raw docs directory: {config.raw_docs_dir}")
         print(f"  Indexed courses directory: {config.indexed_courses_dir}")
         
         return True
     else:
-        print(f"❌ Course directory not found: {user_path}")
+        print(f" Course directory not found: {user_path}")
         print("\nCurrent working directory contents:")
         for item in Path(".").iterdir():
             if item.is_dir():
-                print(f"  📁 {item.name}/")
+                print(f" {item.name}/")
         
         print("\nTo use your actual courses:")
         print("1. Update the path in config.py")

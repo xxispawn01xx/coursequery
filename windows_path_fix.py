@@ -61,11 +61,11 @@ def test_file_access(file_path):
                 with open(path_str, 'rb') as f:
                     # Just read first few bytes to test access
                     data = f.read(10)
-                    print(f"  ✅ {method}: ACCESSIBLE - {path_str}")
+                    print(f" {method}: ACCESSIBLE - {path_str}")
                     return path_str, method
                     
             except Exception as e:
-                print(f"  ❌ {method}: {e}")
+                print(f" {method}: {e}")
     
     return None, None
 
@@ -86,7 +86,7 @@ if __name__ == "__main__":
     working_path, working_method = test_file_access(test_path)
     
     if working_path:
-        print(f"\n✅ SOLUTION: Use {working_method} format")
+        print(f"\n SOLUTION: Use {working_method} format")
         print(f"Working path: {working_path}")
     else:
-        print(f"\n❌ No method worked - file may not exist or be inaccessible")
+        print(f"\n No method worked - file may not exist or be inaccessible")

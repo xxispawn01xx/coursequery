@@ -8,7 +8,7 @@ def calculate_course_processing_costs():
     """Calculate comprehensive costs for 1GB course materials."""
     
     # === FILE SIZE ANALYSIS ===
-    print("📊 1GB Course Materials Breakdown")
+    print(" 1GB Course Materials Breakdown")
     print("=" * 50)
     
     # Typical course material composition
@@ -29,7 +29,7 @@ def calculate_course_processing_costs():
     print(f"Estimated total words: {total_pages * 250:,}")
     
     # === TOKEN CALCULATION ===
-    print("\n📝 Text Processing Analysis")
+    print("\n Text Processing Analysis")
     print("=" * 50)
     
     # Text extraction from 1GB
@@ -41,7 +41,7 @@ def calculate_course_processing_costs():
     print(f"Token density: {total_tokens / (1024**3):.2f} tokens per byte")
     
     # === EMBEDDING COSTS ===
-    print("\n🔍 Embedding Generation Costs")
+    print("\n Embedding Generation Costs")
     print("=" * 50)
     
     # Chunking for embeddings (typical RAG setup)
@@ -69,7 +69,7 @@ def calculate_course_processing_costs():
     queries_per_day = [10, 25, 50, 100]  # Different usage scenarios
     
     for daily_queries in queries_per_day:
-        print(f"\n📊 {daily_queries} queries per day scenario:")
+        print(f"\n {daily_queries} queries per day scenario:")
         
         # Per query costs
         avg_context_tokens = 2048  # Retrieved context per query
@@ -105,7 +105,7 @@ def calculate_course_processing_costs():
         print(f"  Perplexity yearly: ${perplexity_yearly:.2f}")
     
     # === TOTAL COSTS SUMMARY ===
-    print("\n💰 Total Economics Summary (1GB Course)")
+    print("\n Total Economics Summary (1GB Course)")
     print("=" * 50)
     
     print(f"One-time setup costs:")
@@ -136,7 +136,7 @@ def calculate_course_processing_costs():
     print("  - Privacy: Data sent to third parties")
     
     # === BREAK-EVEN ANALYSIS ===
-    print("\n📈 Break-even Analysis")
+    print("\n Break-even Analysis")
     print("=" * 50)
     
     local_monthly = 0.50  # Electricity
@@ -152,7 +152,7 @@ def calculate_course_processing_costs():
     print(f"5-year savings with local: ${monthly_savings * 60:.0f}")
     
     # === SCALING ANALYSIS ===
-    print("\n📊 Scaling Economics")
+    print("\n Scaling Economics")
     print("=" * 50)
     
     gb_sizes = [1, 5, 10, 20, 50]
@@ -177,13 +177,13 @@ def calculate_course_processing_costs():
 
 if __name__ == "__main__":
     print("💼 Course Material Economics Calculator")
-    print("🎯 Analysis for 1GB of PowerPoint, PDFs, and Documents")
-    print("📚 Excluding heavy video/audio files (transcriptions included)")
+    print(" Analysis for 1GB of PowerPoint, PDFs, and Documents")
+    print(" Excluding heavy video/audio files (transcriptions included)")
     print()
     
     results = calculate_course_processing_costs()
     
-    print("\n🎯 Key Takeaways:")
+    print("\n Key Takeaways:")
     print("- Your local RTX 3060 setup pays for itself in ~4 months")
     print("- Unlimited queries with complete privacy")
     print("- Cloud APIs cost $75-150/year for moderate usage")

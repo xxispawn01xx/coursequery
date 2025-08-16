@@ -87,9 +87,9 @@ if __name__ == "__main__":
     actual_location = search_for_actual_file(file_name)
     
     if actual_location:
-        print(f"\n✅ FOUND: {actual_location}")
+        print(f"\n FOUND: {actual_location}")
     else:
-        print(f"\n❌ File not found: {file_name}")
+        print(f"\n File not found: {file_name}")
         
         # Also try searching for any MP4 files
         print("\nSearching for any MP4 files...")

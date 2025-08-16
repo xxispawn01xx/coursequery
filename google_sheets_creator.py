@@ -218,7 +218,7 @@ class GoogleSheetsCreator:
             logger.info(f"Google Sheet created successfully: {spreadsheet_id}")
             
             return f"""
-## ✅ Google Sheet Created Successfully!
+## Google Sheet Created Successfully!
 
 **Live DCF Model**: {sheet_url}
 

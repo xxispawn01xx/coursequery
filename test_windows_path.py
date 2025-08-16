@@ -9,7 +9,7 @@ from config import Config
 
 def test_windows_paths():
     """Test different Windows path formats."""
-    print("🔍 Testing Windows Path Detection")
+    print(" Testing Windows Path Detection")
     print("=" * 40)
     
     # Test different path formats
@@ -46,7 +46,7 @@ def test_windows_paths():
             print(f"  Error: {e}")
     
     # Test config
-    print(f"\n🎯 Config Test:")
+    print(f"\n Config Test:")
     config = Config()
     print(f"  Raw docs dir: {config.raw_docs_dir}")
     print(f"  Exists: {config.raw_docs_dir.exists()}")

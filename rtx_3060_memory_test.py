@@ -26,28 +26,28 @@ class RTX3060MemoryTester:
         
     def test_basic_gpu_access(self):
         """Test basic GPU accessibility."""
-        logger.info("🔍 Testing basic GPU access...")
+        logger.info(" Testing basic GPU access...")
         
         try:
             if not torch.cuda.is_available():
-                logger.error("❌ CUDA not available")
+                logger.error(" CUDA not available")
                 return False
                 
             self.device_name = torch.cuda.get_device_name(0)
             self.total_memory = torch.cuda.get_device_properties(0).total_memory / (1024**3)
             
-            logger.info(f"✅ GPU detected: {self.device_name}")
-            logger.info(f"✅ Total memory: {self.total_memory:.1f}GB")
+            logger.info(f" GPU detected: {self.device_name}")
+            logger.info(f" Total memory: {self.total_memory:.1f}GB")
             
             return True
             
         except Exception as e:
-            logger.error(f"❌ Basic GPU access failed: {e}")
+            logger.error(f" Basic GPU access failed: {e}")
             return False
     
     def test_memory_allocation(self):
         """Test GPU memory allocation in incremental steps."""
-        logger.info("🔍 Testing GPU memory allocation...")
+        logger.info(" Testing GPU memory allocation...")
         
         try:
             # Test small allocation first
@@ -55,26 +55,26 @@ class RTX3060MemoryTester:
             small_tensor = torch.zeros(25 * 1024 * 1024, dtype=torch.float32).cuda()  # ~100MB
             del small_tensor
             torch.cuda.empty_cache()
-            logger.info("✅ Small allocation successful")
+            logger.info(" Small allocation successful")
             
             # Test medium allocation
             logger.info("Testing 1GB allocation...")
             medium_tensor = torch.zeros(256 * 1024 * 1024, dtype=torch.float32).cuda()  # ~1GB
             del medium_tensor
             torch.cuda.empty_cache()
-            logger.info("✅ Medium allocation successful")
+            logger.info(" Medium allocation successful")
             
             # Test large allocation
             logger.info("Testing 4GB allocation...")
             large_tensor = torch.zeros(1024 * 1024 * 1024, dtype=torch.float32).cuda()  # ~4GB
             del large_tensor
             torch.cuda.empty_cache()
-            logger.info("✅ Large allocation successful")
+            logger.info(" Large allocation successful")
             
             return True
             
         except Exception as e:
-            logger.error(f"❌ Memory allocation failed: {e}")
+            logger.error(f" Memory allocation failed: {e}")
             if "device-side assert" in str(e):
                 logger.error("🚨 CONFIRMED: RTX 3060 has faulty memory (device-side assert)")
                 logger.error("This is a hardware issue - GPU memory is corrupted")
@@ -82,7 +82,7 @@ class RTX3060MemoryTester:
     
     def test_compute_operations(self):
         """Test GPU compute operations for stability."""
-        logger.info("🔍 Testing GPU compute operations...")
+        logger.info(" Testing GPU compute operations...")
         
         try:
             # Matrix multiplication test
@@ -92,7 +92,7 @@ class RTX3060MemoryTester:
             c = torch.matmul(a, b)
             del a, b, c
             torch.cuda.empty_cache()
-            logger.info("✅ Matrix multiplication successful")
+            logger.info(" Matrix multiplication successful")
             
             # Iterative compute test
             logger.info("Testing iterative operations (stress test)...")
@@ -103,18 +103,18 @@ class RTX3060MemoryTester:
                 torch.cuda.empty_cache()
                 time.sleep(0.1)  # Brief pause
             
-            logger.info("✅ Iterative operations successful")
+            logger.info(" Iterative operations successful")
             return True
             
         except Exception as e:
-            logger.error(f"❌ Compute operations failed: {e}")
+            logger.error(f" Compute operations failed: {e}")
             if "device-side assert" in str(e):
                 logger.error("🚨 CONFIRMED: RTX 3060 compute units have issues")
             return False
     
     def test_model_loading_simulation(self):
         """Simulate model loading patterns that typically fail."""
-        logger.info("🔍 Testing model loading simulation...")
+        logger.info(" Testing model loading simulation...")
         
         try:
             # Simulate embedding model loading
@@ -131,11 +131,11 @@ class RTX3060MemoryTester:
                 del attention, ffn
                 torch.cuda.empty_cache()
             
-            logger.info("✅ Model loading simulation successful")
+            logger.info(" Model loading simulation successful")
             return True
             
         except Exception as e:
-            logger.error(f"❌ Model loading simulation failed: {e}")
+            logger.error(f" Model loading simulation failed: {e}")
             return False
     
     def comprehensive_test(self):
@@ -164,15 +164,15 @@ class RTX3060MemoryTester:
         logger.info("🔬 DIAGNOSTIC RESULTS:")
         logger.info(f"GPU: {self.device_name}")
         logger.info(f"Memory: {self.total_memory:.1f}GB")
-        logger.info(f"Memory allocation: {'✅ PASS' if memory_ok else '❌ FAIL'}")
-        logger.info(f"Compute operations: {'✅ PASS' if compute_ok else '❌ FAIL'}")
-        logger.info(f"Model loading sim: {'✅ PASS' if model_ok else '❌ FAIL'}")
-        logger.info(f"Overall health: {'✅ HEALTHY' if self.gpu_healthy else '❌ FAULTY'}")
+        logger.info(f"Memory allocation: {' PASS' if memory_ok else ' FAIL'}")
+        logger.info(f"Compute operations: {' PASS' if compute_ok else ' FAIL'}")
+        logger.info(f"Model loading sim: {' PASS' if model_ok else ' FAIL'}")
+        logger.info(f"Overall health: {' HEALTHY' if self.gpu_healthy else ' FAULTY'}")
         
         if not self.gpu_healthy:
             logger.error("🚨 CONCLUSION: RTX 3060 has hardware memory issues")
-            logger.error("💡 RECOMMENDATION: Use CPU-only mode for AI models")
-            logger.error("🔧 SOLUTION: All models will automatically fall back to CPU")
+            logger.error(" RECOMMENDATION: Use CPU-only mode for AI models")
+            logger.error(" SOLUTION: All models will automatically fall back to CPU")
         
         return self.gpu_healthy
 

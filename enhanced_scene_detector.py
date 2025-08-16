@@ -106,8 +106,8 @@ class EnhancedSceneDetector:
             logger.error(f"Video file not found: {video_path}")
             return []
         
-        logger.info(f"🎬 PySceneDetect analyzing: {video_path.name}")
-        logger.info(f"🔧 Method: {self.detection_method}, Threshold: {self.threshold}")
+        logger.info(f" PySceneDetect analyzing: {video_path.name}")
+        logger.info(f" Method: {self.detection_method}, Threshold: {self.threshold}")
         
         try:
             # Initialize video manager
@@ -132,7 +132,7 @@ class EnhancedSceneDetector:
             video_fps = video_manager.get_framerate()
             
             logger.info(f"📹 Video: {video_fps:.1f} FPS")
-            logger.info(f"🎯 Found {len(scene_list)} scenes with PySceneDetect")
+            logger.info(f" Found {len(scene_list)} scenes with PySceneDetect")
             
             # Process scenes into transition data
             transitions = []
@@ -167,7 +167,7 @@ class EnhancedSceneDetector:
             
             video_manager.release()
             
-            logger.info(f"✅ Processed {len(transitions)} scene transitions")
+            logger.info(f" Processed {len(transitions)} scene transitions")
             return transitions
             
         except Exception as e:
@@ -306,7 +306,7 @@ Focus on content that would be useful for course search and Q&A."""
             logger.warning(f"No video files found in: {course_dir}")
             return {}
         
-        logger.info(f"🎬 PySceneDetect processing {len(video_files)} videos...")
+        logger.info(f" PySceneDetect processing {len(video_files)} videos...")
         
         course_results = {
             'course_name': course_dir.name,
@@ -341,7 +341,7 @@ Focus on content that would be useful for course search and Q&A."""
                 course_results['total_scenes'] += len(scenes)
                 course_results['total_screenshots'] += len([s for s in scenes if s.get('screenshot')])
                 
-                logger.info(f"✅ {video_file.name}: {len(scenes)} scenes detected")
+                logger.info(f" {video_file.name}: {len(scenes)} scenes detected")
                 
             except Exception as e:
                 logger.error(f"Failed to process {video_file.name}: {e}")
@@ -357,10 +357,10 @@ Focus on content that would be useful for course search and Q&A."""
         with open(results_file, 'w') as f:
             json.dump(course_results, f, indent=2, default=str)
         
-        logger.info(f"🎯 PySceneDetect analysis complete:")
-        logger.info(f"   📊 {course_results['total_scenes']} scenes detected")
+        logger.info(f" PySceneDetect analysis complete:")
+        logger.info(f" {course_results['total_scenes']} scenes detected")
         logger.info(f"   📸 {course_results['total_screenshots']} screenshots captured")
-        logger.info(f"   📄 Results saved to: {results_file}")
+        logger.info(f" Results saved to: {results_file}")
         
         return course_results
     
@@ -453,13 +453,13 @@ if __name__ == "__main__":
             max_screenshots_per_video=40  # Max 40 screenshots per video
         )
         
-        print("✅ Enhanced Scene Detector with PySceneDetect initialized!")
-        print(f"🔧 Detection method: {detector.detection_method}")
-        print(f"🎯 Threshold: {detector.threshold}")
+        print(" Enhanced Scene Detector with PySceneDetect initialized!")
+        print(f" Detection method: {detector.detection_method}")
+        print(f" Threshold: {detector.threshold}")
         
         # Show recommendations
         rec = EnhancedSceneDetector.get_detection_recommendations("educational")
-        print(f"📋 Recommended settings: {rec}")
+        print(f" Recommended settings: {rec}")
         
     else:
-        print("❌ PySceneDetect not available. Install with: pip install scenedetect[opencv]")
+        print(" PySceneDetect not available. Install with: pip install scenedetect[opencv]")
