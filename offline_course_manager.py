@@ -248,3 +248,72 @@ class OfflineCourseManager:
             return True
         except Exception:
             return False
+    
+    def index_course_documents(self, course_name: str, documents: List[Dict[str, Any]]):
+        """
+        Index documents for a specific course in offline mode.
+        Creates a simple JSON-based storage without complex dependencies.
+        
+        Args:
+            course_name: Name of the course
+            documents: List of processed document dictionaries
+        """
+        logger.info(f"Indexing {len(documents)} documents for course: {course_name}")
+        
+        try:
+            # Create course directory
+            course_index_dir = self.indexed_courses_dir / course_name
+            course_index_dir.mkdir(exist_ok=True)
+            
+            # Save documents in simple JSON format for offline mode
+            documents_path = course_index_dir / "documents.json"
+            
+            # Prepare documents for storage
+            stored_docs = []
+            for doc in documents:
+                stored_doc = {
+                    'file_name': doc.get('file_name', ''),
+                    'file_type': doc.get('file_type', ''),
+                    'file_path': doc.get('file_path', ''),
+                    'content': doc.get('content', ''),
+                    'is_syllabus': doc.get('is_syllabus', False),
+                    'syllabus_weight': doc.get('syllabus_weight', 1.0),
+                    'character_count': doc.get('character_count', len(doc.get('content', ''))),
+                    'word_count': doc.get('word_count', len(doc.get('content', '').split())),
+                    'processed_at': datetime.now().isoformat()
+                }
+                stored_docs.append(stored_doc)
+            
+            # Save documents to JSON
+            with open(documents_path, 'w', encoding='utf-8') as f:
+                json.dump(stored_docs, f, indent=2, ensure_ascii=False)
+            
+            # Save course metadata
+            metadata = {
+                'course_name': course_name,
+                'document_count': len(documents),
+                'syllabus_documents': sum(1 for doc in documents if doc.get('is_syllabus', False)),
+                'last_indexed': datetime.now().isoformat(),
+                'document_types': self._get_document_type_counts(documents),
+                'total_content_length': sum(doc.get('character_count', 0) for doc in documents),
+                'storage_format': 'offline_json',
+                'indexed_by': 'OfflineCourseManager'
+            }
+            
+            metadata_path = course_index_dir / "metadata.json"
+            with open(metadata_path, 'w', encoding='utf-8') as f:
+                json.dump(metadata, f, indent=2, ensure_ascii=False)
+            
+            logger.info(f"Successfully indexed course in offline mode: {course_name}")
+            
+        except Exception as e:
+            logger.error(f"Error indexing course {course_name}: {e}")
+            raise
+    
+    def _get_document_type_counts(self, documents: List[Dict[str, Any]]) -> Dict[str, int]:
+        """Get count of each document type"""
+        type_counts = {}
+        for doc in documents:
+            doc_type = doc.get('file_type', 'unknown')
+            type_counts[doc_type] = type_counts.get(doc_type, 0) + 1
+        return type_counts
