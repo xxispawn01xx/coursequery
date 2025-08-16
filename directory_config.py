@@ -43,27 +43,27 @@ class DirectoryConfigManager:
         # Check if archived_courses exists in current directory
         archived_courses_path = cwd / "archived_courses"
         if archived_courses_path.exists():
-            print(f"📁 Found archived_courses in current directory: {archived_courses_path}")
+            print(f"Found archived_courses in current directory: {archived_courses_path}")
             return str(archived_courses_path)
         
         # Check if we're inside coursequery directory already
         if cwd.name == "coursequery" and archived_courses_path.exists():
-            print(f"📁 Running from coursequery directory: {archived_courses_path}")
+            print(f"Running from coursequery directory: {archived_courses_path}")
             return str(archived_courses_path)
         
         # Check parent directory for archived_courses
         parent_archived = cwd.parent / "archived_courses"
         if parent_archived.exists():
-            print(f"📁 Found archived_courses in parent directory: {parent_archived}")
+            print(f"Found archived_courses in parent directory: {parent_archived}")
             return str(parent_archived)
         
         # Default: create archived_courses in current directory if H:\ not accessible
         if not os.path.exists(ROOT_COURSEQUERY_DIRECTORY):
-            print(f"📁 Root directory not accessible ({ROOT_COURSEQUERY_DIRECTORY}), using local: {archived_courses_path}")
+            print(f"Root directory not accessible ({ROOT_COURSEQUERY_DIRECTORY}), using local: {archived_courses_path}")
             return str(archived_courses_path)
         
         # Fallback to configured root location
-        print(f"📁 Using configured root location: {ROOT_COURSEQUERY_DIRECTORY}")
+        print(f"Using configured root location: {ROOT_COURSEQUERY_DIRECTORY}")
         return os.path.join(ROOT_COURSEQUERY_DIRECTORY, "archived_courses")
     
     def load_configuration(self):
@@ -76,25 +76,26 @@ class DirectoryConfigManager:
                 # Override master directory if saved configuration exists
                 if 'master_directory' in config_data:
                     self.MASTER_COURSE_DIRECTORY = config_data['master_directory']
-                    print(f"📁 Loaded saved directory: {self.MASTER_COURSE_DIRECTORY}")
+                    print(f"Loaded saved directory: {self.MASTER_COURSE_DIRECTORY}")
         except Exception as e:
-            print(f"⚠️ Could not load directory config: {e}")
+            print(f"Could not load directory config: {e}")
     
     def save_configuration(self):
         """Save current directory configuration."""
         try:
+            from datetime import datetime
             config_data = {
                 'master_directory': self.MASTER_COURSE_DIRECTORY,
-                'last_updated': str(Path.now() if hasattr(Path, 'now') else 'unknown')
+                'last_updated': datetime.now().isoformat()
             }
             
             with open(self.config_file, 'w', encoding='utf-8') as f:
                 json.dump(config_data, f, indent=2, ensure_ascii=False)
             
-            print(f"💾 Saved directory configuration: {self.MASTER_COURSE_DIRECTORY}")
+            print(f"Saved directory configuration: {self.MASTER_COURSE_DIRECTORY}")
             return True
         except Exception as e:
-            print(f"⚠️ Could not save directory config: {e}")
+            print(f"Could not save directory config: {e}")
             return False
     
     def setup_all_paths(self):
@@ -106,13 +107,13 @@ class DirectoryConfigManager:
         if self.master_path.exists():
             self.raw_docs_dir = self.master_path
             self.using_master = True
-            print(f"📁 Using MASTER course directory: {self.raw_docs_dir}")
+            print(f"Using MASTER course directory: {self.raw_docs_dir}")
         else:
             # Fallback to local directory
             self.raw_docs_dir = Path(__file__).parent / "archived_courses"
             self.using_master = False
-            print(f"📁 Using FALLBACK directory: {self.raw_docs_dir}")
-            print(f"⚠️ Master directory not accessible: {self.MASTER_COURSE_DIRECTORY}")
+            print(f"Using FALLBACK directory: {self.raw_docs_dir}")
+            print(f"Master directory not accessible: {self.MASTER_COURSE_DIRECTORY}")
         
         # Derived paths (always local for processing)
         base_dir = Path(__file__).parent
@@ -138,11 +139,11 @@ class DirectoryConfigManager:
             
             # Validate the new path
             if not new_path_obj.exists():
-                print(f"❌ Directory does not exist: {new_path}")
+                print(f"Directory does not exist: {new_path}")
                 return False
             
             if not new_path_obj.is_dir():
-                print(f"❌ Path is not a directory: {new_path}")
+                print(f"Path is not a directory: {new_path}")
                 return False
             
             # Update master directory
@@ -155,14 +156,14 @@ class DirectoryConfigManager:
             # Save configuration
             self.save_configuration()
             
-            print(f"✅ Updated master directory:")
+            print(f"Updated master directory:")
             print(f"   From: {old_path}")
             print(f"   To:   {self.MASTER_COURSE_DIRECTORY}")
             
             return True
             
         except Exception as e:
-            print(f"❌ Error updating master directory: {e}")
+            print(f"Error updating master directory: {e}")
             return False
     
     def get_course_path(self, course_name: str) -> Path:
@@ -207,7 +208,7 @@ class DirectoryConfigManager:
                             'file_count': file_count
                         })
         except Exception as e:
-            print(f"❌ Error listing courses: {e}")
+            print(f"Error listing courses: {e}")
         
         return sorted(courses, key=lambda x: x['name'])
     

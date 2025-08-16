@@ -1,0 +1,116 @@
+
++------------------------- Traceback (most recent call last) --------------------------+
+| C:\Program                                                                           |
+| Files\Python312\Lib\site-packages\streamlit\runtime\scriptrunner\exec_code.py:128 in |
+| exec_func_with_error_handling                                                        |
+|                                                                                      |
+| C:\Program                                                                           |
+| Files\Python312\Lib\site-packages\streamlit\runtime\scriptrunner\script_runner.py:66 |
+| 9 in code_to_exec                                                                    |
+|                                                                                      |
+| H:\Archive Classes\coursequery\app.py:4555 in <module>                               |
+|                                                                                      |
+|   4552                                                                               |
+|   4553                                                                               |
+|   4554 if __name__ == "__main__":                                                    |
+| > 4555     main()                                                                    |
+|   4556                                                                               |
+|                                                                                      |
+| H:\Archive Classes\coursequery\app.py:4550 in main                                   |
+|                                                                                      |
+|   4547                                                                               |
+|   4548 def main():                                                                   |
+|   4549     """Application entry point."""                                            |
+| > 4550     app = RealEstateAIApp()                                                   |
+|   4551     app.run()                                                                 |
+|   4552                                                                               |
+|   4553                                                                               |
+|                                                                                      |
+| H:\Archive Classes\coursequery\app.py:93 in __init__                                 |
+|                                                                                      |
+|     90                                                                               |
+|     91     def __init__(self):                                                       |
+|     92         """Initialize the application."""                                     |
+| >   93         self.config = Config()                                                |
+|     94                                                                               |
+|     95         # FORCE local directory usage - override any H:\ detection            |
+|     96         app_dir = Path(__file__).parent                                       |
+|                                                                                      |
+| H:\Archive Classes\coursequery\config.py:22 in __init__                              |
+|                                                                                      |
+|    19     def __init__(self):                                                        |
+|    20         """Initialize configuration."""                                        |
+|    21         self.base_dir = Path(__file__).parent                                  |
+| >  22         self.setup_directories()                                               |
+|    23         self.setup_model_config()                                              |
+|    24                                                                                |
+|    25     def setup_directories(self):                                               |
+|                                                                                      |
+| H:\Archive Classes\coursequery\config.py:28 in setup_directories                     |
+|                                                                                      |
+|    25     def setup_directories(self):                                               |
+|    26         """Create necessary directories for offline usage."""                  |
+|    27         # Import centralized directory configuration                           |
+| >  28         from directory_config import get_directory_config                      |
+|    29                                                                                |
+|    30         # Get global directory configuration                                   |
+|    31         dir_config = get_directory_config()                                    |
+|                                                                                      |
+| H:\Archive Classes\coursequery\directory_config.py:250 in <module>                   |
+|                                                                                      |
+|   247         return validation                                                      |
+|   248                                                                                |
+|   249 # Global instance for system-wide use                                          |
+| > 250 directory_config = DirectoryConfigManager()                                    |
+|   251                                                                                |
+|   252 def get_master_directory() -> str:                                             |
+|   253     """Get the master course directory path."""                                |
+|                                                                                      |
+| H:\Archive Classes\coursequery\directory_config.py:26 in __init__                    |
+|                                                                                      |
+|    23         # MASTER COURSE DIRECTORY CONFIGURATION                                |
+|    24         # =====================================                                |
+|    25         # First try to find coursequery directory dynamically                  |
+| >  26         self.MASTER_COURSE_DIRECTORY = self.find_coursequery_directory()       |
+|    27                                                                                |
+|    28         # Configuration file for persistence                                   |
+|    29         self.config_file = Path(__file__).parent / "directory_config.json"     |
+|                                                                                      |
+| H:\Archive Classes\coursequery\directory_config.py:46 in find_coursequery_directory  |
+|                                                                                      |
+|    43         # Check if archived_courses exists in current directory                |
+|    44         archived_courses_path = cwd / "archived_courses"                       |
+|    45         if archived_courses_path.exists():                                     |
+| >  46             print(f"2025-08-16 06:31:20.887 Uncaught app execution
+Traceback (most recent call last):
+  File "C:\Program Files\Python312\Lib\site-packages\streamlit\runtime\scriptrunner\exec_code.py", line 128, in exec_func_with_error_handling
+    result = func()
+             ^^^^^^
+  File "C:\Program Files\Python312\Lib\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 669, in code_to_exec
+    exec(code, module.__dict__)  # noqa: S102
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "H:\Archive Classes\coursequery\app.py", line 4555, in <module>
+    main()
+  File "H:\Archive Classes\coursequery\app.py", line 4550, in main
+    app = RealEstateAIApp()
+          ^^^^^^^^^^^^^^^^^
+  File "H:\Archive Classes\coursequery\app.py", line 93, in __init__
+    self.config = Config()
+                  ^^^^^^^^
+  File "H:\Archive Classes\coursequery\config.py", line 22, in __init__
+    self.setup_directories()
+  File "H:\Archive Classes\coursequery\config.py", line 28, in setup_directories
+    from directory_config import get_directory_config
+  File "H:\Archive Classes\coursequery\directory_config.py", line 250, in <module>
+    directory_config = DirectoryConfigManager()
+                       ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "H:\Archive Classes\coursequery\directory_config.py", line 26, in __init__
+    self.MASTER_COURSE_DIRECTORY = self.find_coursequery_directory()
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "H:\Archive Classes\coursequery\directory_config.py", line 46, in find_coursequery_directory
+    print(f"\U0001f4c1 Found archived_courses in current directory: {archived_courses_path}")
+  File "C:\Program Files\Python312\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f4c1' in position 0: character maps to <undefined>
+
